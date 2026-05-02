@@ -5,6 +5,10 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), tsconfigPaths()],
+  server: {
+    port: 8080,
+    host: true,
+  },
   build: {
     outDir: "dist/vercel",
     emptyOutDir: true,
