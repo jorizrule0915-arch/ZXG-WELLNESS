@@ -1,13 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductForm, type ProductInput } from "@/components/admin/ProductForm";
 
-export const Route = createFileRoute("/_admin/admin/products/$id")({
-  head: () => ({ meta: [{ title: "Edit Product — ZXG Admin" }] }),
-  component: EditProduct,
-});
+export const Route = createFileRoute("/_admin/admin/products/$id")({ component: EditProduct });
 
 function EditProduct() {
   const { id } = Route.useParams();
@@ -39,7 +37,9 @@ function EditProduct() {
   }, [id]);
 
   return (
-    <div className="px-6 lg:px-10 py-10">
+    <>
+      <Helmet><title>Edit Product — ZXG Admin</title></Helmet>
+      <div className="px-6 lg:px-10 py-10">
       <Link
         to="/admin/products"
         className="inline-flex items-center gap-1 text-[10px] uppercase tracking-luxury text-muted-foreground hover:text-gold mb-6"
@@ -57,6 +57,7 @@ function EditProduct() {
       ) : (
         <ProductForm initial={initial} />
       )}
-    </div>
+      </div>
+    </>
   );
 }

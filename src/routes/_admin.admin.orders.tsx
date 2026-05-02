@@ -1,14 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_admin/admin/orders")({
-  head: () => ({ meta: [{ title: "Orders — ZXG Admin" }] }),
-  component: AdminOrders,
-});
+export const Route = createFileRoute("/_admin/admin/orders")({ component: AdminOrders });
 
 type Item = { product_name: string; quantity: number; unit_price: number };
 type Order = {
@@ -43,9 +41,7 @@ function AdminOrders() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const updateStatus = async (id: string, status: Order["status"]) => {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
@@ -57,8 +53,7 @@ function AdminOrders() {
   const toggle = (id: string) => {
     setExpanded((prev) => {
       const n = new Set(prev);
-      if (n.has(id)) n.delete(id);
-      else n.add(id);
+      if (n.has(id)) n.delete(id); else n.add(id);
       return n;
     });
   };
@@ -66,143 +61,98 @@ function AdminOrders() {
   const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
 
   return (
-    <div className="px-6 lg:px-10 py-10">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">Fulfillment</div>
-        <h1 className="font-display text-4xl md:text-5xl">Orders</h1>
-      </motion.div>
+    <>
+      <Helmet><title>Orders — ZXG Admin</title></Helmet>
+      <div className="px-6 lg:px-10 py-10">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">Fulfillment</div>
+          <h1 className="font-display text-4xl md:text-5xl">Orders</h1>
+        </motion.div>
 
-      <div className="mt-8 flex flex-wrap gap-2">
-        {(["all", ...STATUSES] as const).map((s) => (
-          <button
-            key={s}
-            onClick={() => setFilter(s)}
-            className={`px-4 py-2 text-[10px] uppercase tracking-luxury border transition-colors ${
-              filter === s
-                ? "bg-gold text-obsidian border-gold"
-                : "border-gold/30 text-muted-foreground hover:text-gold hover:border-gold/60"
-            }`}
-          >
-            {s}
-            {s !== "all" && (
-              <span className="ml-2 opacity-60">{orders.filter((o) => o.status === s).length}</span>
-            )}
-          </button>
-        ))}
-      </div>
+        <div className="mt-8 flex flex-wrap gap-2">
+          {(["all", ...STATUSES] as const).map((s) => (
+            <button key={s} onClick={() => setFilter(s)} className={`px-4 py-2 text-[10px] uppercase tracking-luxury border transition-colors ${filter === s ? "bg-gold text-obsidian border-gold" : "border-gold/30 text-muted-foreground hover:text-gold hover:border-gold/60"}`}>
+              {s}
+              {s !== "all" && <span className="ml-2 opacity-60">{orders.filter((o) => o.status === s).length}</span>}
+            </button>
+          ))}
+        </div>
 
-      <div className="mt-8 border border-gold/15 bg-charcoal">
-        {loading ? (
-          <div className="p-12 text-center text-muted-foreground text-sm">Loading…</div>
-        ) : filtered.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground text-sm">No orders</div>
-        ) : (
-          <ul className="divide-y divide-gold/10">
-            {filtered.map((o) => {
-              const isOpen = expanded.has(o.id);
-              return (
-                <li key={o.id}>
-                  <button
-                    onClick={() => toggle(o.id)}
-                    className="w-full grid grid-cols-12 items-center px-6 py-5 hover:bg-surface/40 transition-colors text-left"
-                  >
-                    <div className="col-span-1">
-                      {isOpen ? (
-                        <ChevronDown className="h-4 w-4 text-gold" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </div>
-                    <div className="col-span-11 md:col-span-4">
-                      <div className="font-display text-lg">#{o.id.slice(0, 8)}</div>
-                      <div className="text-xs text-muted-foreground">{o.email}</div>
-                    </div>
-                    <div className="hidden md:block col-span-3 text-xs text-muted-foreground">
-                      {new Date(o.created_at).toLocaleDateString(undefined, {
-                        dateStyle: "medium",
-                      })}
-                    </div>
-                    <div className="hidden md:block col-span-2">
-                      <span className="text-[10px] uppercase tracking-luxury text-gold border border-gold/40 px-2 py-1">
-                        {o.status}
-                      </span>
-                    </div>
-                    <div className="hidden md:block col-span-2 text-right font-display text-xl text-gold">
-                      ${Number(o.total).toFixed(0)}
-                    </div>
-                  </button>
+        <div className="mt-8 border border-gold/15 bg-charcoal">
+          {loading ? (
+            <div className="p-12 text-center text-muted-foreground text-sm">Loading…</div>
+          ) : filtered.length === 0 ? (
+            <div className="p-12 text-center text-muted-foreground text-sm">No orders</div>
+          ) : (
+            <ul className="divide-y divide-gold/10">
+              {filtered.map((o) => {
+                const isOpen = expanded.has(o.id);
+                return (
+                  <li key={o.id}>
+                    <button onClick={() => toggle(o.id)} className="w-full grid grid-cols-12 items-center px-6 py-5 hover:bg-surface/40 transition-colors text-left">
+                      <div className="col-span-1">
+                        {isOpen ? <ChevronDown className="h-4 w-4 text-gold" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                      </div>
+                      <div className="col-span-11 md:col-span-4">
+                        <div className="font-display text-lg">#{o.id.slice(0, 8)}</div>
+                        <div className="text-xs text-muted-foreground">{o.email}</div>
+                      </div>
+                      <div className="hidden md:block col-span-3 text-xs text-muted-foreground">
+                        {new Date(o.created_at).toLocaleDateString(undefined, { dateStyle: "medium" })}
+                      </div>
+                      <div className="hidden md:block col-span-2">
+                        <span className="text-[10px] uppercase tracking-luxury text-gold border border-gold/40 px-2 py-1">{o.status}</span>
+                      </div>
+                      <div className="hidden md:block col-span-2 text-right font-display text-xl text-gold">
+                        ${Number(o.total).toFixed(0)}
+                      </div>
+                    </button>
 
-                  {isOpen && (
-                    <div className="px-6 pb-6 grid md:grid-cols-3 gap-8 border-t border-gold/10 bg-obsidian/40">
-                      <div>
-                        <div className="text-[10px] uppercase tracking-luxury text-gold mb-3 mt-4">
-                          Items
-                        </div>
-                        <ul className="space-y-2 text-sm">
-                          {o.order_items?.map((i, idx) => (
-                            <li key={idx} className="flex justify-between gap-4">
-                              <span>
-                                {i.product_name} × {i.quantity}
-                              </span>
-                              <span className="text-gold">
-                                ${(Number(i.unit_price) * i.quantity).toFixed(0)}
-                              </span>
+                    {isOpen && (
+                      <div className="px-6 pb-6 grid md:grid-cols-3 gap-8 border-t border-gold/10 bg-obsidian/40">
+                        <div>
+                          <div className="text-[10px] uppercase tracking-luxury text-gold mb-3 mt-4">Items</div>
+                          <ul className="space-y-2 text-sm">
+                            {o.order_items?.map((i, idx) => (
+                              <li key={idx} className="flex justify-between gap-4">
+                                <span>{i.product_name} × {i.quantity}</span>
+                                <span className="text-gold">${(Number(i.unit_price) * i.quantity).toFixed(0)}</span>
+                              </li>
+                            ))}
+                            <li className="flex justify-between pt-3 border-t border-gold/15 font-display text-lg">
+                              <span>Total</span>
+                              <span className="text-gold">${Number(o.total).toFixed(0)}</span>
                             </li>
-                          ))}
-                          <li className="flex justify-between pt-3 border-t border-gold/15 font-display text-lg">
-                            <span>Total</span>
-                            <span className="text-gold">${Number(o.total).toFixed(0)}</span>
-                          </li>
-                        </ul>
-                      </div>
-
-                      <div>
-                        <div className="text-[10px] uppercase tracking-luxury text-gold mb-3 mt-4">
-                          Shipping
+                          </ul>
                         </div>
-                        <div className="text-sm space-y-1 text-foreground/80">
-                          <div>{o.shipping_name}</div>
-                          <div>{o.shipping_address}</div>
-                          <div>
-                            {o.shipping_city}, {o.shipping_zip}
+                        <div>
+                          <div className="text-[10px] uppercase tracking-luxury text-gold mb-3 mt-4">Shipping</div>
+                          <div className="text-sm space-y-1 text-foreground/80">
+                            <div>{o.shipping_name}</div>
+                            <div>{o.shipping_address}</div>
+                            <div>{o.shipping_city}, {o.shipping_zip}</div>
+                            <div className="text-muted-foreground text-xs mt-2">{o.email}</div>
                           </div>
-                          <div className="text-muted-foreground text-xs mt-2">{o.email}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] uppercase tracking-luxury text-gold mb-3 mt-4">Update Status</div>
+                          <div className="flex flex-wrap gap-2">
+                            {STATUSES.map((s) => (
+                              <button key={s} onClick={() => updateStatus(o.id, s)} disabled={o.status === s} className={`px-3 py-2 text-[10px] uppercase tracking-luxury border transition-colors ${o.status === s ? "bg-gold text-obsidian border-gold cursor-default" : "border-gold/30 text-muted-foreground hover:text-gold hover:border-gold"}`}>
+                                {s}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
-
-                      <div>
-                        <div className="text-[10px] uppercase tracking-luxury text-gold mb-3 mt-4">
-                          Update Status
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {STATUSES.map((s) => (
-                            <button
-                              key={s}
-                              onClick={() => updateStatus(o.id, s)}
-                              disabled={o.status === s}
-                              className={`px-3 py-2 text-[10px] uppercase tracking-luxury border transition-colors ${
-                                o.status === s
-                                  ? "bg-gold text-obsidian border-gold cursor-default"
-                                  : "border-gold/30 text-muted-foreground hover:text-gold hover:border-gold"
-                              }`}
-                            >
-                              {s}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

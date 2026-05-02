@@ -1,18 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
 import { useState, type FormEvent } from "react";
 import { useCart, cartTotal } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/checkout")({
-  head: () => ({
-    meta: [
-      { title: "Checkout — ZXG Wellness" },
-      { name: "description", content: "Complete your ZXG Wellness order." },
-    ],
-  }),
-  component: CheckoutPage,
-});
+export const Route = createFileRoute("/checkout")({ component: CheckoutPage });
 
 function CheckoutPage() {
   const { items, clear } = useCart();
@@ -110,7 +103,9 @@ function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 lg:px-10 py-20 md:py-28">
+    <>
+      <Helmet><title>Checkout — ZXG Wellness</title></Helmet>
+      <div className="mx-auto max-w-6xl px-6 lg:px-10 py-20 md:py-28">
       <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Final Step</div>
       <h1 className="font-display text-5xl md:text-6xl mb-6">Checkout</h1>
 
@@ -198,6 +193,7 @@ function CheckoutPage() {
         </aside>
       </form>
     </div>
+    </>
   );
 }
 

@@ -1,14 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_admin/admin/products")({
-  head: () => ({ meta: [{ title: "Products — ZXG Admin" }] }),
-  component: AdminProducts,
-});
+export const Route = createFileRoute("/_admin/admin/products")({ component: AdminProducts });
 
 type Row = {
   id: string;
@@ -55,7 +53,9 @@ function AdminProducts() {
   };
 
   return (
-    <div className="px-6 lg:px-10 py-10">
+    <>
+      <Helmet><title>Products — ZXG Admin</title></Helmet>
+      <div className="px-6 lg:px-10 py-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -152,6 +152,7 @@ function AdminProducts() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

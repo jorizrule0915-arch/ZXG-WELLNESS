@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,12 +13,7 @@ type Order = {
   order_items: { product_name: string; quantity: number }[];
 };
 
-export const Route = createFileRoute("/account")({
-  head: () => ({
-    meta: [{ title: "My Atelier — ZXG Wellness" }],
-  }),
-  component: AccountPage,
-});
+export const Route = createFileRoute("/account")({ component: AccountPage });
 
 function AccountPage() {
   const { user, loading, signOut, isAdmin } = useAuth();
@@ -46,6 +42,8 @@ function AccountPage() {
   }
 
   return (
+    <>
+      <Helmet><title>My Atelier — ZXG Wellness</title></Helmet>
     <div className="mx-auto max-w-5xl px-6 lg:px-10 py-20 md:py-28">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -125,5 +123,6 @@ function AccountPage() {
         )}
       </section>
     </div>
+    </>
   );
 }

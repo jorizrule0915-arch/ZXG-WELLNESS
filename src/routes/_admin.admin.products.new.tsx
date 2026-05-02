@@ -1,15 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
 import { ChevronLeft } from "lucide-react";
 import { ProductForm } from "@/components/admin/ProductForm";
 
-export const Route = createFileRoute("/_admin/admin/products/new")({
-  head: () => ({ meta: [{ title: "New Product — ZXG Admin" }] }),
-  component: NewProduct,
-});
+export const Route = createFileRoute("/_admin/admin/products/new")({ component: NewProduct });
 
 function NewProduct() {
   return (
-    <div className="px-6 lg:px-10 py-10">
+    <>
+      <Helmet><title>New Product — ZXG Admin</title></Helmet>
+      <div className="px-6 lg:px-10 py-10">
       <Link
         to="/admin/products"
         className="inline-flex items-center gap-1 text-[10px] uppercase tracking-luxury text-muted-foreground hover:text-gold mb-6"
@@ -21,6 +21,7 @@ function NewProduct() {
       </h1>
       <p className="text-sm text-muted-foreground mb-10">Add a new piece to the atelier.</p>
       <ProductForm />
-    </div>
+      </div>
+    </>
   );
 }

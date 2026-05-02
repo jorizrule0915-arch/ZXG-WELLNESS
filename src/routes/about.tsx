@@ -1,23 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 
-export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "Our Story — ZXG Wellness" },
-      {
-        name: "description",
-        content:
-          "ZXG Wellness was founded on a single conviction: that the way we restore ourselves should be as considered as the way we adorn ourselves.",
-      },
-      { property: "og:title", content: "Our Story — ZXG Wellness" },
-    ],
-  }),
-  component: AboutPage,
-});
+export const Route = createFileRoute("/about")({ component: AboutPage });
 
 function AboutPage() {
   return (
+    <>
+      <Helmet>
+        <title>Our Story — ZXG Wellness</title>
+        <meta name="description" content="ZXG Wellness was founded on a single conviction: that the way we restore ourselves should be as considered as the way we adorn ourselves." />
+      </Helmet>
     <div className="mx-auto max-w-4xl px-6 lg:px-10 py-20 md:py-32">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -81,5 +74,6 @@ function AboutPage() {
         ))}
       </div>
     </div>
+    </>
   );
 }

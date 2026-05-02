@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { fetchProducts, type Product } from "@/lib/products";
@@ -6,19 +7,7 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { productImages } from "@/lib/productImages";
 import { localProducts } from "@/lib/products";
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "ZXG Wellness — Luxury Wellness Atelier" },
-      {
-        name: "description",
-        content:
-          "Premium Creatine and Body Balm crafted for performance and recovery. A black & gold wellness atelier.",
-      },
-    ],
-  }),
-  component: Index,
-});
+export const Route = createFileRoute("/")({ component: Index });
 
 const heroSlides = [
   { slug: "creatine", label: localProducts[0].name, tagline: localProducts[0].tagline },
@@ -40,9 +29,14 @@ function Index() {
 
   return (
     <>
+      <Helmet>
+        <title>ZXG Wellness — Luxury Wellness Atelier</title>
+        <meta name="description" content="Premium Creatine and Body Balm crafted for performance and recovery. A black & gold wellness atelier." />
+      </Helmet>
+
       <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-obsidian">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {typeof window !== "undefined" && Array.from({ length: 14 }).map((_, i) => (
+          {Array.from({ length: 14 }).map((_, i) => (
             <motion.span
               key={i}
               className="absolute h-1 w-1 rounded-full bg-gold/60"
@@ -86,7 +80,6 @@ function Index() {
             </div>
           </motion.div>
 
-          {/* Hero Product Carousel */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
@@ -126,9 +119,7 @@ function Index() {
                 <button
                   key={i}
                   onClick={() => setHeroIdx(i)}
-                  className={`h-px w-8 transition-all duration-300 ${
-                    i === heroIdx ? "bg-gold" : "bg-gold/30"
-                  }`}
+                  className={`h-px w-8 transition-all duration-300 ${i === heroIdx ? "bg-gold" : "bg-gold/30"}`}
                 />
               ))}
             </div>
@@ -152,41 +143,22 @@ function Index() {
 
       <section className="py-32 border-t border-gold/10">
         <div className="mx-auto max-w-5xl px-6 lg:px-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
             <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">
               <span className="gold-line">The Promise</span>
             </div>
             <h2 className="font-display text-3xl md:text-5xl leading-tight max-w-3xl mx-auto">
               Considered ingredients.{" "}
-              <span className="text-gradient-gold italic">Editorial restraint.</span> Ritual at
-              every touchpoint.
+              <span className="text-gradient-gold italic">Editorial restraint.</span> Ritual at every touchpoint.
             </h2>
           </motion.div>
-
           <div className="mt-20 grid md:grid-cols-3 gap-12 text-left">
             {[
-              {
-                t: "Performance",
-                d: "ZXG Creatine is formulated to support strength output, endurance, and hydration during training.",
-              },
-              {
-                t: "Recovery",
-                d: "ZXG Body Balm restores and hydrates skin with botanical extracts. No fillers, no compromises.",
-              },
+              { t: "Performance", d: "ZXG Creatine is formulated to support strength output, endurance, and hydration during training." },
+              { t: "Recovery", d: "ZXG Body Balm restores and hydrates skin with botanical extracts. No fillers, no compromises." },
               { t: "Ritual", d: "Packaged to be displayed. Designed to be returned to, daily." },
             ].map((b, i) => (
-              <motion.div
-                key={b.t}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-              >
+              <motion.div key={b.t} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: i * 0.15 }}>
                 <div className="font-display text-5xl text-gradient-gold mb-4">0{i + 1}</div>
                 <h3 className="font-display text-xl mb-3">{b.t}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{b.d}</p>
@@ -200,27 +172,18 @@ function Index() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="flex items-end justify-between flex-wrap gap-6 mb-16">
             <div>
-              <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">
-                The Collection
-              </div>
+              <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">The Collection</div>
               <h2 className="font-display text-4xl md:text-5xl">Featured Products</h2>
             </div>
-            <Link
-              to="/products"
-              className="text-[11px] uppercase tracking-luxury text-gold border-b border-gold/40 pb-1 hover:border-gold"
-            >
+            <Link to="/products" className="text-[11px] uppercase tracking-luxury text-gold border-b border-gold/40 pb-1 hover:border-gold">
               View All →
             </Link>
           </div>
-
-          {/* Mobile: carousel. Desktop: two cards centered */}
           <div className="hidden sm:grid sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
             {products.map((p: Product, i: number) => (
               <ProductCard key={p.slug} product={p} index={i} />
             ))}
           </div>
-
-          {/* Mobile carousel */}
           <div className="sm:hidden relative">
             <div className="overflow-hidden">
               <AnimatePresence mode="wait">
@@ -242,9 +205,7 @@ function Index() {
                 <button
                   key={i}
                   onClick={() => setHeroIdx(i)}
-                  className={`h-px w-8 transition-all duration-300 ${
-                    heroIdx % Math.max(products.length, 1) === i ? "bg-gold" : "bg-gold/30"
-                  }`}
+                  className={`h-px w-8 transition-all duration-300 ${heroIdx % Math.max(products.length, 1) === i ? "bg-gold" : "bg-gold/30"}`}
                 />
               ))}
             </div>
@@ -260,10 +221,7 @@ function Index() {
           <p className="mt-6 text-base text-muted-foreground max-w-xl mx-auto">
             Premium products built for performance and recovery.
           </p>
-          <Link
-            to="/products"
-            className="mt-10 inline-flex items-center gap-3 px-10 py-4 bg-gold text-obsidian text-[11px] uppercase tracking-luxury font-medium hover:bg-gold-light transition-colors glow-gold"
-          >
+          <Link to="/products" className="mt-10 inline-flex items-center gap-3 px-10 py-4 bg-gold text-obsidian text-[11px] uppercase tracking-luxury font-medium hover:bg-gold-light transition-colors glow-gold">
             Shop Now →
           </Link>
         </div>

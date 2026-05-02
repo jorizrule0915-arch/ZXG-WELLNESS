@@ -1,10 +1,9 @@
-import { Outlet, createRootRoute, HeadContent, Scripts, Link } from "@tanstack/react-router";
+import { Outlet, createRootRoute, Link } from "@tanstack/react-router";
+import { HelmetProvider } from "react-helmet-async";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { AuthProvider } from "@/lib/auth";
-
-import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
@@ -27,51 +26,21 @@ function NotFoundComponent() {
 }
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ZXG Wellness — Luxury Wellness Atelier" },
-      {
-        name: "description",
-        content:
-          "ZXG Wellness — luxury, editorial wellness for those who pursue equilibrium. Adaptogenic elixirs, restorative skincare, ceremonial apothecary.",
-      },
-      { property: "og:title", content: "ZXG Wellness — Luxury Wellness Atelier" },
-      { property: "og:description", content: "Black & gold luxury wellness, ritually crafted." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "stylesheet", href: appCss }],
-  }),
-  shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
 });
 
-function RootShell({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
 function RootComponent() {
   return (
-    <AuthProvider>
-      <Header />
-      <main className="min-h-screen pt-16">
-        <Outlet />
-      </main>
-      <Footer />
-      <CartDrawer />
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <Header />
+        <main className="min-h-screen pt-16">
+          <Outlet />
+        </main>
+        <Footer />
+        <CartDrawer />
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
