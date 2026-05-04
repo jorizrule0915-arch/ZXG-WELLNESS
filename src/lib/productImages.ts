@@ -1,6 +1,6 @@
 import creatineFront from "@/assets/Creatine Products/front Creatine.png";
 import creatineBack from "@/assets/Creatine Products/back Creatine.png";
-import bodyBalm from "@/assets/Body Balm/Body Balm.jpg";
+import bodyBalm from "@/assets/Body Balm/Body Balm.png";
 import bodyBalmBack from "@/assets/Body Balm/backbalm.png";
 import bodyBalmLifestyle from "@/assets/Body Balm/lifestylebalm.png";
 
