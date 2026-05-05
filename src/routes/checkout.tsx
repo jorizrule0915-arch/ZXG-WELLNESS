@@ -167,7 +167,7 @@ function CheckoutPage() {
   // Show payment form after shipping info is submitted
   if (clientSecret && formData) {
     return (
-      <StripeProvider>
+      <StripeProvider clientSecret={clientSecret}>
         <CheckoutPaymentForm
           clientSecret={clientSecret}
           isProcessing={submitting}
@@ -296,7 +296,6 @@ function CheckoutPaymentForm({
           <div>
             <FormSection title="Card Details">
               <PaymentForm
-                clientSecret={clientSecret}
                 isProcessing={isProcessing}
                 onSuccess={onSuccess}
                 onError={onError}

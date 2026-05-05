@@ -34,6 +34,7 @@ export async function createPaymentIntent(
       amount: Math.round(amount * 100), // Convert to cents
       currency: "usd",
       receipt_email: email,
+      automatic_payment_methods: { enabled: true },
       metadata,
     });
 
