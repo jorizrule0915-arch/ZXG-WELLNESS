@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { useState, type FormEvent } from "react";
 import { useCart, cartTotal } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
+import { imageFor } from "@/lib/productImages";
 import { supabase } from "@/integrations/supabase/client";
 import { StripeProvider } from "@/components/site/StripeProvider";
 import { PaymentForm } from "@/components/site/PaymentForm";
@@ -220,7 +221,7 @@ function CheckoutPage() {
             <ul className="space-y-4">
               {items.map((i) => (
                 <li key={i.slug} className="flex items-center gap-3 text-sm">
-                  <img src={i.image} alt="" className="h-14 w-12 object-cover bg-surface-2" />
+                  <img src={imageFor(i.slug) || i.image} alt="" className="h-14 w-12 object-cover bg-surface-2" />
                   <div className="flex-1">
                     <div className="font-display text-base">{i.name}</div>
                     <div className="text-xs text-muted-foreground">Qty {i.quantity}</div>
@@ -296,7 +297,7 @@ function CheckoutPaymentForm({
             <ul className="space-y-4">
               {items.map((i) => (
                 <li key={i.slug} className="flex items-center gap-3 text-sm">
-                  <img src={i.image} alt="" className="h-14 w-12 object-cover bg-surface-2" />
+                  <img src={imageFor(i.slug) || i.image} alt="" className="h-14 w-12 object-cover bg-surface-2" />
                   <div className="flex-1">
                     <div className="font-display text-base">{i.name}</div>
                     <div className="text-xs text-muted-foreground">Qty {i.quantity}</div>

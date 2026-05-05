@@ -1,16 +1,16 @@
-import creatineFront from "@/assets/Creatine Products/front Creatine.png";
-import creatineBack from "@/assets/Creatine Products/back Creatine.png";
-import bodyBalm from "@/assets/Body Balm/Body Balm.png";
-import bodyBalmBack from "@/assets/Body Balm/backbalm.png";
-import bodyBalmLifestyle from "@/assets/Body Balm/lifestylebalm.png";
+import creatineFront from "@/assets/creatine-products/front-creatine.png";
+import creatineBack from "@/assets/creatine-products/back-creatine.png";
+import bodyBalm from "@/assets/body-balm/body-balm.png";
+import bodyBalmBack from "@/assets/body-balm/backbalm.png";
+import bodyBalmLifestyle from "@/assets/body-balm/lifestylebalm.png";
 
 export const productImages: Record<string, string> = {
-  "creatine": creatineFront,
+  creatine: creatineFront,
   "body-balm": bodyBalm,
 };
 
 export const productGallery: Record<string, string[]> = {
-  "creatine": [creatineFront, creatineBack],
+  creatine: [creatineFront, creatineBack],
   "body-balm": [bodyBalm, bodyBalmBack, bodyBalmLifestyle],
 };
 

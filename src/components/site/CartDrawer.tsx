@@ -65,7 +65,7 @@ export function CartDrawer() {
                   {items.map((i) => (
                     <li key={i.slug} className="flex gap-4">
                       <img
-                        src={i.image || imageFor(i.slug)}
+                        src={imageFor(i.slug) || i.image}
                         alt={i.name}
                         className="h-24 w-20 object-cover bg-surface-2 rounded-sm"
                         loading="lazy"
