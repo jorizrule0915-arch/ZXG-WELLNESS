@@ -41,30 +41,18 @@ function CheckoutPage() {
         throw new Error("Email is required");
       }
 
-      const paymentData = {
-        amount: total,
-        email: String(email),
-      };
-
-      console.log("Sending payment request:", paymentData);
-
       const response = await fetch("/api/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(paymentData),
+        body: JSON.stringify({ amount: total, email: String(email) }),
       });
-
-      console.log("Payment response status:", response.status);
 
       let responseData;
       try {
         responseData = await response.json();
-      } catch (parseError) {
-        console.error("Failed to parse response as JSON:", parseError);
+      } catch {
         throw new Error(`Invalid response from server: ${response.status}`);
       }
-
-      console.log("Payment response data:", responseData);
 
       if (!response.ok) {
         throw new Error(responseData?.error || `Server error: ${response.status}`);
@@ -91,7 +79,7 @@ function CheckoutPage() {
         .from("orders")
         .insert({
           user_id: user.id,
-          status: "completed",
+          status: "paid",
           total,
           email: String(formData.get("email") ?? ""),
           shipping_name: `${formData.get("first") ?? ""} ${formData.get("last") ?? ""}`.trim(),

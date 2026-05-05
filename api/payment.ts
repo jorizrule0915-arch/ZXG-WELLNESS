@@ -29,8 +29,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "Email is required" });
     }
 
-    console.log(`Creating payment intent for ${email}, amount: ${amount}`);
-
     const paymentIntent = await createPaymentIntent(amount, email, {
       orderId: orderId || "",
     });
@@ -46,7 +44,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       clientSecret: secret,
     });
   } catch (error) {
-    console.error("Payment error:", error);
     const message = error instanceof Error ? error.message : "Payment intent creation failed";
     return res.status(500).json({ error: message, success: false });
   }

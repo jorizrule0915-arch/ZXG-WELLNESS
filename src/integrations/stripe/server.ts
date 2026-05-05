@@ -14,7 +14,7 @@ function getStripe() {
   }
 
   stripe = new Stripe(secretKey, {
-    apiVersion: "2024-12-18.acacia",
+    apiVersion: "2026-04-22.dahlia",
   });
 
   return stripe;
