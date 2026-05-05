@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { X, Plus, Minus } from "lucide-react";
 import { useCart, cartTotal } from "@/lib/cart";
+import { imageFor } from "@/lib/productImages";
 import { AnimatePresence, motion } from "framer-motion";
 
 export function CartDrawer() {
@@ -64,7 +65,7 @@ export function CartDrawer() {
                   {items.map((i) => (
                     <li key={i.slug} className="flex gap-4">
                       <img
-                        src={i.image}
+                        src={i.image || imageFor(i.slug)}
                         alt={i.name}
                         className="h-24 w-20 object-cover bg-surface-2 rounded-sm"
                         loading="lazy"
