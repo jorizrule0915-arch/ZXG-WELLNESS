@@ -38,25 +38,27 @@ function EditProduct() {
 
   return (
     <>
-      <Helmet><title>Edit Product — ZXG Admin</title></Helmet>
+      <Helmet>
+        <title>Edit Product — ZXG Admin</title>
+      </Helmet>
       <div className="px-6 lg:px-10 py-10">
-      <Link
-        to="/admin/products"
-        className="inline-flex items-center gap-1 text-[10px] uppercase tracking-luxury text-muted-foreground hover:text-gold mb-6"
-      >
-        <ChevronLeft className="h-3.5 w-3.5" /> Back to catalog
-      </Link>
-      <h1 className="font-display text-4xl md:text-5xl mb-2">
-        Edit <span className="text-gradient-gold italic">{initial?.name ?? "…"}</span>
-      </h1>
-      <p className="text-sm text-muted-foreground mb-10">Refine the details of this creation.</p>
-      {missing ? (
-        <div className="text-sm text-muted-foreground">Product not found.</div>
-      ) : !initial ? (
-        <div className="text-sm text-muted-foreground">Loading…</div>
-      ) : (
-        <ProductForm initial={initial} />
-      )}
+        <Link
+          to="/admin/products"
+          className="inline-flex items-center gap-1 text-[10px] uppercase tracking-luxury text-muted-foreground hover:text-gold mb-6"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" /> Back to catalog
+        </Link>
+        <h1 className="font-display text-4xl md:text-5xl mb-2">
+          Edit <span className="text-gradient-gold italic">{initial?.name ?? "…"}</span>
+        </h1>
+        <p className="text-sm text-muted-foreground mb-10">Refine the details of this creation.</p>
+        {missing ? (
+          <div className="text-sm text-muted-foreground">Product not found.</div>
+        ) : !initial ? (
+          <div className="text-sm text-muted-foreground">Loading…</div>
+        ) : (
+          <ProductForm initial={initial} />
+        )}
       </div>
     </>
   );

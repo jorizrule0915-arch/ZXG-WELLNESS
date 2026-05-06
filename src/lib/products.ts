@@ -68,7 +68,11 @@ export const localProducts: Product[] = [
     category: "Skincare",
     image: imageFor("body-balm"),
     ingredients: ["Cocoa Butter", "Shea Butter", "Squalane"],
-    benefits: ["Deep moisture for dry skin", "Lightweight and non-greasy", "Comfortable daily-use finish"],
+    benefits: [
+      "Deep moisture for dry skin",
+      "Lightweight and non-greasy",
+      "Comfortable daily-use finish",
+    ],
     featured: true,
     variants: [
       { label: "Aloe Scent", price: 16.99 },

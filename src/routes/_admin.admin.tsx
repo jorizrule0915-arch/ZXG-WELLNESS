@@ -3,7 +3,17 @@ import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { DollarSign, Package, ShoppingCart, Users, TrendingUp } from "lucide-react";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar } from "recharts";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  BarChart,
+  Bar,
+} from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_admin/admin")({ component: AdminDashboard });
@@ -24,7 +34,10 @@ function AdminDashboard() {
   useEffect(() => {
     (async () => {
       const [ordersRes, productsRes, itemsRes] = await Promise.all([
-        supabase.from("orders").select("id, created_at, total, status, email").order("created_at", { ascending: false }),
+        supabase
+          .from("orders")
+          .select("id, created_at, total, status, email")
+          .order("created_at", { ascending: false }),
         supabase.from("products").select("id", { count: "exact", head: true }),
         supabase.from("order_items").select("product_name, quantity"),
       ]);
@@ -37,19 +50,40 @@ function AdminDashboard() {
         const d = new Date();
         d.setDate(d.getDate() - i);
         const key = d.toISOString().slice(0, 10);
-        const dayRev = orders.filter((o) => o.created_at.slice(0, 10) === key).reduce((s, o) => s + Number(o.total), 0);
-        days.push({ day: d.toLocaleDateString(undefined, { month: "short", day: "numeric" }), revenue: dayRev });
+        const dayRev = orders
+          .filter((o) => o.created_at.slice(0, 10) === key)
+          .reduce((s, o) => s + Number(o.total), 0);
+        days.push({
+          day: d.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+          revenue: dayRev,
+        });
       }
 
       const map = new Map<string, number>();
-      (itemsRes.data ?? []).forEach((i) => { map.set(i.product_name, (map.get(i.product_name) ?? 0) + i.quantity); });
-      const topProducts = [...map.entries()].map(([name, qty]) => ({ name, qty })).sort((a, b) => b.qty - a.qty).slice(0, 5);
+      (itemsRes.data ?? []).forEach((i) => {
+        map.set(i.product_name, (map.get(i.product_name) ?? 0) + i.quantity);
+      });
+      const topProducts = [...map.entries()]
+        .map(([name, qty]) => ({ name, qty }))
+        .sort((a, b) => b.qty - a.qty)
+        .slice(0, 5);
 
-      setStats({ revenue, orderCount: orders.length, productCount: productsRes.count ?? 0, customerCount: 0, recentOrders: orders.slice(0, 5), revenueByDay: days, topProducts });
+      setStats({
+        revenue,
+        orderCount: orders.length,
+        productCount: productsRes.count ?? 0,
+        customerCount: 0,
+        recentOrders: orders.slice(0, 5),
+        revenueByDay: days,
+        topProducts,
+      });
     })();
   }, []);
 
-  if (!stats) return <div className="p-12 text-center text-muted-foreground text-sm">Loading atelier metrics…</div>;
+  if (!stats)
+    return (
+      <div className="p-12 text-center text-muted-foreground text-sm">Loading atelier metrics…</div>
+    );
 
   const cards = [
     { label: "Total Revenue", value: `$${stats.revenue.toFixed(0)}`, icon: DollarSign },
@@ -60,11 +94,19 @@ function AdminDashboard() {
 
   return (
     <>
-      <Helmet><title>Dashboard — ZXG Admin</title></Helmet>
+      <Helmet>
+        <title>Dashboard — ZXG Admin</title>
+      </Helmet>
       <div className="px-6 lg:px-10 py-10">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">Overview</div>
-          <h1 className="font-display text-4xl md:text-5xl">Welcome to the <span className="text-gradient-gold italic">Atelier</span></h1>
+          <h1 className="font-display text-4xl md:text-5xl">
+            Welcome to the <span className="text-gradient-gold italic">Atelier</span>
+          </h1>
           <p className="text-sm text-muted-foreground mt-2">Real-time pulse of the house.</p>
         </motion.div>
 
@@ -72,13 +114,23 @@ function AdminDashboard() {
           {cards.map((c, i) => {
             const Icon = c.icon;
             return (
-              <motion.div key={c.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 * i }} className="border border-gold/15 bg-charcoal p-6 hover:border-gold/40 transition-colors">
+              <motion.div
+                key={c.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.05 * i }}
+                className="border border-gold/15 bg-charcoal p-6 hover:border-gold/40 transition-colors"
+              >
                 <div className="flex items-start justify-between">
                   <div>
-                    <div className="text-[10px] uppercase tracking-luxury text-muted-foreground">{c.label}</div>
+                    <div className="text-[10px] uppercase tracking-luxury text-muted-foreground">
+                      {c.label}
+                    </div>
                     <div className="font-display text-3xl mt-3 text-gradient-gold">{c.value}</div>
                   </div>
-                  <div className="p-2 border border-gold/30"><Icon className="h-4 w-4 text-gold" strokeWidth={1.5} /></div>
+                  <div className="p-2 border border-gold/30">
+                    <Icon className="h-4 w-4 text-gold" strokeWidth={1.5} />
+                  </div>
                 </div>
               </motion.div>
             );
@@ -89,7 +141,9 @@ function AdminDashboard() {
           <div className="lg:col-span-2 border border-gold/15 bg-charcoal p-6">
             <div className="flex items-center gap-2 mb-6">
               <TrendingUp className="h-4 w-4 text-gold" />
-              <div className="text-[10px] uppercase tracking-luxury text-gold">Revenue · 14 days</div>
+              <div className="text-[10px] uppercase tracking-luxury text-gold">
+                Revenue · 14 days
+              </div>
             </div>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
@@ -101,10 +155,30 @@ function AdminDashboard() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid stroke="oklch(0.78 0.13 80 / 0.08)" vertical={false} />
-                  <XAxis dataKey="day" stroke="oklch(0.65 0 0)" fontSize={10} tickLine={false} axisLine={false} />
+                  <XAxis
+                    dataKey="day"
+                    stroke="oklch(0.65 0 0)"
+                    fontSize={10}
+                    tickLine={false}
+                    axisLine={false}
+                  />
                   <YAxis stroke="oklch(0.65 0 0)" fontSize={10} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ background: "oklch(0.13 0 0)", border: "1px solid oklch(0.78 0.13 80 / 0.3)", borderRadius: 0, fontSize: 12 }} labelStyle={{ color: "oklch(0.78 0.13 80)" }} />
-                  <Area type="monotone" dataKey="revenue" stroke="oklch(0.78 0.13 80)" strokeWidth={2} fill="url(#g)" />
+                  <Tooltip
+                    contentStyle={{
+                      background: "oklch(0.13 0 0)",
+                      border: "1px solid oklch(0.78 0.13 80 / 0.3)",
+                      borderRadius: 0,
+                      fontSize: 12,
+                    }}
+                    labelStyle={{ color: "oklch(0.78 0.13 80)" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="oklch(0.78 0.13 80)"
+                    strokeWidth={2}
+                    fill="url(#g)"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -119,8 +193,23 @@ function AdminDashboard() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={stats.topProducts} layout="vertical" margin={{ left: 0 }}>
                     <XAxis type="number" hide />
-                    <YAxis type="category" dataKey="name" stroke="oklch(0.96 0 0)" fontSize={10} width={100} tickLine={false} axisLine={false} />
-                    <Tooltip contentStyle={{ background: "oklch(0.13 0 0)", border: "1px solid oklch(0.78 0.13 80 / 0.3)", borderRadius: 0, fontSize: 12 }} />
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      stroke="oklch(0.96 0 0)"
+                      fontSize={10}
+                      width={100}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "oklch(0.13 0 0)",
+                        border: "1px solid oklch(0.78 0.13 80 / 0.3)",
+                        borderRadius: 0,
+                        fontSize: 12,
+                      }}
+                    />
                     <Bar dataKey="qty" fill="oklch(0.78 0.13 80)" radius={0} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -141,11 +230,17 @@ function AdminDashboard() {
                 <li key={o.id} className="flex items-center justify-between px-6 py-4">
                   <div>
                     <div className="font-display text-lg">#{o.id.slice(0, 8)}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{o.email} · {new Date(o.created_at).toLocaleDateString()}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {o.email} · {new Date(o.created_at).toLocaleDateString()}
+                    </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-[10px] uppercase tracking-luxury text-gold/80 border border-gold/30 px-2 py-1">{o.status}</span>
-                    <div className="font-display text-xl text-gold">${Number(o.total).toFixed(0)}</div>
+                    <span className="text-[10px] uppercase tracking-luxury text-gold/80 border border-gold/30 px-2 py-1">
+                      {o.status}
+                    </span>
+                    <div className="font-display text-xl text-gold">
+                      ${Number(o.total).toFixed(0)}
+                    </div>
                   </div>
                 </li>
               ))}

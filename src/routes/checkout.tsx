@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { useState, type FormEvent } from "react";
-import { useCart, cartTotal } from "@/lib/cart";
+import { useCart, cartTotal, type CartItem } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { imageFor } from "@/lib/productImages";
 import { supabase } from "@/integrations/supabase/client";
@@ -171,7 +171,9 @@ function CheckoutPage() {
 
   return (
     <>
-      <Helmet><title>Checkout — ZXG Wellness</title></Helmet>
+      <Helmet>
+        <title>Checkout — ZXG Wellness</title>
+      </Helmet>
       <div className="mx-auto max-w-6xl px-6 lg:px-10 py-20 md:py-28">
         <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Final Step</div>
         <h1 className="font-display text-5xl md:text-6xl mb-6">Checkout</h1>
@@ -217,11 +219,17 @@ function CheckoutPage() {
           </div>
 
           <aside className="bg-charcoal border border-gold/20 p-8 h-fit lg:sticky lg:top-24">
-            <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">Order Summary</div>
+            <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">
+              Order Summary
+            </div>
             <ul className="space-y-4">
               {items.map((i) => (
                 <li key={i.slug} className="flex items-center gap-3 text-sm">
-                  <img src={imageFor(i.slug) || i.image} alt="" className="h-14 w-12 object-cover bg-surface-2" />
+                  <img
+                    src={imageFor(i.slug) || i.image}
+                    alt=""
+                    className="h-14 w-12 object-cover bg-surface-2"
+                  />
                   <div className="flex-1">
                     <div className="font-display text-base">{i.name}</div>
                     <div className="text-xs text-muted-foreground">Qty {i.quantity}</div>
@@ -271,12 +279,14 @@ function CheckoutPaymentForm({
   isProcessing: boolean;
   onSuccess: () => void;
   onError: (err: string) => void;
-  items: any[];
+  items: CartItem[];
   total: number;
 }) {
   return (
     <>
-      <Helmet><title>Payment — ZXG Wellness</title></Helmet>
+      <Helmet>
+        <title>Payment — ZXG Wellness</title>
+      </Helmet>
       <div className="mx-auto max-w-6xl px-6 lg:px-10 py-20 md:py-28">
         <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Secure Payment</div>
         <h1 className="font-display text-5xl md:text-6xl mb-6">Complete Payment</h1>
@@ -284,20 +294,22 @@ function CheckoutPaymentForm({
         <div className="grid lg:grid-cols-[1fr,400px] gap-12">
           <div>
             <FormSection title="Card Details">
-              <PaymentForm
-                isProcessing={isProcessing}
-                onSuccess={onSuccess}
-                onError={onError}
-              />
+              <PaymentForm isProcessing={isProcessing} onSuccess={onSuccess} onError={onError} />
             </FormSection>
           </div>
 
           <aside className="bg-charcoal border border-gold/20 p-8 h-fit lg:sticky lg:top-24">
-            <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">Order Summary</div>
+            <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">
+              Order Summary
+            </div>
             <ul className="space-y-4">
               {items.map((i) => (
                 <li key={i.slug} className="flex items-center gap-3 text-sm">
-                  <img src={imageFor(i.slug) || i.image} alt="" className="h-14 w-12 object-cover bg-surface-2" />
+                  <img
+                    src={imageFor(i.slug) || i.image}
+                    alt=""
+                    className="h-14 w-12 object-cover bg-surface-2"
+                  />
                   <div className="flex-1">
                     <div className="font-display text-base">{i.name}</div>
                     <div className="text-xs text-muted-foreground">Qty {i.quantity}</div>

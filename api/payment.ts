@@ -10,7 +10,7 @@ function getStripe() {
 async function createPaymentIntent(
   amount: number,
   email: string,
-  metadata: Record<string, string>
+  metadata: Record<string, string>,
 ) {
   const stripe = getStripe();
   return stripe.paymentIntents.create({
@@ -37,7 +37,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!email) return res.status(400).json({ error: "Email is required" });
 
     const paymentIntent = await createPaymentIntent(amount, email, { orderId: orderId || "" });
-    if (!paymentIntent.client_secret) return res.status(500).json({ error: "Failed to get payment secret" });
+    if (!paymentIntent.client_secret)
+      return res.status(500).json({ error: "Failed to get payment secret" });
 
     return res.status(200).json({ success: true, clientSecret: paymentIntent.client_secret });
   } catch (error) {

@@ -33,7 +33,10 @@ function ProductsPage() {
     <>
       <Helmet>
         <title>The Collection — ZXG Wellness</title>
-        <meta name="description" content="Explore the ZXG Wellness collection — Creatine Performance Matrix Powder and restorative Body Balm." />
+        <meta
+          name="description"
+          content="Explore the ZXG Wellness collection — Creatine Performance Matrix Powder and restorative Body Balm."
+        />
       </Helmet>
 
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-20 md:py-28">
@@ -68,7 +71,9 @@ function ProductsPage() {
         {loading ? (
           <div className="text-center text-muted-foreground py-20">Loading the collection…</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center text-muted-foreground py-20">No products found for this collection.</div>
+          <div className="text-center text-muted-foreground py-20">
+            No products found for this collection.
+          </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14">
             {filtered.map((p, i) => (

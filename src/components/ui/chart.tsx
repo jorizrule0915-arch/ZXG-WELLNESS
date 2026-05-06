@@ -89,8 +89,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${safeId}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const rawColor =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+    const rawColor = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
     const color = rawColor ? sanitizeCssColor(rawColor) : null;
     return color ? `  --color-${key.replace(/[^a-zA-Z0-9-_]/g, "")}: ${color};` : null;
   })

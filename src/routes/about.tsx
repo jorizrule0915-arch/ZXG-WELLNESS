@@ -9,7 +9,10 @@ function AboutPage() {
     <>
       <Helmet>
         <title>Our Story — ZXG Wellness</title>
-        <meta name="description" content="ZXG Wellness was built on a simple belief: that caring for yourself should feel as meaningful as anything else you do with intention." />
+        <meta
+          name="description"
+          content="ZXG Wellness was built on a simple belief: that caring for yourself should feel as meaningful as anything else you do with intention."
+        />
       </Helmet>
       <div className="mx-auto max-w-4xl px-6 lg:px-10 py-20 md:py-32">
         <motion.div

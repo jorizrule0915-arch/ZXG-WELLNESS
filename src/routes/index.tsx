@@ -2,10 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { fetchProducts, type Product } from "@/lib/products";
-import { ProductCard } from "@/components/site/ProductCard";
 import { productImages } from "@/lib/productImages";
 import { localProducts } from "@/lib/products";
+import creatineVideo from "@/assets/Creatine Production Video.mp4";
 
 export const Route = createFileRoute("/")({ component: Index });
 
@@ -15,13 +14,7 @@ const heroSlides = [
 ];
 
 function Index() {
-  const [products, setProducts] = useState<Product[]>([]);
   const [heroIdx, setHeroIdx] = useState(0);
-
-  useEffect(() => {
-    fetchProducts().then(setProducts).catch(console.error);
-  }, []);
-
   useEffect(() => {
     const t = setInterval(() => setHeroIdx((i) => (i + 1) % heroSlides.length), 3000);
     return () => clearInterval(t);
@@ -31,7 +24,10 @@ function Index() {
     <>
       <Helmet>
         <title>ZXG Wellness — Luxury Wellness Atelier</title>
-        <meta name="description" content="Premium Creatine and Body Balm crafted for performance and recovery. A black & gold wellness atelier." />
+        <meta
+          name="description"
+          content="Premium Creatine and Body Balm crafted for performance and recovery. A black & gold wellness atelier."
+        />
       </Helmet>
 
       <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-obsidian">
@@ -109,8 +105,12 @@ function Index() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <div className="font-display text-lg text-foreground leading-tight">{heroSlides[heroIdx].label}</div>
-                  <div className="text-[10px] uppercase tracking-luxury text-gold mt-1">{heroSlides[heroIdx].tagline}</div>
+                  <div className="font-display text-lg text-foreground leading-tight">
+                    {heroSlides[heroIdx].label}
+                  </div>
+                  <div className="text-[10px] uppercase tracking-luxury text-gold mt-1">
+                    {heroSlides[heroIdx].tagline}
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -143,22 +143,40 @@ function Index() {
 
       <section className="py-32 border-t border-gold/10">
         <div className="mx-auto max-w-5xl px-6 lg:px-10 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
             <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">
               <span className="gold-line">The Promise</span>
             </div>
             <h2 className="font-display text-3xl md:text-5xl leading-tight max-w-3xl mx-auto">
               Considered ingredients.{" "}
-              <span className="text-gradient-gold italic">Editorial restraint.</span> Ritual at every touchpoint.
+              <span className="text-gradient-gold italic">Editorial restraint.</span> Ritual at
+              every touchpoint.
             </h2>
           </motion.div>
           <div className="mt-20 grid md:grid-cols-3 gap-12 text-left">
             {[
-              { t: "Performance", d: "ZXG Creatine is formulated to support strength output, endurance, and hydration during training." },
-              { t: "Recovery", d: "ZXG Body Balm restores and hydrates skin with botanical extracts. No fillers, no compromises." },
+              {
+                t: "Performance",
+                d: "ZXG Creatine is formulated to support strength output, endurance, and hydration during training.",
+              },
+              {
+                t: "Recovery",
+                d: "ZXG Body Balm restores and hydrates skin with botanical extracts. No fillers, no compromises.",
+              },
               { t: "Ritual", d: "Packaged to be displayed. Designed to be returned to, daily." },
             ].map((b, i) => (
-              <motion.div key={b.t} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: i * 0.15 }}>
+              <motion.div
+                key={b.t}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.15 }}
+              >
                 <div className="font-display text-5xl text-gradient-gold mb-4">0{i + 1}</div>
                 <h3 className="font-display text-xl mb-3">{b.t}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{b.d}</p>
@@ -168,49 +186,40 @@ function Index() {
         </div>
       </section>
 
-      <section className="py-32 border-t border-gold/10">
-        <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="flex items-end justify-between flex-wrap gap-6 mb-16">
+      <section className="border-t border-gold/10">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10 pt-32 pb-10">
+          <div className="flex items-end justify-between flex-wrap gap-6 mb-10">
             <div>
-              <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">The Collection</div>
-              <h2 className="font-display text-4xl md:text-5xl">Featured Products</h2>
+              <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">
+                The Collection
+              </div>
+              <h2 className="font-display text-4xl md:text-5xl">Featured Product</h2>
             </div>
-            <Link to="/products" className="text-[11px] uppercase tracking-luxury text-gold border-b border-gold/40 pb-1 hover:border-gold">
+            <Link
+              to="/products"
+              className="text-[11px] uppercase tracking-luxury text-gold border-b border-gold/40 pb-1 hover:border-gold"
+            >
               View All →
             </Link>
           </div>
-          <div className="hidden sm:grid sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
-            {products.map((p: Product, i: number) => (
-              <ProductCard key={p.slug} product={p} index={i} />
-            ))}
-          </div>
-          <div className="sm:hidden relative">
-            <div className="overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={products[heroIdx % Math.max(products.length, 1)]?.slug}
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -40 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  {products[heroIdx % Math.max(products.length, 1)] && (
-                    <ProductCard product={products[heroIdx % products.length]} index={0} />
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            <div className="flex justify-center gap-2 mt-6">
-              {products.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setHeroIdx(i)}
-                  className={`h-px w-8 transition-all duration-300 ${heroIdx % Math.max(products.length, 1) === i ? "bg-gold" : "bg-gold/30"}`}
-                />
-              ))}
-            </div>
-          </div>
         </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.8 }}
+          className="w-full"
+        >
+          <video
+            src={creatineVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full object-cover max-h-[80vh]"
+          />
+        </motion.div>
+        <div className="pb-16" />
       </section>
 
       <section className="py-32 border-t border-gold/10">
@@ -221,7 +230,10 @@ function Index() {
           <p className="mt-6 text-base text-muted-foreground max-w-xl mx-auto">
             Premium products built for performance and recovery.
           </p>
-          <Link to="/products" className="mt-10 inline-flex items-center gap-3 px-10 py-4 bg-gold text-obsidian text-[11px] uppercase tracking-luxury font-medium hover:bg-gold-light transition-colors glow-gold">
+          <Link
+            to="/products"
+            className="mt-10 inline-flex items-center gap-3 px-10 py-4 bg-gold text-obsidian text-[11px] uppercase tracking-luxury font-medium hover:bg-gold-light transition-colors glow-gold"
+          >
             Shop Now →
           </Link>
         </div>
