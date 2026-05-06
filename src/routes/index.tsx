@@ -23,10 +23,10 @@ function Index() {
   return (
     <>
       <Helmet>
-        <title>ZXG Wellness — Luxury Wellness Atelier</title>
+        <title>ZXG Wellness — Luxury Wellness</title>
         <meta
           name="description"
-          content="Premium Creatine and Body Balm crafted for performance and recovery. A black & gold wellness atelier."
+          content="Premium Creatine and Body Balm crafted for performance and recovery. A black & gold wellness brand."
         />
       </Helmet>
 

@@ -44,7 +44,7 @@ function AccountPage() {
   return (
     <>
       <Helmet>
-        <title>My Atelier — ZXG Wellness</title>
+        <title>My Account — ZXG Wellness</title>
       </Helmet>
       <div className="mx-auto max-w-5xl px-6 lg:px-10 py-20 md:py-28">
         <motion.div
@@ -52,7 +52,7 @@ function AccountPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Your Atelier</div>
+          <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Your Account</div>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <h1 className="font-display text-5xl md:text-6xl">
               Welcome,{" "}

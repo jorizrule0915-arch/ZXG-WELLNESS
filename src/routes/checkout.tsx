@@ -126,7 +126,7 @@ function CheckoutPage() {
         <div className="font-display text-6xl text-gradient-gold italic">Thank you</div>
         <p className="mt-6 text-muted-foreground max-w-md">
           Your order has been received and is being prepared with care. View it anytime in your
-          atelier.
+          account.
         </p>
         <div className="mt-10 flex gap-4">
           <Link

@@ -53,7 +53,7 @@ function AdminLayout() {
         <div className="px-6 py-8 border-b border-gold/15">
           <div className="font-display text-3xl text-gold tracking-luxury">ZXG</div>
           <div className="text-[10px] uppercase tracking-luxury text-muted-foreground mt-1">
-            Atelier Admin
+            ZXG Admin
           </div>
         </div>
         <nav className="flex-1 py-6 px-4 space-y-1">

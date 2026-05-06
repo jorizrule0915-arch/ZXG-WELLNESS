@@ -21,7 +21,7 @@ function NewProduct() {
         <h1 className="font-display text-4xl md:text-5xl mb-2">
           New <span className="text-gradient-gold italic">Creation</span>
         </h1>
-        <p className="text-sm text-muted-foreground mb-10">Add a new piece to the atelier.</p>
+        <p className="text-sm text-muted-foreground mb-10">Add a new piece to the collection.</p>
         <ProductForm />
       </div>
     </>

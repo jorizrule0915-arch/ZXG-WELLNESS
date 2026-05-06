@@ -84,7 +84,7 @@ function LoginPage() {
         >
           <div className="text-center mb-10">
             <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">
-              Atelier Access
+              Member Access
             </div>
             <h1 className="font-display text-5xl">
               {mode === "signin" ? "Welcome back" : "Begin"}
@@ -92,7 +92,7 @@ function LoginPage() {
             <p className="mt-3 text-sm text-muted-foreground">
               {mode === "signin"
                 ? "Enter your credentials to continue."
-                : "Create your private atelier account."}
+                : "Create your private account."}
             </p>
           </div>
 
@@ -151,7 +151,7 @@ function LoginPage() {
               to="/"
               className="text-[11px] uppercase tracking-luxury text-muted-foreground hover:text-gold"
             >
-              ← Return to atelier
+              ← Return to store
             </Link>
           </div>
         </motion.div>

@@ -15,13 +15,13 @@ function ContactPage() {
   return (
     <>
       <Helmet>
-        <title>Contact the Atelier — ZXG Wellness</title>
+        <title>Contact Us — ZXG Wellness</title>
       </Helmet>
       <div className="mx-auto max-w-5xl px-6 lg:px-10 py-20 md:py-28 grid lg:grid-cols-2 gap-16">
         <div>
           <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">Concierge</div>
           <h1 className="font-display text-5xl md:text-6xl leading-tight">
-            Reach the <span className="text-gradient-gold italic">atelier</span>.
+            Reach the <span className="text-gradient-gold italic">team</span>.
           </h1>
           <p className="mt-6 text-foreground/75 leading-relaxed max-w-md">
             For private consultations, partnerships, press inquiries, or simply to say hello — we
@@ -30,13 +30,13 @@ function ContactPage() {
           <div className="mt-12 space-y-6 text-sm">
             <div>
               <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">General</div>
-              <div className="text-foreground/85">concierge@zxg.wellness</div>
+              <div className="text-foreground/85">g@zxgwellness.com</div>
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">
                 Press &amp; Partnerships
               </div>
-              <div className="text-foreground/85">studio@zxg.wellness</div>
+              <div className="text-foreground/85">g@zxgwellness.com</div>
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">Studios</div>

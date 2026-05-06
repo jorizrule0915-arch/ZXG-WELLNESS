@@ -12,19 +12,19 @@ function CartPage() {
   return (
     <>
       <Helmet>
-        <title>Atelier Cart — ZXG Wellness</title>
+        <title>Your Cart — ZXG Wellness</title>
       </Helmet>
       <div className="mx-auto max-w-5xl px-6 lg:px-10 py-20 md:py-28">
         <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Your Selection</div>
         <h1 className="font-display text-5xl md:text-6xl">
-          Atelier <span className="text-gradient-gold italic">cart</span>
+          Your <span className="text-gradient-gold italic">cart</span>
         </h1>
 
         {items.length === 0 ? (
           <div className="mt-20 text-center py-20 border-y border-gold/15">
             <div className="font-display text-3xl text-gold/80">Empty</div>
             <p className="mt-3 text-muted-foreground">
-              Your atelier cart awaits its first treasure.
+              Your cart awaits its first treasure.
             </p>
             <Link
               to="/products"

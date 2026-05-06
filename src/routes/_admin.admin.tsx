@@ -82,7 +82,7 @@ function AdminDashboard() {
 
   if (!stats)
     return (
-      <div className="p-12 text-center text-muted-foreground text-sm">Loading atelier metrics…</div>
+      <div className="p-12 text-center text-muted-foreground text-sm">Loading metrics…</div>
     );
 
   const cards = [
@@ -105,7 +105,7 @@ function AdminDashboard() {
         >
           <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">Overview</div>
           <h1 className="font-display text-4xl md:text-5xl">
-            Welcome to the <span className="text-gradient-gold italic">Atelier</span>
+            Welcome to the <span className="text-gradient-gold italic">Dashboard</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-2">Real-time pulse of the house.</p>
         </motion.div>
