@@ -66,6 +66,7 @@ function CheckoutPage() {
 
       setClientSecret(secret);
       setFormData(fd);
+      setSubmitting(false);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Something went wrong");
       setSubmitting(false);
