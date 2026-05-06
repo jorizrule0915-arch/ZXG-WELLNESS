@@ -8,7 +8,7 @@ export function Footer() {
         <div className="md:col-span-2">
           <img src={footerLogo} alt="ZXG Wellness" className="h-24 w-auto" />
           <p className="mt-4 text-sm text-muted-foreground max-w-sm leading-relaxed">
-            A luxury wellness atelier — premium, editorial, considered. Crafted in small batches for
+            A luxury wellness brand — premium, editorial, considered. Crafted in small batches for
             those who pursue equilibrium.
           </p>
         </div>
@@ -38,9 +38,9 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Atelier</div>
+          <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Contact</div>
           <ul className="space-y-3 text-sm text-foreground/75">
-            <li>concierge@zxg.wellness</li>
+            <li>g@zxgwellness.com</li>
           </ul>
         </div>
       </div>
