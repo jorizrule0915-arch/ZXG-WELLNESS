@@ -11,6 +11,7 @@ export function PaymentForm({ isProcessing, onSuccess, onError }: PaymentFormPro
   const stripe = useStripe();
   const elements = useElements();
   const [ready, setReady] = useState(false);
+  const [localProcessing, setLocalProcessing] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -19,6 +20,8 @@ export function PaymentForm({ isProcessing, onSuccess, onError }: PaymentFormPro
       onError("Payment system not ready");
       return;
     }
+
+    setLocalProcessing(true);
 
     try {
       const { error, paymentIntent } = await stripe.confirmPayment({
@@ -34,6 +37,8 @@ export function PaymentForm({ isProcessing, onSuccess, onError }: PaymentFormPro
       }
     } catch (e) {
       onError(e instanceof Error ? e.message : "Payment failed");
+    } finally {
+      setLocalProcessing(false);
     }
   };
 
@@ -43,10 +48,10 @@ export function PaymentForm({ isProcessing, onSuccess, onError }: PaymentFormPro
 
       <button
         type="submit"
-        disabled={!ready || isProcessing}
+        disabled={!ready || isProcessing || localProcessing}
         className="w-full px-6 py-3 bg-gold text-obsidian font-medium uppercase tracking-luxury disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gold-light transition-colors"
       >
-        {isProcessing ? "Processing..." : "Complete Payment"}
+        {isProcessing || localProcessing ? "Processing..." : "Complete Payment"}
       </button>
     </form>
   );

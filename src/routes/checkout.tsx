@@ -74,6 +74,7 @@ function CheckoutPage() {
 
   const handlePaymentSuccess = async () => {
     if (!formData || !user) return;
+    setSubmitting(true);
 
     try {
       const { data: order, error } = await supabase
@@ -111,6 +112,11 @@ function CheckoutPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handlePaymentError = (errorMessage: string) => {
+    setErr(errorMessage);
+    setSubmitting(false);
   };
 
   if (done) {
@@ -161,7 +167,7 @@ function CheckoutPage() {
           clientSecret={clientSecret}
           isProcessing={submitting}
           onSuccess={handlePaymentSuccess}
-          onError={setErr}
+          onError={handlePaymentError}
           items={items}
           total={total}
         />
