@@ -1,13 +1,13 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Package, ShoppingCart, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Users, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
 
 export const Route = createFileRoute("/_admin")({ component: AdminLayout });
 
 const navItems: {
-  to: "/admin" | "/admin/products" | "/admin/orders";
+  to: "/admin" | "/admin/products" | "/admin/orders" | "/admin/users";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
@@ -15,6 +15,7 @@ const navItems: {
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { to: "/admin/users", label: "Users", icon: Users },
 ];
 
 function AdminLayout() {
