@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_admin/admin/products")({ component: AdminProducts });
@@ -24,13 +23,19 @@ function AdminProducts() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("products")
-      .select("id, slug, name, category, price, active, featured")
-      .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
-    setRows((data ?? []) as Row[]);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/admin-data?resource=products");
+      const data = await res.json();
+      if (data.error) {
+        toast.error(data.error);
+      } else {
+        setRows(data as Row[]);
+      }
+    } catch {
+      toast.error("Failed to load products");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -38,18 +43,36 @@ function AdminProducts() {
   }, []);
 
   const toggleActive = async (id: string, current: boolean) => {
-    const { error } = await supabase.from("products").update({ active: !current }).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success(`Product ${!current ? "published" : "hidden"}`);
-    load();
+    try {
+      const res = await fetch("/api/admin-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle-product-active", id, payload: { active: !current } }),
+      });
+      const data = await res.json();
+      if (data.error) return toast.error(data.error);
+      toast.success(`Product ${!current ? "published" : "hidden"}`);
+      load();
+    } catch {
+      toast.error("Failed to update product");
+    }
   };
 
   const remove = async (id: string, name: string) => {
     if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
-    const { error } = await supabase.from("products").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Product removed");
-    load();
+    try {
+      const res = await fetch("/api/admin-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete-product", id }),
+      });
+      const data = await res.json();
+      if (data.error) return toast.error(data.error);
+      toast.success("Product removed");
+      load();
+    } catch {
+      toast.error("Failed to delete product");
+    }
   };
 
   return (

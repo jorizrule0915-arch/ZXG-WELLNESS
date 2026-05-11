@@ -12,7 +12,6 @@ import {
   ChevronRight,
   KeyRound,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_admin/admin/users")({ component: AdminUsers });
@@ -47,87 +46,73 @@ function AdminUsers() {
 
   const load = async () => {
     setLoading(true);
-    const { data: profiles, error } = await supabase
-      .from("profiles")
-      .select("id, full_name, email, status, admin_notes, created_at")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      toast.error(error.message);
+    try {
+      const res = await fetch("/api/admin-data?resource=users");
+      const data = await res.json();
+      if (data.error) {
+        toast.error(data.error);
+        setLoading(false);
+        return;
+      }
+      const rows = data as UserRow[];
+      setUsers(rows);
+      const initialNotes: Record<string, string> = {};
+      rows.forEach((r) => { initialNotes[r.id] = r.admin_notes ?? ""; });
+      setNotes(initialNotes);
+    } catch {
+      toast.error("Failed to load users");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Get roles
-    const { data: roles } = await supabase.from("user_roles").select("user_id, role");
-
-    // Get order stats
-    const { data: orders } = await supabase
-      .from("orders")
-      .select("user_id, total");
-
-    const adminIds = new Set((roles ?? []).filter((r) => r.role === "admin").map((r) => r.user_id));
-
-    const orderMap = new Map<string, { count: number; total: number }>();
-    (orders ?? []).forEach((o) => {
-      const prev = orderMap.get(o.user_id) ?? { count: 0, total: 0 };
-      orderMap.set(o.user_id, { count: prev.count + 1, total: prev.total + Number(o.total) });
-    });
-
-    const rows: UserRow[] = (profiles ?? []).map((p) => ({
-      id: p.id,
-      email: p.email ?? "",
-      full_name: p.full_name ?? "",
-      status: (p.status as UserRow["status"]) ?? "active",
-      admin_notes: p.admin_notes,
-      created_at: p.created_at,
-      is_admin: adminIds.has(p.id),
-      order_count: orderMap.get(p.id)?.count ?? 0,
-      total_spent: orderMap.get(p.id)?.total ?? 0,
-    }));
-
-    setUsers(rows);
-    const initialNotes: Record<string, string> = {};
-    rows.forEach((r) => { initialNotes[r.id] = r.admin_notes ?? ""; });
-    setNotes(initialNotes);
-    setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
 
   const updateStatus = async (id: string, status: UserRow["status"]) => {
-    const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success(`Account ${status}`);
-    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, status } : u)));
+    try {
+      const res = await fetch("/api/admin-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update-user-status", id, payload: { status } }),
+      });
+      const data = await res.json();
+      if (data.error) return toast.error(data.error);
+      toast.success(`Account ${status}`);
+      setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, status } : u)));
+    } catch {
+      toast.error("Failed to update status");
+    }
   };
 
   const saveNotes = async (id: string) => {
-    const { error } = await supabase
-      .from("profiles")
-      .update({ admin_notes: notes[id] })
-      .eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Notes saved");
+    try {
+      const res = await fetch("/api/admin-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save-user-notes", id, payload: { notes: notes[id] } }),
+      });
+      const data = await res.json();
+      if (data.error) return toast.error(data.error);
+      toast.success("Notes saved");
+    } catch {
+      toast.error("Failed to save notes");
+    }
   };
 
   const toggleAdmin = async (id: string, isAdmin: boolean) => {
-    if (isAdmin) {
-      const { error } = await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", id)
-        .eq("role", "admin");
-      if (error) return toast.error(error.message);
-      toast.success("Admin role removed");
-    } else {
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: id, role: "admin" });
-      if (error) return toast.error(error.message);
-      toast.success("Admin role granted");
+    try {
+      const res = await fetch("/api/admin-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "toggle-admin", id, payload: { isAdmin } }),
+      });
+      const data = await res.json();
+      if (data.error) return toast.error(data.error);
+      toast.success(isAdmin ? "Admin role removed" : "Admin role granted");
+      setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, is_admin: !isAdmin } : u)));
+    } catch {
+      toast.error("Failed to update admin role");
     }
-    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, is_admin: !isAdmin } : u)));
   };
 
   const sendWarning = async (user: UserRow) => {

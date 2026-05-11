@@ -14,7 +14,6 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_admin/admin")({ component: AdminDashboard });
 
@@ -30,55 +29,22 @@ type Stats = {
 
 function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
-      const [ordersRes, productsRes, itemsRes] = await Promise.all([
-        supabase
-          .from("orders")
-          .select("id, created_at, total, status, email")
-          .order("created_at", { ascending: false }),
-        supabase.from("products").select("id", { count: "exact", head: true }),
-        supabase.from("order_items").select("product_name, quantity"),
-      ]);
-
-      const orders = ordersRes.data ?? [];
-      const revenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
-
-      const days: { day: string; revenue: number }[] = [];
-      for (let i = 13; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const key = d.toISOString().slice(0, 10);
-        const dayRev = orders
-          .filter((o) => o.created_at.slice(0, 10) === key)
-          .reduce((s, o) => s + Number(o.total), 0);
-        days.push({
-          day: d.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-          revenue: dayRev,
-        });
-      }
-
-      const map = new Map<string, number>();
-      (itemsRes.data ?? []).forEach((i) => {
-        map.set(i.product_name, (map.get(i.product_name) ?? 0) + i.quantity);
-      });
-      const topProducts = [...map.entries()]
-        .map(([name, qty]) => ({ name, qty }))
-        .sort((a, b) => b.qty - a.qty)
-        .slice(0, 5);
-
-      setStats({
-        revenue,
-        orderCount: orders.length,
-        productCount: productsRes.count ?? 0,
-        customerCount: 0,
-        recentOrders: orders.slice(0, 5),
-        revenueByDay: days,
-        topProducts,
-      });
-    })();
+    fetch("/api/admin-data?resource=dashboard")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.error) setError(data.error);
+        else setStats(data as Stats);
+      })
+      .catch((e) => setError(e.message));
   }, []);
+
+  if (error)
+    return (
+      <div className="p-12 text-center text-destructive text-sm">Error: {error}</div>
+    );
 
   if (!stats)
     return (

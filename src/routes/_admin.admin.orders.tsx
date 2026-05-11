@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_admin/admin/orders")({ component: AdminOrders });
@@ -32,13 +31,19 @@ function AdminOrders() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*, order_items(product_name, quantity, unit_price)")
-      .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
-    setOrders((data ?? []) as unknown as Order[]);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/admin-data?resource=orders");
+      const data = await res.json();
+      if (data.error) {
+        toast.error(data.error);
+      } else {
+        setOrders(data as Order[]);
+      }
+    } catch (e) {
+      toast.error("Failed to load orders");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -46,10 +51,19 @@ function AdminOrders() {
   }, []);
 
   const updateStatus = async (id: string, status: Order["status"]) => {
-    const { error } = await supabase.from("orders").update({ status }).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success(`Order marked ${status}`);
-    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+    try {
+      const res = await fetch("/api/admin-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update-order-status", id, payload: { status } }),
+      });
+      const data = await res.json();
+      if (data.error) return toast.error(data.error);
+      toast.success(`Order marked ${status}`);
+      setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+    } catch {
+      toast.error("Failed to update status");
+    }
   };
 
   const toggle = (id: string) => {
