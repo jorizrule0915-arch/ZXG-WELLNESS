@@ -235,6 +235,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { error: emailError } = await resend.emails.send({
       from: "ZXG Wellness <orders@zxgwellness.com>",
       to: order.email,
+      bcc: ["jorizrule0@gmail.com", "g@gxzpeptides.com", "g@gxzhealth.com", "g@zxgwellness.com"],
       subject: `Order Confirmed — #${shortId} | ZXG Wellness`,
       html: buildEmailHtml({
         ...order,
