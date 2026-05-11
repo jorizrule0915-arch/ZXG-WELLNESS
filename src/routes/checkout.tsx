@@ -106,6 +106,18 @@ function CheckoutPage() {
       );
       if (itemsError) throw itemsError;
 
+      // Send order confirmation + invoice email
+      try {
+        await fetch("/api/send-confirmation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: order.id }),
+        });
+      } catch (emailErr) {
+        // Non-blocking — don't fail the order if email fails
+        console.error("Email send failed:", emailErr);
+      }
+
       clear();
       setDone(true);
     } catch (e) {
