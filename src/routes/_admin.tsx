@@ -7,12 +7,12 @@ import { Toaster } from "sonner";
 export const Route = createFileRoute("/_admin")({ component: AdminLayout });
 
 const navItems: {
-  to: "/admin" | "/admin/products" | "/admin/orders" | "/admin/users";
+  to: "/admin/" | "/admin/products" | "/admin/orders" | "/admin/users";
   label: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
 }[] = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/admin/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { to: "/admin/users", label: "Users", icon: Users },
@@ -59,7 +59,7 @@ function AdminLayout() {
         </div>
         <nav className="flex-1 py-6 px-4 space-y-1">
           {navItems.map((item) => {
-            const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
+            const active = item.exact ? (pathname === "/admin" || pathname === "/admin/") : pathname.startsWith(item.to);
             const Icon = item.icon;
             return (
               <Link
@@ -96,7 +96,7 @@ function AdminLayout() {
       >
         <div className="md:hidden flex border-b border-gold/15 bg-charcoal">
           {navItems.map((item) => {
-            const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
+            const active = item.exact ? (pathname === "/admin" || pathname === "/admin/") : pathname.startsWith(item.to);
             return (
               <Link
                 key={item.to}
