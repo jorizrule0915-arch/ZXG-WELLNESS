@@ -16,11 +16,12 @@ function getSafeRedirectPath(searchParams: URLSearchParams) {
 
 function LoginPage() {
   const nav = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [err, setErr] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
 
@@ -28,47 +29,58 @@ function LoginPage() {
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) return;
       const redirectTo = getSafeRedirectPath(new URLSearchParams(window.location.search));
-      if (redirectTo) {
-        window.location.assign(redirectTo);
-        return;
-      }
+      if (redirectTo) { window.location.assign(redirectTo); return; }
       const { data: isAdmin } = await supabase.rpc("has_role", {
         _user_id: data.session.user.id,
         _role: "admin",
       });
-      nav({ to: isAdmin ? "/admin" : "/account" });
+      nav({ to: isAdmin ? "/admin/" : "/account" });
     });
   }, [nav]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErr(null);
+    setSuccess(null);
     setLoading(true);
+
+    if (mode === "forgot") {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      setLoading(false);
+      if (error) { setErr(error.message); return; }
+      setSuccess("Check your email — we sent a reset link.");
+      return;
+    }
+
     const { error } =
       mode === "signin" ? await signIn(email, password) : await signUp(email, password, name);
     setLoading(false);
-    if (error) {
-      setErr(error);
-      return;
-    }
+    if (error) { setErr(error); return; }
     const redirectTo = getSafeRedirectPath(new URLSearchParams(window.location.search));
-    if (redirectTo) {
-      window.location.assign(redirectTo);
-      return;
-    }
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    if (redirectTo) { window.location.assign(redirectTo); return; }
+    const { data: { session } } = await supabase.auth.getSession();
     if (session) {
       const { data: isAdmin } = await supabase.rpc("has_role", {
         _user_id: session.user.id,
         _role: "admin",
       });
-      nav({ to: isAdmin ? "/admin" : "/account" });
+      nav({ to: isAdmin ? "/admin/" : "/account" });
     } else {
       nav({ to: "/account" });
     }
   };
+
+  const title = mode === "signin" ? "Welcome back" : mode === "signup" ? "Begin" : "Reset Password";
+  const subtitle =
+    mode === "signin" ? "Enter your credentials to continue."
+    : mode === "signup" ? "Create your private account."
+    : "Enter your email and we'll send a reset link.";
+  const btnLabel =
+    mode === "signin" ? "Sign In →"
+    : mode === "signup" ? "Create Account →"
+    : "Send Reset Link →";
 
   return (
     <>
@@ -83,47 +95,32 @@ function LoginPage() {
           className="w-full max-w-md"
         >
           <div className="text-center mb-10">
-            <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">
-              Member Access
-            </div>
-            <h1 className="font-display text-5xl">
-              {mode === "signin" ? "Welcome back" : "Begin"}
-            </h1>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {mode === "signin"
-                ? "Enter your credentials to continue."
-                : "Create your private account."}
-            </p>
+            <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">Member Access</div>
+            <h1 className="font-display text-5xl">{title}</h1>
+            <p className="mt-3 text-sm text-muted-foreground">{subtitle}</p>
           </div>
 
           <div className="bg-charcoal border border-gold/20 p-8 backdrop-blur-sm">
             <form onSubmit={onSubmit} className="space-y-5">
               <AnimatePresence mode="wait">
                 {mode === "signup" && (
-                  <motion.div
-                    key="name"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                  >
+                  <motion.div key="name" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
                     <Field label="Full name" value={name} onChange={setName} required />
                   </motion.div>
                 )}
               </AnimatePresence>
+
               <Field label="Email" type="email" value={email} onChange={setEmail} required />
-              <Field
-                label="Password"
-                type="password"
-                value={password}
-                onChange={setPassword}
-                canToggleVisibility
-                required
-              />
+
+              {mode !== "forgot" && (
+                <Field label="Password" type="password" value={password} onChange={setPassword} canToggleVisibility required />
+              )}
 
               {err && (
-                <div className="text-[11px] text-destructive border border-destructive/30 bg-destructive/10 px-3 py-2">
-                  {err}
-                </div>
+                <div className="text-[11px] text-destructive border border-destructive/30 bg-destructive/10 px-3 py-2">{err}</div>
+              )}
+              {success && (
+                <div className="text-[11px] text-emerald-400 border border-emerald-400/30 bg-emerald-400/10 px-3 py-2">{success}</div>
               )}
 
               <button
@@ -131,26 +128,35 @@ function LoginPage() {
                 disabled={loading}
                 className="w-full py-4 bg-gold text-obsidian text-[11px] uppercase tracking-luxury font-medium hover:bg-gold-light transition-colors disabled:opacity-50 glow-gold-sm"
               >
-                {loading ? "…" : mode === "signin" ? "Sign In →" : "Create Account →"}
+                {loading ? "…" : btnLabel}
               </button>
             </form>
 
-            <button
-              onClick={() => {
-                setMode(mode === "signin" ? "signup" : "signin");
-                setErr(null);
-              }}
-              className="mt-6 w-full text-center text-[11px] uppercase tracking-luxury text-muted-foreground hover:text-gold"
-            >
-              {mode === "signin" ? "No account? Create one →" : "Already a member? Sign in →"}
-            </button>
+            <div className="mt-6 space-y-2">
+              {mode === "signin" && (
+                <button
+                  onClick={() => { setMode("forgot"); setErr(null); setSuccess(null); }}
+                  className="w-full text-center text-[11px] uppercase tracking-luxury text-muted-foreground hover:text-gold transition-colors"
+                >
+                  Forgot password?
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  setMode(mode === "signup" ? "signin" : mode === "forgot" ? "signin" : "signup");
+                  setErr(null); setSuccess(null);
+                }}
+                className="w-full text-center text-[11px] uppercase tracking-luxury text-muted-foreground hover:text-gold transition-colors"
+              >
+                {mode === "signin" ? "No account? Create one →"
+                  : mode === "signup" ? "Already a member? Sign in →"
+                  : "Back to sign in →"}
+              </button>
+            </div>
           </div>
 
           <div className="mt-8 text-center">
-            <Link
-              to="/"
-              className="text-[11px] uppercase tracking-luxury text-muted-foreground hover:text-gold"
-            >
+            <Link to="/" className="text-[11px] uppercase tracking-luxury text-muted-foreground hover:text-gold">
               ← Return to store
             </Link>
           </div>
@@ -160,20 +166,9 @@ function LoginPage() {
   );
 }
 
-function Field({
-  label,
-  value,
-  onChange,
-  type = "text",
-  canToggleVisibility = false,
-  required,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  canToggleVisibility?: boolean;
-  required?: boolean;
+function Field({ label, value, onChange, type = "text", canToggleVisibility = false, required }: {
+  label: string; value: string; onChange: (v: string) => void;
+  type?: string; canToggleVisibility?: boolean; required?: boolean;
 }) {
   const [visible, setVisible] = useState(false);
   const inputType = canToggleVisibility && type === "password" && visible ? "text" : type;
@@ -191,12 +186,8 @@ function Field({
           className={`w-full bg-transparent border-b border-gold/30 focus:border-gold outline-none py-2 text-sm text-foreground transition-colors ${canToggleVisibility ? "pr-10" : ""}`}
         />
         {canToggleVisibility && (
-          <button
-            type="button"
-            onClick={() => setVisible((c) => !c)}
-            aria-label={visible ? "Hide password" : "Show password"}
-            className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-gold transition-colors"
-          >
+          <button type="button" onClick={() => setVisible((c) => !c)} aria-label={visible ? "Hide password" : "Show password"}
+            className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-gold transition-colors">
             <VisibilityIcon className="h-4 w-4" strokeWidth={1.5} />
           </button>
         )}
