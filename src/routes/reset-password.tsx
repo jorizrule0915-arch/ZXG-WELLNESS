@@ -19,24 +19,33 @@ function ResetPasswordPage() {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    // Supabase appends #access_token=... to the URL after redirect
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if (code) {
+      // PKCE flow — exchange code for session
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (error) { setInvalid(true); return; }
         setReady(true);
-      }
+        // Clean up the URL
+        window.history.replaceState({}, "", "/reset-password");
+      });
+      return;
+    }
+
+    // Legacy implicit flow — hash contains access_token
+    supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setReady(true);
     });
-    // If already has a session via token in URL hash
+
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-      else {
-        // Give Supabase a moment to process the hash
-        setTimeout(() => {
-          supabase.auth.getSession().then(({ data: d }) => {
-            if (d.session) setReady(true);
-            else setInvalid(true);
-          });
-        }, 1500);
-      }
+      if (data.session) { setReady(true); return; }
+      setTimeout(() => {
+        supabase.auth.getSession().then(({ data: d }) => {
+          if (d.session) setReady(true);
+          else setInvalid(true);
+        });
+      }, 1500);
     });
   }, []);
 
