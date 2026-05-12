@@ -56,7 +56,7 @@ function LoginPage() {
 
     if (mode === "forgot") {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       });
       setLoading(false);
       if (error) { setErr(error.message); return; }

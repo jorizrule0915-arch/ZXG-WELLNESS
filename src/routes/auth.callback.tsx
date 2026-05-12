@@ -10,32 +10,23 @@ function AuthCallback() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
-    const type = params.get("type");
 
     if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
         if (error) {
           nav({ to: "/login" });
           return;
         }
-        // Check if this is a password recovery session
-        const isRecovery =
-          type === "recovery" ||
-          data?.session?.user?.recovery_sent_at != null;
-
-        if (isRecovery) {
-          nav({ to: "/reset-password" });
-        } else {
-          nav({ to: "/account" });
-        }
+        // /auth/callback is only used for password recovery — always go to reset
+        nav({ to: "/reset-password" });
       });
     } else {
-      // No code — listen for auth state
+      // Implicit/hash flow
       const { data: sub } = supabase.auth.onAuthStateChange((event) => {
         if (event === "PASSWORD_RECOVERY") {
           nav({ to: "/reset-password" });
         } else if (event === "SIGNED_IN") {
-          nav({ to: "/account" });
+          nav({ to: "/reset-password" });
         }
       });
       return () => sub.subscription.unsubscribe();
