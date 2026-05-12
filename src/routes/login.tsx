@@ -26,6 +26,12 @@ function LoginPage() {
   const { signIn, signUp } = useAuth();
 
   useEffect(() => {
+    if (!success) return;
+    const t = setTimeout(() => setSuccess(null), 8000);
+    return () => clearTimeout(t);
+  }, [success]);
+
+  useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) return;
       const redirectTo = getSafeRedirectPath(new URLSearchParams(window.location.search));
@@ -84,6 +90,32 @@ function LoginPage() {
 
   return (
     <>
+      {/* Toast popup */}
+      <AnimatePresence>
+        {success && (
+          <motion.div
+            key="toast"
+            initial={{ opacity: 0, y: -24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -24 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90vw] max-w-md bg-obsidian border border-emerald-500/50 shadow-2xl px-5 py-4 flex items-start gap-3"
+          >
+            <span className="text-emerald-400 text-lg leading-none mt-0.5">✓</span>
+            <div className="flex-1">
+              <p className="text-emerald-400 text-xs leading-relaxed">{success}</p>
+            </div>
+            <button
+              onClick={() => setSuccess(null)}
+              className="text-white/40 hover:text-white/80 text-sm leading-none ml-2 mt-0.5 transition-colors"
+              aria-label="Dismiss"
+            >
+              ✕
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Helmet>
         <title>Sign In — ZXG Wellness</title>
       </Helmet>
@@ -119,11 +151,7 @@ function LoginPage() {
               {err && (
                 <div className="text-[11px] text-destructive border border-destructive/30 bg-destructive/10 px-3 py-2">{err}</div>
               )}
-              {success && (
-                <div className="text-xs text-emerald-400 border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 leading-relaxed">
-                  {success}
-                </div>
-              )}
+
 
               <button
                 type="submit"
