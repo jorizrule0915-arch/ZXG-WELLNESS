@@ -1,9 +1,11 @@
-import { Outlet, createRootRoute, Link } from "@tanstack/react-router";
+import { Outlet, createRootRoute, Link, useNavigate } from "@tanstack/react-router";
 import { HelmetProvider } from "react-helmet-async";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { AuthProvider } from "@/lib/auth";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -31,6 +33,17 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+  const nav = useNavigate();
+
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        nav({ to: "/reset-password" });
+      }
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [nav]);
+
   return (
     <HelmetProvider>
       <AuthProvider>
