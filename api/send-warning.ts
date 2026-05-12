@@ -15,7 +15,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   const { error } = await resend.emails.send({
-    from: "ZXG Wellness <orders@zxgwellness.com>",
+    from: "ZXG Wellness <admin@zxgwellness.com>",
     to: email,
     subject: "Important Notice — ZXG Wellness",
     html: `

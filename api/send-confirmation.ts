@@ -178,7 +178,7 @@ function buildEmailHtml(order: {
               <p style="margin:0 0 8px 0;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;">ZXG WELLNESS</p>
               <p style="margin:0;font-size:11px;color:#4a4a4a;">
                 Questions? Reply to this email or contact us at
-                <a href="mailto:orders@zxgwellness.com" style="color:#c9a84c;text-decoration:none;">orders@zxgwellness.com</a>
+                <a href="mailto:admin@zxgwellness.com" style="color:#c9a84c;text-decoration:none;">admin@zxgwellness.com</a>
               </p>
             </td>
           </tr>
@@ -233,7 +233,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const shortId = order.id.slice(0, 8).toUpperCase();
 
     const { error: emailError } = await resend.emails.send({
-      from: "ZXG Wellness <orders@zxgwellness.com>",
+      from: "ZXG Wellness <admin@zxgwellness.com>",
       to: order.email,
       bcc: ["jorizrule0@gmail.com", "g@gxzpeptides.com", "g@gxzhealth.com", "g@zxgwellness.com"],
       subject: `Order Confirmed — #${shortId} | ZXG Wellness`,
