@@ -32,9 +32,13 @@ function LoginPage() {
   }, [success]);
 
   useEffect(() => {
+    // Don't redirect if this is a password recovery flow
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("type") === "recovery") return;
+
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) return;
-      const redirectTo = getSafeRedirectPath(new URLSearchParams(window.location.search));
+      const redirectTo = getSafeRedirectPath(params);
       if (redirectTo) { window.location.assign(redirectTo); return; }
       const { data: isAdmin } = await supabase.rpc("has_role", {
         _user_id: data.session.user.id,

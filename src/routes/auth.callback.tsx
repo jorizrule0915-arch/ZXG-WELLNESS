@@ -11,29 +11,34 @@ function AuthCallback() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     const type = params.get("type");
-    const next = params.get("next") ?? "/reset-password";
 
     if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+      supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
         if (error) {
           nav({ to: "/login" });
           return;
         }
-        if (type === "recovery") {
+        // Check if this is a password recovery session
+        const isRecovery =
+          type === "recovery" ||
+          data?.session?.user?.recovery_sent_at != null;
+
+        if (isRecovery) {
           nav({ to: "/reset-password" });
         } else {
-          nav({ to: next as any });
+          nav({ to: "/account" });
         }
       });
     } else {
-      // Check hash for implicit flow tokens
-      supabase.auth.onAuthStateChange((event) => {
+      // No code — listen for auth state
+      const { data: sub } = supabase.auth.onAuthStateChange((event) => {
         if (event === "PASSWORD_RECOVERY") {
           nav({ to: "/reset-password" });
         } else if (event === "SIGNED_IN") {
-          nav({ to: "/" });
+          nav({ to: "/account" });
         }
       });
+      return () => sub.subscription.unsubscribe();
     }
   }, []);
 
