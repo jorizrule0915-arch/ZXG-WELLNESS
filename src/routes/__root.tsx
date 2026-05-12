@@ -1,5 +1,6 @@
 import { Outlet, createRootRoute, Link } from "@tanstack/react-router";
 import { HelmetProvider } from "react-helmet-async";
+import { Analytics } from "@vercel/analytics/react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/CartDrawer";
@@ -40,6 +41,7 @@ function RootComponent() {
         </main>
         <Footer />
         <CartDrawer />
+        <Analytics />
       </AuthProvider>
     </HelmetProvider>
   );
