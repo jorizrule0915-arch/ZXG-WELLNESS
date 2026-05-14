@@ -36,7 +36,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .from("products")
           .select("id, slug, name, category, price, active, featured, track_stock, stock_qty, options")
           .order("created_at", { ascending: false });
-        if (error) return res.status(500).json({ error: error.message });
+        if (error) {
+          // Fallback: columns may not exist yet — fetch without new columns
+          const { data: data2, error: error2 } = await supabase
+            .from("products")
+            .select("id, slug, name, category, price, active, featured")
+            .order("created_at", { ascending: false });
+          if (error2) return res.status(500).json({ error: error2.message });
+          return res.status(200).json((data2 ?? []).map((p: any) => ({
+            ...p, track_stock: false, stock_qty: 0, options: []
+          })));
+        }
         return res.status(200).json(data);
       }
 
