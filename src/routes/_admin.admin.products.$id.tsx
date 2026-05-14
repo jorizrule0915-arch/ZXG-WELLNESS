@@ -32,6 +32,9 @@ function EditProduct() {
         benefits: data.benefits ?? [],
         featured: data.featured,
         active: data.active,
+        track_stock: (data as any).track_stock ?? false,
+        stock_qty: (data as any).stock_qty ?? 0,
+        options: (data as any).options ?? [],
       });
     })();
   }, [id]);

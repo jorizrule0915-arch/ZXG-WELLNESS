@@ -34,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (resource === "products") {
         const { data, error } = await supabase
           .from("products")
-          .select("id, slug, name, category, price, active, featured")
+          .select("id, slug, name, category, price, active, featured, track_stock, stock_qty, options")
           .order("created_at", { ascending: false });
         if (error) return res.status(500).json({ error: error.message });
         return res.status(200).json(data);

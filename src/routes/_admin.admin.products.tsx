@@ -15,7 +15,16 @@ type Row = {
   price: number;
   active: boolean;
   featured: boolean;
+  track_stock: boolean;
+  stock_qty: number;
 };
+
+function StockBadge({ track_stock, stock_qty }: { track_stock: boolean; stock_qty: number }) {
+  if (!track_stock) return <span className="text-[10px] text-muted-foreground uppercase tracking-luxury">—</span>;
+  if (stock_qty === 0) return <span className="text-[10px] uppercase tracking-luxury px-2 py-0.5 bg-destructive/10 text-destructive border border-destructive/30">Out of Stock</span>;
+  if (stock_qty <= 5) return <span className="text-[10px] uppercase tracking-luxury px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/30">Low ({stock_qty})</span>;
+  return <span className="text-[10px] uppercase tracking-luxury px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">In Stock ({stock_qty})</span>;
+}
 
 function AdminProducts() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -113,6 +122,7 @@ function AdminProducts() {
                     <th className="px-6 py-4">Name</th>
                     <th className="px-6 py-4">Category</th>
                     <th className="px-6 py-4">Price</th>
+                    <th className="px-6 py-4">Stock</th>
                     <th className="px-6 py-4">Status</th>
                     <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
@@ -129,6 +139,9 @@ function AdminProducts() {
                       </td>
                       <td className="px-6 py-4 font-display text-lg text-gold">
                         ${Number(r.price).toFixed(0)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <StockBadge track_stock={r.track_stock} stock_qty={r.stock_qty} />
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">

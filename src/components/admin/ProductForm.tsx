@@ -2,6 +2,12 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Plus, X } from "lucide-react";
+
+export type ProductOption = {
+  name: string;   // e.g. "Size"
+  values: string[]; // e.g. ["50ml", "100ml"]
+};
 
 export type ProductInput = {
   id?: string;
@@ -16,6 +22,9 @@ export type ProductInput = {
   benefits: string[];
   featured: boolean;
   active: boolean;
+  track_stock: boolean;
+  stock_qty: number;
+  options: ProductOption[];
 };
 
 const empty: ProductInput = {
@@ -30,6 +39,9 @@ const empty: ProductInput = {
   benefits: [],
   featured: false,
   active: true,
+  track_stock: false,
+  stock_qty: 0,
+  options: [],
 };
 
 const inputCls =
@@ -40,10 +52,41 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
   const nav = useNavigate();
   const [form, setForm] = useState<ProductInput>(initial ?? empty);
   const [saving, setSaving] = useState(false);
+  const [newOptName, setNewOptName] = useState("");
 
   const set = <K extends keyof ProductInput>(k: K, v: ProductInput[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
 
+  // ── Options helpers ──────────────────────────────────────────
+  const addOption = () => {
+    const name = newOptName.trim();
+    if (!name) return;
+    if (form.options.find((o) => o.name.toLowerCase() === name.toLowerCase())) return;
+    set("options", [...form.options, { name, values: [] }]);
+    setNewOptName("");
+  };
+
+  const removeOption = (idx: number) => {
+    set("options", form.options.filter((_, i) => i !== idx));
+  };
+
+  const addOptionValue = (idx: number, raw: string) => {
+    const val = raw.trim();
+    if (!val) return;
+    const opts = form.options.map((o, i) =>
+      i === idx ? { ...o, values: [...o.values, val] } : o
+    );
+    set("options", opts);
+  };
+
+  const removeOptionValue = (optIdx: number, valIdx: number) => {
+    const opts = form.options.map((o, i) =>
+      i === optIdx ? { ...o, values: o.values.filter((_, vi) => vi !== valIdx) } : o
+    );
+    set("options", opts);
+  };
+
+  // ── Submit ───────────────────────────────────────────────────
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -59,177 +102,183 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
       benefits: form.benefits,
       featured: form.featured,
       active: form.active,
+      track_stock: form.track_stock,
+      stock_qty: form.track_stock ? Number(form.stock_qty) : 0,
+      options: form.options,
     };
 
     if (form.id) {
       const { error } = await supabase.from("products").update(payload).eq("id", form.id);
-      if (error) {
-        toast.error(error.message);
-        setSaving(false);
-        return;
-      }
+      if (error) { toast.error(error.message); setSaving(false); return; }
       toast.success("Product updated");
     } else {
       const { error } = await supabase.from("products").insert(payload);
-      if (error) {
-        toast.error(error.message);
-        setSaving(false);
-        return;
-      }
+      if (error) { toast.error(error.message); setSaving(false); return; }
       toast.success("Product created");
     }
     nav({ to: "/admin/products" });
   };
 
   return (
-    <form onSubmit={submit} className="space-y-6 max-w-3xl">
+    <form onSubmit={submit} className="space-y-8 max-w-3xl">
+
+      {/* Basic Info */}
       <div className="grid sm:grid-cols-2 gap-6">
         <div>
           <label className={labelCls}>Name</label>
-          <input
-            className={inputCls}
-            required
-            value={form.name}
-            onChange={(e) => set("name", e.target.value)}
-          />
+          <input className={inputCls} required value={form.name} onChange={(e) => set("name", e.target.value)} />
         </div>
         <div>
           <label className={labelCls}>Slug</label>
-          <input
-            className={inputCls}
-            required
-            value={form.slug}
-            onChange={(e) => set("slug", e.target.value)}
-            placeholder="adaptogenic-elixir"
-          />
+          <input className={inputCls} required value={form.slug} onChange={(e) => set("slug", e.target.value)} placeholder="adaptogenic-elixir" />
         </div>
       </div>
 
       <div>
         <label className={labelCls}>Tagline</label>
-        <input
-          className={inputCls}
-          required
-          value={form.tagline}
-          onChange={(e) => set("tagline", e.target.value)}
-        />
+        <input className={inputCls} required value={form.tagline} onChange={(e) => set("tagline", e.target.value)} />
       </div>
 
       <div>
         <label className={labelCls}>Description</label>
-        <textarea
-          rows={5}
-          className={inputCls}
-          required
-          value={form.description}
-          onChange={(e) => set("description", e.target.value)}
-        />
+        <textarea rows={5} className={inputCls} required value={form.description} onChange={(e) => set("description", e.target.value)} />
       </div>
 
       <div className="grid sm:grid-cols-3 gap-6">
         <div>
           <label className={labelCls}>Price (USD)</label>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            required
-            className={inputCls}
-            value={form.price}
-            onChange={(e) => set("price", parseFloat(e.target.value) || 0)}
-          />
+          <input type="number" step="0.01" min="0" required className={inputCls} value={form.price} onChange={(e) => set("price", parseFloat(e.target.value) || 0)} />
         </div>
         <div>
           <label className={labelCls}>Category</label>
-          <input
-            className={inputCls}
-            required
-            value={form.category}
-            onChange={(e) => set("category", e.target.value)}
-          />
+          <input className={inputCls} required value={form.category} onChange={(e) => set("category", e.target.value)} />
         </div>
         <div>
           <label className={labelCls}>Image key</label>
-          <input
-            className={inputCls}
-            value={form.image}
-            onChange={(e) => set("image", e.target.value)}
-            placeholder="defaults to slug"
-          />
+          <input className={inputCls} value={form.image} onChange={(e) => set("image", e.target.value)} placeholder="defaults to slug" />
         </div>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-6">
         <div>
           <label className={labelCls}>Ingredients (comma separated)</label>
-          <input
-            className={inputCls}
-            value={form.ingredients.join(", ")}
-            onChange={(e) =>
-              set(
-                "ingredients",
-                e.target.value
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter(Boolean),
-              )
-            }
-          />
+          <input className={inputCls} value={form.ingredients.join(", ")} onChange={(e) => set("ingredients", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))} />
         </div>
         <div>
           <label className={labelCls}>Benefits (comma separated)</label>
-          <input
-            className={inputCls}
-            value={form.benefits.join(", ")}
-            onChange={(e) =>
-              set(
-                "benefits",
-                e.target.value
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter(Boolean),
-              )
-            }
-          />
+          <input className={inputCls} value={form.benefits.join(", ")} onChange={(e) => set("benefits", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))} />
         </div>
       </div>
 
+      {/* Stock */}
+      <div className="border border-gold/20 p-6 space-y-5">
+        <h3 className="text-[10px] uppercase tracking-luxury text-gold">Inventory</h3>
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked={form.track_stock} onChange={(e) => set("track_stock", e.target.checked)} className="accent-gold w-4 h-4" />
+          <span className="text-[11px] uppercase tracking-luxury">Track stock quantity</span>
+        </label>
+        {form.track_stock && (
+          <div className="max-w-xs">
+            <label className={labelCls}>Stock Quantity</label>
+            <input
+              type="number"
+              min="0"
+              className={inputCls}
+              value={form.stock_qty}
+              onChange={(e) => set("stock_qty", parseInt(e.target.value) || 0)}
+            />
+            <p className="mt-2 text-[10px] text-muted-foreground">
+              {form.stock_qty === 0 ? "⚠ Out of stock" : form.stock_qty <= 5 ? `⚠ Low stock (${form.stock_qty} left)` : `✓ In stock (${form.stock_qty} units)`}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Options */}
+      <div className="border border-gold/20 p-6 space-y-5">
+        <h3 className="text-[10px] uppercase tracking-luxury text-gold">Product Options</h3>
+        <p className="text-[11px] text-muted-foreground">e.g. Size, Flavor, Strength — customers pick one value per option at checkout.</p>
+
+        {form.options.map((opt, oi) => (
+          <div key={oi} className="border border-gold/10 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">{opt.name}</span>
+              <button type="button" onClick={() => removeOption(oi)} className="text-destructive hover:text-destructive/80 transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {opt.values.map((val, vi) => (
+                <span key={vi} className="flex items-center gap-1 bg-gold/10 border border-gold/20 px-3 py-1 text-[11px]">
+                  {val}
+                  <button type="button" onClick={() => removeOptionValue(oi, vi)} className="text-muted-foreground hover:text-destructive ml-1">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                className="flex-1 bg-obsidian border border-gold/20 px-3 py-2 text-sm focus:border-gold focus:outline-none"
+                placeholder={`Add ${opt.name} value…`}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addOptionValue(oi, (e.target as HTMLInputElement).value);
+                    (e.target as HTMLInputElement).value = "";
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  const inp = (e.currentTarget.previousSibling as HTMLInputElement);
+                  addOptionValue(oi, inp.value);
+                  inp.value = "";
+                }}
+                className="px-4 py-2 border border-gold/40 text-gold text-[11px] uppercase tracking-luxury hover:bg-gold hover:text-obsidian transition-colors"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        ))}
+
+        <div className="flex gap-2">
+          <input
+            className="flex-1 bg-obsidian border border-gold/20 px-3 py-2 text-sm focus:border-gold focus:outline-none"
+            placeholder="Option name (e.g. Size)"
+            value={newOptName}
+            onChange={(e) => setNewOptName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addOption(); } }}
+          />
+          <button
+            type="button"
+            onClick={addOption}
+            className="flex items-center gap-2 px-4 py-2 border border-gold/40 text-gold text-[11px] uppercase tracking-luxury hover:bg-gold hover:text-obsidian transition-colors"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add Option
+          </button>
+        </div>
+      </div>
+
+      {/* Visibility */}
       <div className="flex flex-wrap gap-6">
         <label className="flex items-center gap-3 text-sm cursor-pointer">
-          <input
-            type="checkbox"
-            checked={form.active}
-            onChange={(e) => set("active", e.target.checked)}
-            className="accent-gold w-4 h-4"
-          />
-          <span className="text-[11px] uppercase tracking-luxury">
-            Active (visible on storefront)
-          </span>
+          <input type="checkbox" checked={form.active} onChange={(e) => set("active", e.target.checked)} className="accent-gold w-4 h-4" />
+          <span className="text-[11px] uppercase tracking-luxury">Active (visible on storefront)</span>
         </label>
         <label className="flex items-center gap-3 text-sm cursor-pointer">
-          <input
-            type="checkbox"
-            checked={form.featured}
-            onChange={(e) => set("featured", e.target.checked)}
-            className="accent-gold w-4 h-4"
-          />
+          <input type="checkbox" checked={form.featured} onChange={(e) => set("featured", e.target.checked)} className="accent-gold w-4 h-4" />
           <span className="text-[11px] uppercase tracking-luxury">Featured on home</span>
         </label>
       </div>
 
       <div className="flex gap-3 pt-6 border-t border-gold/15">
-        <button
-          type="submit"
-          disabled={saving}
-          className="bg-gold text-obsidian px-8 py-3 text-[11px] uppercase tracking-luxury hover:bg-gold-light transition-colors disabled:opacity-50"
-        >
+        <button type="submit" disabled={saving} className="bg-gold text-obsidian px-8 py-3 text-[11px] uppercase tracking-luxury hover:bg-gold-light transition-colors disabled:opacity-50">
           {saving ? "Saving…" : form.id ? "Save Changes" : "Create Product"}
         </button>
-        <button
-          type="button"
-          onClick={() => nav({ to: "/admin/products" })}
-          className="border border-gold/40 text-gold px-8 py-3 text-[11px] uppercase tracking-luxury hover:bg-gold hover:text-obsidian transition-colors"
-        >
+        <button type="button" onClick={() => nav({ to: "/admin/products" })} className="border border-gold/40 text-gold px-8 py-3 text-[11px] uppercase tracking-luxury hover:bg-gold hover:text-obsidian transition-colors">
           Cancel
         </button>
       </div>
