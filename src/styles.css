@@ -73,7 +73,7 @@
   --secondary: var(--surface-2);
   --secondary-foreground: oklch(0.96 0 0);
   --muted: var(--surface-2);
-  --muted-foreground: oklch(0.65 0 0);
+  --muted-foreground: oklch(0.75 0 0);
   --accent: var(--gold);
   --accent-foreground: var(--obsidian);
   --destructive: oklch(0.55 0.2 25);
@@ -113,7 +113,7 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-body);
-    font-weight: 300;
+    font-weight: 400;
     -webkit-font-smoothing: antialiased;
   }
   h1,
@@ -190,6 +190,20 @@
     opacity: 0.6;
   }
 }
+
+/* ─── Readability overrides ─────────────────────────────────────────────── */
+/* Minimum body text size — nothing falls below 13px */
+.text-xs   { font-size: 0.8125rem; line-height: 1.5; }   /* 13px */
+.text-sm   { font-size: 0.875rem;  line-height: 1.6; }   /* 14px */
+
+/* Uppercase tracking labels — the [10px]/[11px] pattern — minimum 11px */
+.tracking-luxury { font-size: max(0.6875rem, 1em); }
+
+/* Lift muted body text opacity site-wide */
+.text-foreground\/75  { color: oklch(0.88 0 0 / 0.85) !important; }
+.text-foreground\/80  { color: oklch(0.88 0 0 / 0.88) !important; }
+.text-foreground\/85  { color: oklch(0.88 0 0 / 0.9)  !important; }
+.text-foreground\/90  { color: oklch(0.88 0 0 / 0.93) !important; }
 
 /* Scrollbar */
 ::-webkit-scrollbar {

@@ -29,7 +29,7 @@ function AboutPage() {
           </h1>
         </motion.div>
 
-        <div className="mt-20 space-y-12 text-lg leading-relaxed text-foreground/85 font-light">
+        <div className="mt-20 space-y-12 text-lg leading-relaxed text-foreground/85">
           {[
             "ZXG Wellness was built on a simple belief: that caring for yourself should feel as meaningful as anything else you do with intention. We were founded by people who were tired of wellness that felt clinical, impersonal, or rushed — and who believed that something better was possible.",
             "What started as a passion for clean formulation became a commitment to craft. Every product we create is developed slowly — through careful botanical sourcing, honest ingredients, and a standard we hold to without compromise. We don't cut corners. We don't follow trends. We follow what actually works.",
