@@ -8,6 +8,7 @@ import headerLogo from "@/assets/Logo/Header Nav Logo.png";
 const links = [
   { to: "/", label: "Home" },
   { to: "/products", label: "Products" },
+  { to: "/how-to-use", label: "How to Use" },
   { to: "/about", label: "About" },
   { to: "/returns", label: "Returns" },
   { to: "/contact", label: "Contact" },
