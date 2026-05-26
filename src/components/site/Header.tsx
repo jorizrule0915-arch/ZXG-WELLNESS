@@ -41,19 +41,19 @@ export function Header() {
           : "bg-transparent border-b border-transparent"
       }`}
     >
-      <div className="mx-auto max-w-7xl px-6 lg:px-10 h-16 flex items-center justify-between">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10 h-[68px] flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <img src={headerLogo} alt="ZXG Wellness" className="h-10 w-auto" />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-10">
+        <nav className="hidden md:flex items-center gap-8">
           {links.map((l) => {
             const active = pathname === l.to;
             return (
               <Link
                 key={l.to}
                 to={l.to}
-                className="group relative text-[11px] uppercase tracking-luxury text-foreground/80 hover:text-gold transition-colors"
+                className="group relative text-[13px] uppercase tracking-widest text-foreground hover:text-gold transition-colors font-medium"
               >
                 {l.label}
                 <span
@@ -102,12 +102,12 @@ export function Header() {
           mobileOpen ? "max-h-96" : "max-h-0"
         }`}
       >
-        <nav className="flex flex-col py-4 px-6">
+        <nav className="flex flex-col py-2 px-6">
           {links.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className="py-3 text-sm uppercase tracking-luxury text-foreground/85 hover:text-gold border-b border-gold/10 last:border-0"
+              className="py-4 text-[15px] uppercase tracking-widest text-foreground font-medium hover:text-gold border-b border-gold/10 last:border-0 transition-colors"
             >
               {l.label}
             </Link>
