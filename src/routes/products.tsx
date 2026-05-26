@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchProducts, type Product } from "@/lib/products";
 import { ProductCard } from "@/components/site/ProductCard";
 
-const categories = ["All", "Supplements", "Skincare"] as const;
+const categories = ["All", "Supplements", "Skincare", "Accessories"] as const;
 
 export const Route = createFileRoute("/products")({ component: ProductsPage });
 
