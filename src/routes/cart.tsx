@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { Plus, Minus, X } from "lucide-react";
-import { useCart, cartTotal } from "@/lib/cart";
+import { useCart, cartTotal, SHIPPING_FEE } from "@/lib/cart";
 
 export const Route = createFileRoute("/cart")({ component: CartPage });
 
@@ -88,13 +88,13 @@ function CartPage() {
                 Order Summary
               </div>
               <div className="space-y-3 text-sm">
-                <Row label="Subtotal" value={`$${total.toFixed(0)}`} />
-                <Row label="Shipping" value="Complimentary" />
+                <Row label="Subtotal" value={`${total.toFixed(2)}`} />
+                <Row label="Shipping" value={`${SHIPPING_FEE.toFixed(2)}`} />
                 <Row label="Estimated tax" value="At checkout" />
               </div>
               <div className="mt-6 pt-6 border-t border-gold/15 flex items-center justify-between">
                 <span className="text-[11px] uppercase tracking-luxury">Total</span>
-                <span className="font-display text-3xl text-gold">${total.toFixed(0)}</span>
+                <span className="font-display text-3xl text-gold">${(total + SHIPPING_FEE).toFixed(2)}</span>
               </div>
               <Link
                 to="/checkout"

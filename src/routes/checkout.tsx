@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { useState, type FormEvent } from "react";
-import { useCart, cartTotal, type CartItem } from "@/lib/cart";
+import { useCart, cartTotal, SHIPPING_FEE, type CartItem } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { imageFor } from "@/lib/productImages";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,7 +45,7 @@ function CheckoutPage() {
       const response = await fetch("/api/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: total, email: String(email) }),
+        body: JSON.stringify({ amount: total + SHIPPING_FEE, email: String(email) }),
       });
 
       let responseData;
@@ -83,7 +83,7 @@ function CheckoutPage() {
         .insert({
           user_id: user.id,
           status: "paid",
-          total,
+          total: total + SHIPPING_FEE,
           email: String(formData.get("email") ?? ""),
           shipping_name: `${formData.get("first") ?? ""} ${formData.get("last") ?? ""}`.trim(),
           shipping_address: String(formData.get("address") ?? ""),
@@ -260,16 +260,16 @@ function CheckoutPage() {
             <div className="mt-6 pt-6 border-t border-gold/15 space-y-2 text-sm text-foreground/80">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${total.toFixed(0)}</span>
+                <span>${total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>Complimentary</span>
+                <span>${SHIPPING_FEE.toFixed(2)}</span>
               </div>
             </div>
             <div className="mt-6 pt-6 border-t border-gold/15 flex justify-between items-center">
               <span className="text-[11px] uppercase tracking-luxury">Total</span>
-              <span className="font-display text-3xl text-gold">${total.toFixed(0)}</span>
+              <span className="font-display text-3xl text-gold">${(total + SHIPPING_FEE).toFixed(2)}</span>
             </div>
             {err && <div className="mt-4 text-xs text-destructive">{err}</div>}
             <button
@@ -340,16 +340,16 @@ function CheckoutPaymentForm({
             <div className="mt-6 pt-6 border-t border-gold/15 space-y-2 text-sm text-foreground/80">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${total.toFixed(0)}</span>
+                <span>${total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>Complimentary</span>
+                <span>${SHIPPING_FEE.toFixed(2)}</span>
               </div>
             </div>
             <div className="mt-6 pt-6 border-t border-gold/15 flex justify-between items-center">
               <span className="text-[11px] uppercase tracking-luxury">Total</span>
-              <span className="font-display text-3xl text-gold">${total.toFixed(0)}</span>
+              <span className="font-display text-3xl text-gold">${(total + SHIPPING_FEE).toFixed(2)}</span>
             </div>
           </aside>
         </div>

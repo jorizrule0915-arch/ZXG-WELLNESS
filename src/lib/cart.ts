@@ -57,3 +57,5 @@ export const useCart = create<CartState>()(
 export const cartCount = (items: CartItem[]) => items.reduce((n, i) => n + i.quantity, 0);
 
 export const cartTotal = (items: CartItem[]) => items.reduce((s, i) => s + i.price * i.quantity, 0);
+
+export const SHIPPING_FEE = 10;
