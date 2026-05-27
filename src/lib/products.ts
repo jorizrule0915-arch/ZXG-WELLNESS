@@ -115,15 +115,16 @@ export const localProducts: Product[] = [
     tagline: "Ultra-fine micro-tip — 100 per box",
     description:
       "ZXG single-use pen needles are designed for a smoother, more comfortable attachment experience. Every box includes 100 ultra-fine needles, making them a convenient staple alongside reusable pens.",
-    price: 8,
+    price: 10,
     category: "Accessories",
     image: imageFor("needles"),
     ingredients: ["Ultra-fine micro-tip", "100 per box", "Clean sterile finish"],
     benefits: ["Works with ZXG pens", "Designed for controlled use", "Easy-to-store packaging"],
     featured: false,
     variants: [
-      { label: "32g × 4mm", price: 8 },
-      { label: "31g × 8mm", price: 8 },
+      { label: "32g × 4mm", price: 10 },
+      { label: "31g × 8mm", price: 10 },
+      { label: "6mm 31G", price: 10 },
     ],
   },
   {
