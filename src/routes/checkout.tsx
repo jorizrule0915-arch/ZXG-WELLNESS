@@ -96,6 +96,7 @@ function CheckoutPage() {
             name: `${formData.get("first") ?? ""} ${formData.get("last") ?? ""}`.trim(),
             address: String(formData.get("address") ?? ""),
             city: String(formData.get("city") ?? ""),
+            state: String(formData.get("state") ?? ""),
             zip: String(formData.get("zip") ?? ""),
           },
           items: items.map((item) => ({
@@ -229,6 +230,7 @@ function CheckoutPage() {
                   <Field label="Address" name="address" />
                 </div>
                 <Field label="City" name="city" />
+                <Field label="State" name="state" />
                 <Field label="Postal code" name="zip" />
               </div>
             </FormSection>

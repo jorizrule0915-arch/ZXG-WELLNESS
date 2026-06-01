@@ -39,6 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const trustedCart = await calculateTrustedCart(supabase, items);
     const paymentIntent = await createPaymentIntent(trustedCart.amountCents, email, {
       userId: user.id,
+      customerEmail: String(email),
       cartTotal: trustedCart.total.toFixed(2),
       cartHash: trustedCart.cartHash,
     });

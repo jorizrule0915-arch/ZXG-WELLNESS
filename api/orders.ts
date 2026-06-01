@@ -22,7 +22,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!paymentIntentId) {
       return res.status(400).json({ error: "paymentIntentId is required" });
     }
-    if (!shipping?.email || !shipping?.name || !shipping?.address || !shipping?.city || !shipping?.zip) {
+    if (
+      !shipping?.email ||
+      !shipping?.name ||
+      !shipping?.address ||
+      !shipping?.city ||
+      !shipping?.state ||
+      !shipping?.zip
+    ) {
       return res.status(400).json({ error: "Shipping details are required" });
     }
 
@@ -59,6 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         shipping_name: String(shipping.name),
         shipping_address: String(shipping.address),
         shipping_city: String(shipping.city),
+        shipping_state: String(shipping.state),
         shipping_zip: String(shipping.zip),
         stripe_payment_intent_id: paymentIntent.id,
       })

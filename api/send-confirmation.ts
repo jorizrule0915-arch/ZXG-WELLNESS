@@ -21,6 +21,7 @@ function buildEmailHtml(order: {
   shipping_address: string;
   shipping_city: string;
   shipping_zip: string;
+  shipping_state?: string | null;
   total: number;
   created_at: string;
   items: { product_name: string; quantity: number; unit_price: number }[];
@@ -154,7 +155,7 @@ function buildEmailHtml(order: {
               <p style="margin:0;font-size:14px;color:#e8e8e8;line-height:1.8;">
                 ${order.shipping_name}<br/>
                 ${order.shipping_address}<br/>
-                ${order.shipping_city}, ${order.shipping_zip}
+                ${order.shipping_city}${order.shipping_state ? `, ${order.shipping_state}` : ""} ${order.shipping_zip}
               </p>
             </td>
           </tr>

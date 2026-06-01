@@ -18,6 +18,7 @@ type Order = {
   shipping_name: string;
   shipping_address: string;
   shipping_city: string;
+  shipping_state: string | null;
   shipping_zip: string;
   order_items: Item[];
 };
@@ -182,7 +183,8 @@ function AdminOrders() {
                             <div>{o.shipping_name}</div>
                             <div>{o.shipping_address}</div>
                             <div>
-                              {o.shipping_city}, {o.shipping_zip}
+                              {o.shipping_city}
+                              {o.shipping_state ? `, ${o.shipping_state}` : ""} {o.shipping_zip}
                             </div>
                             <div className="text-muted-foreground text-xs mt-2">{o.email}</div>
                           </div>
