@@ -69,9 +69,9 @@ function ProductDetail() {
     : product.price;
 
   const cartName = selectedColor
-    ? `${product.name} — ${selectedColor.label}`
+    ? `${product.name} - ${selectedColor.label}`
     : selectedVariant
-    ? `${product.name} — ${selectedVariant.label}`
+    ? `${product.name} - ${selectedVariant.label}`
     : product.name;
 
   return (
@@ -231,7 +231,14 @@ function ProductDetail() {
             <div className="mt-10 hairline" />
             <div className="mt-8">
               <button
-                onClick={() => add({ ...product, price: displayPrice, name: cartName })}
+                onClick={() =>
+                  add({
+                    ...product,
+                    price: displayPrice,
+                    name: cartName,
+                    selectedOptionLabel: selectedColor?.label ?? selectedVariant?.label,
+                  })
+                }
                 className="w-full py-4 bg-gold text-obsidian text-xs uppercase tracking-luxury font-semibold hover:bg-gold-light transition-all glow-gold-sm"
               >
                 Add to Cart →

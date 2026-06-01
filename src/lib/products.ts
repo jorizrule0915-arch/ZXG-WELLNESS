@@ -26,6 +26,7 @@ export type Product = {
   featured: boolean;
   variants?: ProductVariant[];
   colorVariants?: ProductColorVariant[];
+  selectedOptionLabel?: string;
 };
 
 type Row = {

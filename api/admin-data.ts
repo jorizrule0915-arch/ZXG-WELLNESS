@@ -1,24 +1,15 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { createClient } from "@supabase/supabase-js";
-
-function getSupabase() {
-  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("Supabase env vars missing");
-  return createClient(url, key);
-}
+import { enforceRateLimit, requireAdmin, sendApiError, setJsonHeaders } from "./_security";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  setJsonHeaders(res);
   if (req.method === "OPTIONS") return res.status(200).end();
 
   const resource = req.query.resource as string;
 
   try {
-    const supabase = getSupabase();
+    enforceRateLimit(req, "admin-data", { limit: req.method === "GET" ? 120 : 30, windowMs: 60_000 });
+    const { supabase } = await requireAdmin(req);
 
     // ── GET requests ──────────────────────────────────────────────
     if (req.method === "GET") {
@@ -224,7 +215,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    return res.status(500).json({ error: msg });
+    return sendApiError(res, err);
   }
 }

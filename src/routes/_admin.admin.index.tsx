@@ -14,6 +14,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import { authFetch } from "@/lib/api";
 
 export const Route = createFileRoute("/_admin/admin/")({ component: AdminDashboard });
 
@@ -32,7 +33,7 @@ function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin-data?resource=dashboard")
+    authFetch("/api/admin-data?resource=dashboard")
       .then((r) => r.json())
       .then((data) => {
         if (data.error) setError(data.error);

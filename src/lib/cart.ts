@@ -8,6 +8,7 @@ export type CartItem = {
   price: number;
   image: string;
   quantity: number;
+  optionLabel?: string;
 };
 
 type CartState = {
@@ -34,7 +35,14 @@ export const useCart = create<CartState>()(
             ? s.items.map((i) => (i.slug === p.slug ? { ...i, quantity: i.quantity + 1 } : i))
             : [
                 ...s.items,
-                { slug: p.slug, name: p.name, price: p.price, image: p.image, quantity: 1 },
+                {
+                  slug: p.slug,
+                  name: p.name,
+                  price: p.price,
+                  image: p.image,
+                  quantity: 1,
+                  optionLabel: p.selectedOptionLabel,
+                },
               ];
           return { items, isOpen: true };
         }),

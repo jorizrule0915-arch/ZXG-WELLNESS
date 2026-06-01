@@ -1,20 +1,21 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
+import { enforceRateLimit, requireAdmin, sendApiError, setJsonHeaders } from "./_security";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  setJsonHeaders(res);
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { email, name, message } = req.body || {};
-  if (!email || !message) return res.status(400).json({ error: "email and message required" });
+  try {
+    enforceRateLimit(req, "send-warning", { limit: 10, windowMs: 60_000 });
+    await requireAdmin(req);
+    const { email, name, message } = req.body || {};
+    if (!email || !message) return res.status(400).json({ error: "email and message required" });
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-  const { error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
     from: "ZXG Wellness <admin@zxgwellness.com>",
     to: email,
     subject: "Important Notice — ZXG Wellness",
@@ -50,6 +51,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 </html>`,
   });
 
-  if (error) return res.status(500).json({ error: "Failed to send email" });
-  return res.status(200).json({ success: true });
+    if (error) return res.status(500).json({ error: "Failed to send email" });
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    return sendApiError(res, error);
+  }
 }

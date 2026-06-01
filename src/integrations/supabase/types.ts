@@ -66,6 +66,7 @@ export type Database = {
           shipping_name: string;
           shipping_zip: string;
           status: Database["public"]["Enums"]["order_status"];
+          stripe_payment_intent_id: string | null;
           total: number;
           updated_at: string;
           user_id: string;
@@ -79,6 +80,7 @@ export type Database = {
           shipping_name: string;
           shipping_zip: string;
           status?: Database["public"]["Enums"]["order_status"];
+          stripe_payment_intent_id?: string | null;
           total: number;
           updated_at?: string;
           user_id: string;
@@ -92,6 +94,7 @@ export type Database = {
           shipping_name?: string;
           shipping_zip?: string;
           status?: Database["public"]["Enums"]["order_status"];
+          stripe_payment_intent_id?: string | null;
           total?: number;
           updated_at?: string;
           user_id?: string;
@@ -110,9 +113,12 @@ export type Database = {
           image: string;
           ingredients: string[];
           name: string;
+          options: Json;
           price: number;
           slug: string;
+          stock_qty: number;
           tagline: string;
+          track_stock: boolean;
           updated_at: string;
         };
         Insert: {
@@ -126,9 +132,12 @@ export type Database = {
           image: string;
           ingredients?: string[];
           name: string;
+          options?: Json;
           price: number;
           slug: string;
+          stock_qty?: number;
           tagline: string;
+          track_stock?: boolean;
           updated_at?: string;
         };
         Update: {
@@ -142,9 +151,12 @@ export type Database = {
           image?: string;
           ingredients?: string[];
           name?: string;
+          options?: Json;
           price?: number;
           slug?: string;
+          stock_qty?: number;
           tagline?: string;
+          track_stock?: boolean;
           updated_at?: string;
         };
         Relationships: [];

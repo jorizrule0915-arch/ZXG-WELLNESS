@@ -1,18 +1,17 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
-import { createClient } from "@supabase/supabase-js";
+import {
+  getSupabaseAdmin as createSupabaseAdmin,
+  enforceRateLimit,
+  requireUser,
+  sendApiError,
+  setJsonHeaders,
+} from "./_security";
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY is not configured.");
   return new Resend(key);
-}
-
-function getSupabaseAdmin() {
-  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("Supabase admin env vars missing.");
-  return createClient(url, key);
 }
 
 function buildEmailHtml(order: {
@@ -33,6 +32,11 @@ function buildEmailHtml(order: {
   });
 
   const shortId = order.id.slice(0, 8).toUpperCase();
+  const subtotal = order.items.reduce(
+    (sum, item) => sum + Number(item.unit_price) * Number(item.quantity),
+    0,
+  );
+  const shipping = Math.max(0, Number(order.total) - subtotal);
 
   const itemRows = order.items
     .map(
@@ -121,13 +125,13 @@ function buildEmailHtml(order: {
                 <tr>
                   <td style="text-align:right;padding:6px 0;">
                     <span style="font-size:12px;color:#6a6a6a;letter-spacing:1px;">Subtotal</span>
-                    <span style="font-size:14px;color:#e8e8e8;margin-left:32px;">$${order.total.toFixed(2)}</span>
+                    <span style="font-size:14px;color:#e8e8e8;margin-left:32px;">$${subtotal.toFixed(2)}</span>
                   </td>
                 </tr>
                 <tr>
                   <td style="text-align:right;padding:6px 0;">
                     <span style="font-size:12px;color:#6a6a6a;letter-spacing:1px;">Shipping</span>
-                    <span style="font-size:14px;color:#e8e8e8;margin-left:32px;">Complimentary</span>
+                    <span style="font-size:14px;color:#e8e8e8;margin-left:32px;">$${shipping.toFixed(2)}</span>
                   </td>
                 </tr>
                 <tr>
@@ -194,19 +198,18 @@ function buildEmailHtml(order: {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  setJsonHeaders(res);
 
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
+    enforceRateLimit(req, "send-confirmation", { limit: 10, windowMs: 60_000 });
+    const { user } = await requireUser(req);
     const { orderId } = req.body || {};
     if (!orderId) return res.status(400).json({ error: "orderId is required" });
 
-    const supabase = getSupabaseAdmin();
+    const supabase = createSupabaseAdmin();
 
     // Fetch order
     const { data: order, error: orderError } = await supabase
@@ -217,6 +220,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (orderError || !order) {
       return res.status(404).json({ error: "Order not found" });
+    }
+    if (order.user_id !== user.id) {
+      const { data: role } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (!role) return res.status(403).json({ error: "Forbidden" });
     }
 
     // Fetch order items
@@ -250,8 +262,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ success: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("send-confirmation error:", message);
-    return res.status(500).json({ error: message });
+    console.error("send-confirmation error:", error);
+    return sendApiError(res, error);
   }
 }

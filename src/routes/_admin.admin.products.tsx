@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { authFetch } from "@/lib/api";
 
 export const Route = createFileRoute("/_admin/admin/products")({ component: AdminProducts });
 
@@ -33,7 +34,7 @@ function AdminProducts() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin-data?resource=products");
+      const res = await authFetch("/api/admin-data?resource=products");
       const data = await res.json();
       if (data.error) {
         toast.error(data.error);
@@ -53,7 +54,7 @@ function AdminProducts() {
 
   const toggleActive = async (id: string, current: boolean) => {
     try {
-      const res = await fetch("/api/admin-data", {
+      const res = await authFetch("/api/admin-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "toggle-product-active", id, payload: { active: !current } }),
@@ -70,7 +71,7 @@ function AdminProducts() {
   const remove = async (id: string, name: string) => {
     if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
     try {
-      const res = await fetch("/api/admin-data", {
+      const res = await authFetch("/api/admin-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "delete-product", id }),

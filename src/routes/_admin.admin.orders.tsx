@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import { authFetch } from "@/lib/api";
 
 export const Route = createFileRoute("/_admin/admin/orders")({ component: AdminOrders });
 
@@ -32,7 +33,7 @@ function AdminOrders() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin-data?resource=orders");
+      const res = await authFetch("/api/admin-data?resource=orders");
       const data = await res.json();
       if (data.error) {
         toast.error(data.error);
@@ -52,7 +53,7 @@ function AdminOrders() {
 
   const updateStatus = async (id: string, status: Order["status"]) => {
     try {
-      const res = await fetch("/api/admin-data", {
+      const res = await authFetch("/api/admin-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "update-order-status", id, payload: { status } }),

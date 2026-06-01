@@ -4,9 +4,9 @@ import { useState, type FormEvent } from "react";
 import { useCart, cartTotal, SHIPPING_FEE, type CartItem } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { imageFor } from "@/lib/productImages";
-import { supabase } from "@/integrations/supabase/client";
 import { StripeProvider } from "@/components/site/StripeProvider";
 import { PaymentForm } from "@/components/site/PaymentForm";
+import { authFetch } from "@/lib/api";
 
 export const Route = createFileRoute("/checkout")({ component: CheckoutPage });
 
@@ -42,10 +42,18 @@ function CheckoutPage() {
         throw new Error("Email is required");
       }
 
-      const response = await fetch("/api/payment", {
+      const response = await authFetch("/api/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: total + SHIPPING_FEE, email: String(email) }),
+        body: JSON.stringify({
+          email: String(email),
+          items: items.map((item) => ({
+            slug: item.slug,
+            quantity: item.quantity,
+            optionLabel: item.optionLabel,
+            name: item.name,
+          })),
+        }),
       });
 
       let responseData;
@@ -73,45 +81,40 @@ function CheckoutPage() {
     }
   };
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
     if (!formData || !user) return;
     setSubmitting(true);
 
     try {
-      const { data: order, error } = await supabase
-        .from("orders")
-        .insert({
-          user_id: user.id,
-          status: "paid",
-          total: total + SHIPPING_FEE,
-          email: String(formData.get("email") ?? ""),
-          shipping_name: `${formData.get("first") ?? ""} ${formData.get("last") ?? ""}`.trim(),
-          shipping_address: String(formData.get("address") ?? ""),
-          shipping_city: String(formData.get("city") ?? ""),
-          shipping_zip: String(formData.get("zip") ?? ""),
-        })
-        .select("id")
-        .single();
-
-      if (error || !order) throw error ?? new Error("Order creation failed");
-
-      const { error: itemsError } = await supabase.from("order_items").insert(
-        items.map((i) => ({
-          order_id: order.id,
-          product_slug: i.slug,
-          product_name: i.name,
-          unit_price: i.price,
-          quantity: i.quantity,
-        })),
-      );
-      if (itemsError) throw itemsError;
+      const orderResponse = await authFetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          paymentIntentId,
+          shipping: {
+            email: String(formData.get("email") ?? ""),
+            name: `${formData.get("first") ?? ""} ${formData.get("last") ?? ""}`.trim(),
+            address: String(formData.get("address") ?? ""),
+            city: String(formData.get("city") ?? ""),
+            zip: String(formData.get("zip") ?? ""),
+          },
+          items: items.map((item) => ({
+            slug: item.slug,
+            quantity: item.quantity,
+            optionLabel: item.optionLabel,
+            name: item.name,
+          })),
+        }),
+      });
+      const orderData = await orderResponse.json();
+      if (!orderResponse.ok) throw new Error(orderData?.error || "Order creation failed");
 
       // Send order confirmation + invoice email
       try {
-        await fetch("/api/send-confirmation", {
+        await authFetch("/api/send-confirmation", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId: order.id }),
+          body: JSON.stringify({ orderId: orderData.orderId }),
         });
       } catch (emailErr) {
         // Non-blocking — don't fail the order if email fails
@@ -296,7 +299,7 @@ function CheckoutPaymentForm({
 }: {
   clientSecret: string;
   isProcessing: boolean;
-  onSuccess: () => void;
+  onSuccess: (paymentIntentId: string) => void;
   onError: (err: string) => void;
   items: CartItem[];
   total: number;

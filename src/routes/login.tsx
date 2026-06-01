@@ -44,7 +44,7 @@ function LoginPage() {
         _user_id: data.session.user.id,
         _role: "admin",
       });
-      nav({ to: isAdmin ? "/admin/" : "/account" });
+      nav({ to: isAdmin ? "/admin" : "/account" });
     });
   }, [nav]);
 
@@ -76,7 +76,7 @@ function LoginPage() {
         _user_id: session.user.id,
         _role: "admin",
       });
-      nav({ to: isAdmin ? "/admin/" : "/account" });
+      nav({ to: isAdmin ? "/admin" : "/account" });
     } else {
       nav({ to: "/account" });
     }

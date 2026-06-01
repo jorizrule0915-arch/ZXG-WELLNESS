@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 
 interface PaymentFormProps {
   isProcessing: boolean;
-  onSuccess: () => void;
+  onSuccess: (paymentIntentId: string) => void;
   onError: (error: string) => void;
 }
 
@@ -33,7 +33,7 @@ export function PaymentForm({ isProcessing, onSuccess, onError }: PaymentFormPro
       if (error) {
         onError(error.message || "Payment failed");
       } else if (paymentIntent?.status === "succeeded") {
-        onSuccess();
+        onSuccess(paymentIntent.id);
       }
     } catch (e) {
       onError(e instanceof Error ? e.message : "Payment failed");

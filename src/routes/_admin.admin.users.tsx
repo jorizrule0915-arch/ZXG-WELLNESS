@@ -13,6 +13,7 @@ import {
   KeyRound,
 } from "lucide-react";
 import { toast } from "sonner";
+import { authFetch } from "@/lib/api";
 
 export const Route = createFileRoute("/_admin/admin/users")({ component: AdminUsers });
 
@@ -47,7 +48,7 @@ function AdminUsers() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin-data?resource=users");
+      const res = await authFetch("/api/admin-data?resource=users");
       const data = await res.json();
       if (data.error) {
         toast.error(data.error);
@@ -70,7 +71,7 @@ function AdminUsers() {
 
   const updateStatus = async (id: string, status: UserRow["status"]) => {
     try {
-      const res = await fetch("/api/admin-data", {
+      const res = await authFetch("/api/admin-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "update-user-status", id, payload: { status } }),
@@ -86,7 +87,7 @@ function AdminUsers() {
 
   const saveNotes = async (id: string) => {
     try {
-      const res = await fetch("/api/admin-data", {
+      const res = await authFetch("/api/admin-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "save-user-notes", id, payload: { notes: notes[id] } }),
@@ -101,7 +102,7 @@ function AdminUsers() {
 
   const toggleAdmin = async (id: string, isAdmin: boolean) => {
     try {
-      const res = await fetch("/api/admin-data", {
+      const res = await authFetch("/api/admin-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "toggle-admin", id, payload: { isAdmin } }),
@@ -120,7 +121,7 @@ function AdminUsers() {
     if (!message) return toast.error("Enter a warning message first");
     setSending(user.id);
     try {
-      const res = await fetch("/api/send-warning", {
+      const res = await authFetch("/api/send-warning", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: user.email, name: user.full_name, message }),
@@ -140,7 +141,7 @@ function AdminUsers() {
     if (!pwd || pwd.length < 6) return toast.error("Password must be at least 6 characters");
     setSending(user.id + "-pwd");
     try {
-      const res = await fetch("/api/admin-reset-password", {
+      const res = await authFetch("/api/admin-reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user.id, password: pwd }),
