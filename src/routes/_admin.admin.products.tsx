@@ -30,6 +30,8 @@ function StockBadge({ track_stock, stock_qty }: { track_stock: boolean; stock_qt
 function AdminProducts() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
+  const activeCount = rows.filter((row) => row.active).length;
+  const featuredCount = rows.filter((row) => row.featured).length;
 
   const load = async () => {
     setLoading(true);
@@ -84,16 +86,16 @@ function AdminProducts() {
       <Helmet>
         <title>Products — ZXG Admin</title>
       </Helmet>
-      <div className="px-6 lg:px-10 py-10">
+      <div className="px-5 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gold/15 pb-6">
             <div>
-              <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">Catalog</div>
-              <h1 className="font-display text-4xl md:text-5xl">The Collection</h1>
+              <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">Catalog</div>
+              <h1 className="font-display text-3xl md:text-4xl">Products</h1>
             </div>
             <Link
               to="/admin/products/new"
@@ -104,7 +106,20 @@ function AdminProducts() {
           </div>
         </motion.div>
 
-        <div className="mt-10 border border-gold/15 bg-charcoal overflow-hidden">
+        <div className="mt-6 grid sm:grid-cols-3 gap-3">
+          {[
+            ["Total", rows.length],
+            ["Active", activeCount],
+            ["Featured", featuredCount],
+          ].map(([label, value]) => (
+            <div key={label} className="border border-gold/15 bg-charcoal px-5 py-4">
+              <div className="text-[10px] uppercase tracking-luxury text-muted-foreground">{label}</div>
+              <div className="font-display text-2xl text-gold mt-1">{value}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 border border-gold/15 bg-charcoal overflow-hidden">
           {loading ? (
             <div className="p-12 text-center text-muted-foreground text-sm">Loading…</div>
           ) : rows.length === 0 ? (

@@ -61,20 +61,20 @@ function AdminDashboard() {
       <Helmet>
         <title>Dashboard — ZXG Admin</title>
       </Helmet>
-      <div className="px-6 lg:px-10 py-10">
+      <div className="px-5 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">Overview</div>
-          <h1 className="font-display text-4xl md:text-5xl">
-            Welcome to the <span className="text-gradient-gold italic">Dashboard</span>
-          </h1>
-          <p className="text-sm text-muted-foreground mt-2">Real-time pulse of the house.</p>
+          <div className="border-b border-gold/15 pb-6">
+            <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">Overview</div>
+            <h1 className="font-display text-3xl md:text-4xl">Dashboard</h1>
+            <p className="text-sm text-muted-foreground mt-2">Revenue, orders, catalog, and customer activity.</p>
+          </div>
         </motion.div>
 
-        <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
           {cards.map((c, i) => {
             const Icon = c.icon;
             return (
@@ -83,7 +83,7 @@ function AdminDashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.05 * i }}
-                className="border border-gold/15 bg-charcoal p-6 hover:border-gold/40 transition-colors"
+                className="border border-gold/15 bg-charcoal p-5 hover:border-gold/40 transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div>
@@ -101,7 +101,7 @@ function AdminDashboard() {
           })}
         </div>
 
-        <div className="mt-10 grid lg:grid-cols-3 gap-6">
+        <div className="mt-6 grid lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 border border-gold/15 bg-charcoal p-6">
             <div className="flex items-center gap-2 mb-6">
               <TrendingUp className="h-4 w-4 text-gold" />
@@ -182,7 +182,7 @@ function AdminDashboard() {
           </div>
         </div>
 
-        <div className="mt-10 border border-gold/15 bg-charcoal">
+        <div className="mt-6 border border-gold/15 bg-charcoal">
           <div className="flex items-center justify-between p-6 border-b border-gold/15">
             <div className="text-[10px] uppercase tracking-luxury text-gold">Recent Orders</div>
           </div>

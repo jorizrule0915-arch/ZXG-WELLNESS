@@ -1,4 +1,4 @@
-import { Outlet, createRootRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Outlet, createRootRoute, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { HelmetProvider } from "react-helmet-async";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -34,6 +34,8 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const nav = useNavigate();
+  const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
@@ -47,12 +49,12 @@ function RootComponent() {
   return (
     <HelmetProvider>
       <AuthProvider>
-        <Header />
-        <main className="min-h-screen pt-16">
+        {!isAdmin && <Header />}
+        <main className={`min-h-screen ${isAdmin ? "" : "pt-16"}`}>
           <Outlet />
         </main>
-        <Footer />
-        <CartDrawer />
+        {!isAdmin && <Footer />}
+        {!isAdmin && <CartDrawer />}
       </AuthProvider>
     </HelmetProvider>
   );

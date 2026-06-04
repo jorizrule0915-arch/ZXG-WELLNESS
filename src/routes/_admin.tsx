@@ -49,7 +49,7 @@ function AdminLayout() {
   if (checking) return <div className="py-32 text-center text-muted-foreground">…</div>;
 
   return (
-    <div className="-mt-16 min-h-screen bg-obsidian flex">
+    <div className="min-h-screen bg-obsidian flex">
       <aside className="w-64 shrink-0 border-r border-gold/15 bg-charcoal min-h-screen sticky top-0 hidden md:flex flex-col">
         <div className="px-6 py-8 border-b border-gold/15">
           <div className="font-display text-3xl text-gold tracking-luxury">ZXG</div>
@@ -108,7 +108,9 @@ function AdminLayout() {
             );
           })}
         </div>
-        <Outlet />
+        <div className="mx-auto w-full max-w-[1500px]">
+          <Outlet />
+        </div>
       </main>
       <Toaster theme="dark" position="top-right" />
     </div>

@@ -3,6 +3,133 @@ import { createClient, type SupabaseClient, type User } from "@supabase/supabase
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
+const defaultProducts = [
+  {
+    slug: "pen",
+    name: "ZXG Wellness Reusable Injection Pen",
+    tagline: "Precision-engineered metal pen",
+    description:
+      "Durable reusable injection pen with a premium metal body and adjustable dosing dial.",
+    price: 20,
+    category: "Accessories",
+    image: "pen",
+    ingredients: ["Metal construction", "Adjustable dial", "Reusable design"],
+    benefits: ["Premium metal finish", "Smooth dose control", "Designed for long-term use"],
+    featured: false,
+    active: true,
+    track_stock: false,
+    stock_qty: 0,
+    options: [
+      { label: "Blue", price: 20 },
+      { label: "Black", price: 20 },
+      { label: "Dark Gray", price: 20 },
+      { label: "Gold", price: 20 },
+      { label: "Gray", price: 20 },
+      { label: "Light Blue", price: 20 },
+      { label: "Pink", price: 20 },
+      { label: "Red", price: 20 },
+      { label: "Silver", price: 20 },
+    ],
+  },
+  {
+    slug: "syringe",
+    name: "ZXG Wellness Syringe",
+    tagline: "Sterile precision - 100 per box",
+    description:
+      "Clean, precise syringes with dependable sterile packaging and multiple size choices.",
+    price: 15,
+    category: "Accessories",
+    image: "syringe",
+    ingredients: ["Sterile packaging", "Multiple sizes", "100 per box"],
+    benefits: ["Small, mini, and large sizes", "Easy-to-read barrel markings", "Reliable handling"],
+    featured: false,
+    active: true,
+    track_stock: false,
+    stock_qty: 0,
+    options: [
+      { label: "Small (1ml 30g)", price: 15 },
+      { label: "Mini (0.5ml 30g)", price: 15 },
+      { label: "Large (3ml 23g)", price: 15 },
+    ],
+  },
+  {
+    slug: "cartridge",
+    name: "ZXG Wellness Disposable 3mL Cartridges",
+    tagline: "Standard 3mL - 10 per set",
+    description:
+      "Disposable cartridges built for a clean fit inside reusable ZXG injection pens.",
+    price: 10,
+    category: "Accessories",
+    image: "cartridge",
+    ingredients: ["3mL capacity", "Universal ZXG fit", "10 per set"],
+    benefits: ["Reliable replacement option", "Built for ZXG reusable pens", "Compact set"],
+    featured: false,
+    active: true,
+    track_stock: false,
+    stock_qty: 0,
+    options: [],
+  },
+  {
+    slug: "needles",
+    name: "ZXG Wellness Single-Use Pen Needles",
+    tagline: "Ultra-fine micro-tip - 100 per box",
+    description:
+      "Single-use pen needles designed for a smoother attachment experience.",
+    price: 10,
+    category: "Accessories",
+    image: "needles",
+    ingredients: ["Ultra-fine micro-tip", "100 per box", "Clean sterile finish"],
+    benefits: ["Works with ZXG pens", "Designed for controlled use", "Easy-to-store packaging"],
+    featured: false,
+    active: true,
+    track_stock: false,
+    stock_qty: 0,
+    options: [
+      { label: "32g x 4mm", price: 10 },
+      { label: "31g x 8mm", price: 10 },
+      { label: "6mm 31G", price: 10 },
+    ],
+  },
+  {
+    slug: "creatine",
+    name: "ZXG Wellness Creatine Performance Matrix Powder",
+    tagline: "Pure performance formula",
+    description:
+      "Creatine formula built to support strength output, workout endurance, and training recovery.",
+    price: 29.99,
+    category: "Supplements",
+    image: "creatine",
+    ingredients: ["Creatine Monohydrate"],
+    benefits: ["Boosts strength", "Enhances endurance", "Supports recovery"],
+    featured: true,
+    active: true,
+    track_stock: false,
+    stock_qty: 0,
+    options: [],
+  },
+  {
+    slug: "body-balm",
+    name: "ZXG Wellness Nourishing Body Balm",
+    tagline: "Deeply moisturizing skin treatment",
+    description:
+      "Moisturizing body balm formulated with cocoa butter, shea butter, and squalane.",
+    price: 16.99,
+    category: "Skincare",
+    image: "body-balm",
+    ingredients: ["Cocoa Butter", "Shea Butter", "Squalane"],
+    benefits: ["Deep moisture for dry skin", "Lightweight and non-greasy", "Comfortable daily-use finish"],
+    featured: true,
+    active: true,
+    track_stock: false,
+    stock_qty: 0,
+    options: [
+      { label: "Aloe Scent", price: 16.99 },
+      { label: "Unscented", price: 16.99 },
+      { label: "Pack (Both)", price: 23.99 },
+    ],
+  },
+];
+
 function setJsonHeaders(res: VercelResponse) {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -127,6 +254,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(200).json((data2 ?? []).map((p: any) => ({
             ...p, track_stock: false, stock_qty: 0, options: []
           })));
+        }
+        if ((data ?? []).length === 0) {
+          const { data: seeded, error: seedError } = await supabase
+            .from("products")
+            .upsert(defaultProducts, { onConflict: "slug" })
+            .select("id, slug, name, category, price, active, featured, track_stock, stock_qty, options")
+            .order("created_at", { ascending: false });
+          if (seedError) return res.status(500).json({ error: seedError.message });
+          return res.status(200).json(seeded ?? []);
         }
         return res.status(200).json(data);
       }

@@ -79,17 +79,20 @@ function AdminOrders() {
       <Helmet>
         <title>Orders — ZXG Admin</title>
       </Helmet>
-      <div className="px-6 lg:px-10 py-10">
+      <div className="px-5 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">Fulfillment</div>
-          <h1 className="font-display text-4xl md:text-5xl">Orders</h1>
+          <div className="border-b border-gold/15 pb-6">
+            <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">Fulfillment</div>
+            <h1 className="font-display text-3xl md:text-4xl">Orders</h1>
+            <p className="text-sm text-muted-foreground mt-2">Review payment status, shipping details, and fulfillment progress.</p>
+          </div>
         </motion.div>
 
-        <div className="mt-8 flex flex-wrap gap-2">
+        <div className="mt-6 flex flex-wrap gap-2">
           {(["all", ...STATUSES] as const).map((s) => (
             <button
               key={s}
@@ -106,7 +109,7 @@ function AdminOrders() {
           ))}
         </div>
 
-        <div className="mt-8 border border-gold/15 bg-charcoal">
+        <div className="mt-6 border border-gold/15 bg-charcoal">
           {loading ? (
             <div className="p-12 text-center text-muted-foreground text-sm">Loading…</div>
           ) : filtered.length === 0 ? (

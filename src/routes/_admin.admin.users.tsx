@@ -158,18 +158,21 @@ function AdminUsers() {
       <Helmet>
         <title>Users — ZXG Admin</title>
       </Helmet>
-      <div className="px-6 lg:px-10 py-10">
+      <div className="px-5 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="text-[10px] uppercase tracking-luxury text-gold mb-3">Management</div>
-          <h1 className="font-display text-4xl md:text-5xl">Accounts</h1>
+          <div className="border-b border-gold/15 pb-6">
+            <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">Management</div>
+            <h1 className="font-display text-3xl md:text-4xl">Accounts</h1>
+            <p className="text-sm text-muted-foreground mt-2">Manage customer access, notes, warning emails, and admin roles.</p>
+          </div>
         </motion.div>
 
         {/* Search */}
-        <div className="mt-8 relative">
+        <div className="mt-6 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             value={search}
