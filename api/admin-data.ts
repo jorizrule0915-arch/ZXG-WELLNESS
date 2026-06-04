@@ -130,6 +130,10 @@ const defaultProducts = [
   },
 ];
 
+const defaultProductBaseFields = defaultProducts.map(
+  ({ track_stock, stock_qty, options, ...product }) => product,
+);
+
 function setJsonHeaders(res: VercelResponse) {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -251,6 +255,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .select("id, slug, name, category, price, active, featured")
             .order("created_at", { ascending: false });
           if (error2) return res.status(500).json({ error: error2.message });
+          if ((data2 ?? []).length === 0) {
+            const { data: seeded, error: seedError } = await supabase
+              .from("products")
+              .upsert(defaultProductBaseFields, { onConflict: "slug" })
+              .select("id, slug, name, category, price, active, featured")
+              .order("created_at", { ascending: false });
+            if (seedError) return res.status(500).json({ error: seedError.message });
+            return res.status(200).json((seeded ?? []).map((p: any) => ({
+              ...p, track_stock: false, stock_qty: 0, options: []
+            })));
+          }
           return res.status(200).json((data2 ?? []).map((p: any) => ({
             ...p, track_stock: false, stock_qty: 0, options: []
           })));
