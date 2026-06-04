@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import { authFetch } from "@/lib/api";
+import { authFetch, readApiJson } from "@/lib/api";
 
 export const Route = createFileRoute("/_admin/admin/products")({ component: AdminProducts });
 
@@ -35,12 +35,8 @@ function AdminProducts() {
     setLoading(true);
     try {
       const res = await authFetch("/api/admin-data?resource=products");
-      const data = await res.json();
-      if (data.error) {
-        toast.error(data.error);
-      } else {
-        setRows(data as Row[]);
-      }
+      const data = await readApiJson<Row[]>(res);
+      setRows(data);
     } catch {
       toast.error("Failed to load products");
     } finally {
@@ -59,8 +55,7 @@ function AdminProducts() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "toggle-product-active", id, payload: { active: !current } }),
       });
-      const data = await res.json();
-      if (data.error) return toast.error(data.error);
+      await readApiJson(res);
       toast.success(`Product ${!current ? "published" : "hidden"}`);
       load();
     } catch {
@@ -76,8 +71,7 @@ function AdminProducts() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "delete-product", id }),
       });
-      const data = await res.json();
-      if (data.error) return toast.error(data.error);
+      await readApiJson(res);
       toast.success("Product removed");
       load();
     } catch {

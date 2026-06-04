@@ -31,7 +31,7 @@ function getBearerToken(req: VercelRequest) {
 function getClientIp(req: VercelRequest) {
   const forwardedFor = req.headers["x-forwarded-for"];
   const firstForwarded = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
-  return firstForwarded?.split(",")[0]?.trim() || req.socket.remoteAddress || "unknown";
+  return firstForwarded?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
 }
 
 export function enforceRateLimit(

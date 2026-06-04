@@ -13,7 +13,7 @@ import {
   KeyRound,
 } from "lucide-react";
 import { toast } from "sonner";
-import { authFetch } from "@/lib/api";
+import { authFetch, readApiJson } from "@/lib/api";
 
 export const Route = createFileRoute("/_admin/admin/users")({ component: AdminUsers });
 
@@ -49,13 +49,7 @@ function AdminUsers() {
     setLoading(true);
     try {
       const res = await authFetch("/api/admin-data?resource=users");
-      const data = await res.json();
-      if (data.error) {
-        toast.error(data.error);
-        setLoading(false);
-        return;
-      }
-      const rows = data as UserRow[];
+      const rows = await readApiJson<UserRow[]>(res);
       setUsers(rows);
       const initialNotes: Record<string, string> = {};
       rows.forEach((r) => { initialNotes[r.id] = r.admin_notes ?? ""; });
@@ -76,8 +70,7 @@ function AdminUsers() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "update-user-status", id, payload: { status } }),
       });
-      const data = await res.json();
-      if (data.error) return toast.error(data.error);
+      await readApiJson(res);
       toast.success(`Account ${status}`);
       setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, status } : u)));
     } catch {
@@ -92,8 +85,7 @@ function AdminUsers() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "save-user-notes", id, payload: { notes: notes[id] } }),
       });
-      const data = await res.json();
-      if (data.error) return toast.error(data.error);
+      await readApiJson(res);
       toast.success("Notes saved");
     } catch {
       toast.error("Failed to save notes");
@@ -107,8 +99,7 @@ function AdminUsers() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "toggle-admin", id, payload: { isAdmin } }),
       });
-      const data = await res.json();
-      if (data.error) return toast.error(data.error);
+      await readApiJson(res);
       toast.success(isAdmin ? "Admin role removed" : "Admin role granted");
       setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, is_admin: !isAdmin } : u)));
     } catch {

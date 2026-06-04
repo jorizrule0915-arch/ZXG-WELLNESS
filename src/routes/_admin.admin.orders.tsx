@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
-import { authFetch } from "@/lib/api";
+import { authFetch, readApiJson } from "@/lib/api";
 
 export const Route = createFileRoute("/_admin/admin/orders")({ component: AdminOrders });
 
@@ -35,12 +35,8 @@ function AdminOrders() {
     setLoading(true);
     try {
       const res = await authFetch("/api/admin-data?resource=orders");
-      const data = await res.json();
-      if (data.error) {
-        toast.error(data.error);
-      } else {
-        setOrders(data as Order[]);
-      }
+      const data = await readApiJson<Order[]>(res);
+      setOrders(data);
     } catch (e) {
       toast.error("Failed to load orders");
     } finally {
@@ -59,8 +55,7 @@ function AdminOrders() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "update-order-status", id, payload: { status } }),
       });
-      const data = await res.json();
-      if (data.error) return toast.error(data.error);
+      await readApiJson(res);
       toast.success(`Order marked ${status}`);
       setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
     } catch {

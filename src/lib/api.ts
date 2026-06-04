@@ -15,3 +15,22 @@ export async function authFetch(input: RequestInfo | URL, init: RequestInit = {}
     headers,
   });
 }
+
+export async function readApiJson<T = unknown>(response: Response): Promise<T> {
+  const text = await response.text();
+  let data: any = null;
+
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error(text.slice(0, 160) || `Server returned ${response.status}`);
+    }
+  }
+
+  if (!response.ok || data?.error) {
+    throw new Error(data?.error || `Server returned ${response.status}`);
+  }
+
+  return data as T;
+}
