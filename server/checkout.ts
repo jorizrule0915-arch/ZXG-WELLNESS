@@ -53,8 +53,12 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
     price: 10,
     active: true,
     optionPrices: {
+      "32g x 4mm": 10,
+      "31g x 8mm": 10,
       "32g × 4mm": 10,
       "31g × 8mm": 10,
+      "32g Ã— 4mm": 10,
+      "31g Ã— 8mm": 10,
       "6mm 31G": 10,
     },
   },
@@ -80,7 +84,7 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
 function normalizeOption(item: CheckoutItemInput) {
   if (item.optionLabel) return item.optionLabel;
   const name = item.name ?? "";
-  const separators = [" — ", " â€” ", " - "];
+  const separators = [" — ", " â€” ", " Ã¢â‚¬â€ ", " - "];
   for (const sep of separators) {
     if (name.includes(sep)) return name.split(sep).pop()?.trim();
   }

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
-import { enforceRateLimit, requireAdmin, sendApiError, setJsonHeaders } from "./_security";
+import { enforceRateLimit, requireAdmin, sendApiError, setJsonHeaders } from "../server/security";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   setJsonHeaders(res);

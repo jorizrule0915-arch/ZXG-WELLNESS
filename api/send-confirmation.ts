@@ -6,7 +6,7 @@ import {
   requireUser,
   sendApiError,
   setJsonHeaders,
-} from "./_security";
+} from "../server/security";
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;

@@ -2,6 +2,15 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 import Stripe from "stripe";
 
+type PaidPaymentIntent = {
+  id: string;
+  amount_received: number;
+  currency: string;
+  receipt_email: string | null;
+  metadata: Record<string, string>;
+  status: string;
+};
+
 const defaultAdminEmails = [
   "jorizrule0@gmail.com",
   "g@gxzpeptides.com",
@@ -36,7 +45,7 @@ async function getRawBody(req: VercelRequest) {
   return Buffer.concat(chunks);
 }
 
-async function sendPaidPaymentEmail(paymentIntent: Stripe.PaymentIntent) {
+async function sendPaidPaymentEmail(paymentIntent: PaidPaymentIntent) {
   const amount = (paymentIntent.amount_received / 100).toFixed(2);
   const customerEmail =
     paymentIntent.receipt_email || paymentIntent.metadata.customerEmail || "No email on payment";
@@ -81,7 +90,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
 
     if (event.type === "payment_intent.succeeded") {
-      await sendPaidPaymentEmail(event.data.object as Stripe.PaymentIntent);
+      await sendPaidPaymentEmail(event.data.object as PaidPaymentIntent);
     }
 
     return res.status(200).json({ received: true });
