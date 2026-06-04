@@ -139,12 +139,40 @@ function withoutStockFields(product: Record<string, unknown>) {
   return baseProduct;
 }
 
-async function insertProduct(supabase: SupabaseClient, payload: Record<string, unknown>) {
-  const { error } = await supabase.from("products").insert(payload);
-  if (!error) return null;
+function missingColumnFrom(error: { message?: string } | null) {
+  const message = error?.message ?? "";
+  return (
+    message.match(/'([^']+)' column/)?.[1] ??
+    message.match(/column products\.([a-zA-Z0-9_]+) does not exist/)?.[1] ??
+    null
+  );
+}
 
-  const retry = await supabase.from("products").insert(withoutStockFields(payload));
-  return retry.error;
+async function retryWithAvailableColumns(
+  payload: Record<string, unknown>,
+  save: (nextPayload: Record<string, unknown>) => Promise<{ error: any }>,
+) {
+  let nextPayload = { ...payload };
+
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const result = await save(nextPayload);
+    if (!result.error) return null;
+
+    const missingColumn = missingColumnFrom(result.error);
+    if (!missingColumn || !(missingColumn in nextPayload)) return result.error;
+
+    const { [missingColumn]: _removed, ...rest } = nextPayload;
+    nextPayload = rest;
+  }
+
+  return new Error("Product save failed after matching the live schema.");
+}
+
+async function insertProduct(supabase: SupabaseClient, payload: Record<string, unknown>) {
+  return retryWithAvailableColumns(withoutStockFields(payload), async (nextPayload) => {
+    const { error } = await supabase.from("products").insert(nextPayload);
+    return { error };
+  });
 }
 
 async function updateProduct(
@@ -152,11 +180,10 @@ async function updateProduct(
   id: string,
   payload: Record<string, unknown>,
 ) {
-  const { error } = await supabase.from("products").update(payload).eq("id", id);
-  if (!error) return null;
-
-  const retry = await supabase.from("products").update(withoutStockFields(payload)).eq("id", id);
-  return retry.error;
+  return retryWithAvailableColumns(withoutStockFields(payload), async (nextPayload) => {
+    const { error } = await supabase.from("products").update(nextPayload).eq("id", id);
+    return { error };
+  });
 }
 
 function setJsonHeaders(res: VercelResponse) {
