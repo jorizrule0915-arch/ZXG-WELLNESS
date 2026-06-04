@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { ChevronLeft } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { ProductForm, type ProductInput } from "@/components/admin/ProductForm";
+import { authFetch, readApiJson } from "@/lib/api";
 
 export const Route = createFileRoute("/_admin/admin/products/$id")({ component: EditProduct });
 
@@ -14,7 +14,10 @@ function EditProduct() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from("products").select("*").eq("id", id).maybeSingle();
+      const rows = await authFetch("/api/admin-data?resource=products")
+        .then((res) => readApiJson<any[]>(res))
+        .catch(() => []);
+      const data = rows.find((row) => row.id === id);
       if (!data) {
         setMissing(true);
         return;

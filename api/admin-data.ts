@@ -134,6 +134,31 @@ const defaultProductBaseFields = defaultProducts.map(
   ({ track_stock, stock_qty, options, ...product }) => product,
 );
 
+function withoutStockFields(product: Record<string, unknown>) {
+  const { track_stock, stock_qty, options, ...baseProduct } = product;
+  return baseProduct;
+}
+
+async function insertProduct(supabase: SupabaseClient, payload: Record<string, unknown>) {
+  const { error } = await supabase.from("products").insert(payload);
+  if (!error) return null;
+
+  const retry = await supabase.from("products").insert(withoutStockFields(payload));
+  return retry.error;
+}
+
+async function updateProduct(
+  supabase: SupabaseClient,
+  id: string,
+  payload: Record<string, unknown>,
+) {
+  const { error } = await supabase.from("products").update(payload).eq("id", id);
+  if (!error) return null;
+
+  const retry = await supabase.from("products").update(withoutStockFields(payload)).eq("id", id);
+  return retry.error;
+}
+
 function setJsonHeaders(res: VercelResponse) {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -406,6 +431,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .from("products")
           .update({ active: payload.active })
           .eq("id", id);
+        if (error) return res.status(500).json({ error: error.message });
+        return res.status(200).json({ success: true });
+      }
+
+      if (action === "create-product") {
+        const error = await insertProduct(supabase, payload);
+        if (error) return res.status(500).json({ error: error.message });
+        return res.status(200).json({ success: true });
+      }
+
+      if (action === "update-product") {
+        const error = await updateProduct(supabase, id, payload);
         if (error) return res.status(500).json({ error: error.message });
         return res.status(200).json({ success: true });
       }

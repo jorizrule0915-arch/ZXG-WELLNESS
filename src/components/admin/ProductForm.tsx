@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, X } from "lucide-react";
+import { authFetch, readApiJson } from "@/lib/api";
 
 export type ProductOption = {
   name: string;   // e.g. "Size"
@@ -107,14 +107,22 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
       options: form.options,
     };
 
-    if (form.id) {
-      const { error } = await supabase.from("products").update(payload).eq("id", form.id);
-      if (error) { toast.error(error.message); setSaving(false); return; }
-      toast.success("Product updated");
-    } else {
-      const { error } = await supabase.from("products").insert(payload);
-      if (error) { toast.error(error.message); setSaving(false); return; }
-      toast.success("Product created");
+    try {
+      const res = await authFetch("/api/admin-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: form.id ? "update-product" : "create-product",
+          id: form.id,
+          payload,
+        }),
+      });
+      await readApiJson(res);
+      toast.success(form.id ? "Product updated" : "Product created");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to save product");
+      setSaving(false);
+      return;
     }
     nav({ to: "/admin/products" });
   };
