@@ -183,20 +183,20 @@ function ProductDetail() {
             {/* Option picker — syringe / needles / body-balm */}
             {product.variants && product.variants.length > 0 && (
               <div className="mt-8">
-                <div className="text-xs uppercase tracking-luxury text-gold mb-3">Choose Option</div>
+                <div className="text-sm font-medium text-gold mb-3">Choose option</div>
                 <div className="flex flex-wrap gap-3">
                   {product.variants.map((v) => (
                     <button
                       key={v.label}
                       onClick={() => setSelectedVariant(v)}
-                      className={`px-4 py-3 text-xs uppercase tracking-luxury border transition-colors ${
+                      className={`px-4 py-3 text-sm font-medium border transition-colors ${
                         selectedVariant?.label === v.label
                           ? "bg-gold text-obsidian border-gold"
                           : "border-gold/30 text-foreground/80 hover:border-gold hover:text-gold"
                       }`}
                     >
                       {v.label}
-                      <span className="block text-[11px] mt-0.5 opacity-80">${v.price.toFixed(2)}</span>
+                      <span className="block text-xs font-normal mt-0.5 opacity-80">${v.price.toFixed(2)}</span>
                     </button>
                   ))}
                 </div>

@@ -386,14 +386,14 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
         {form.options.map((opt, oi) => (
           <div key={oi} className="border border-gold/10 p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{opt.name}</span>
+              <span className="text-base font-medium">{opt.name}</span>
               <button type="button" onClick={() => removeOption(oi)} className="text-destructive hover:text-destructive/80 transition-colors">
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
               {opt.values.map((val, vi) => (
-                <span key={vi} className="flex items-center gap-1 bg-gold/10 border border-gold/20 px-3 py-1 text-[11px]">
+                <span key={vi} className="flex items-center gap-1 bg-gold/10 border border-gold/20 px-3 py-1.5 text-sm">
                   {val}
                   <button type="button" onClick={() => removeOptionValue(oi, vi)} className="text-muted-foreground hover:text-destructive ml-1">
                     <X className="h-3 w-3" />
