@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Plus, X } from "lucide-react";
+import { ImagePlus, Plus, X } from "lucide-react";
 import { authFetch, readApiJson } from "@/lib/api";
 import { imageRefsFrom } from "@/lib/productImages";
+import { supabase } from "@/integrations/supabase/client";
 
 export type ProductOption = {
   name: string;   // e.g. "Size"
@@ -63,6 +64,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
     };
   });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [newOptName, setNewOptName] = useState("");
 
   const set = <K extends keyof ProductInput>(k: K, v: ProductInput[K]) =>
@@ -141,6 +143,40 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
     nav({ to: "/admin/products" });
   };
 
+  const uploadImages = async (files: FileList | null) => {
+    const selected = Array.from(files ?? []).filter((file) => file.type.startsWith("image/"));
+    if (selected.length === 0) return;
+
+    setUploading(true);
+    try {
+      const uploadedUrls: string[] = [];
+
+      for (const file of selected) {
+        const res = await authFetch("/api/admin-data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "create-product-image-upload",
+            payload: { fileName: file.name, contentType: file.type },
+          }),
+        });
+        const upload = await readApiJson<{ path: string; token: string; publicUrl: string }>(res);
+        const { error } = await supabase.storage
+          .from("product-images")
+          .uploadToSignedUrl(upload.path, upload.token, file);
+        if (error) throw error;
+        uploadedUrls.push(upload.publicUrl);
+      }
+
+      set("galleryImages", [...form.galleryImages, ...uploadedUrls]);
+      toast.success(`${uploadedUrls.length} image${uploadedUrls.length === 1 ? "" : "s"} uploaded`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to upload images");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <form onSubmit={submit} className="space-y-8 max-w-3xl">
 
@@ -179,6 +215,21 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
 
       <div>
         <label className={labelCls}>Images / Carousel</label>
+        <label className="mb-3 flex cursor-pointer items-center justify-center gap-2 border border-dashed border-gold/30 bg-obsidian px-4 py-6 text-center text-[11px] uppercase tracking-luxury text-gold transition-colors hover:border-gold hover:bg-gold/5">
+          <ImagePlus className="h-4 w-4" />
+          {uploading ? "Uploading..." : "Upload Images"}
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            multiple
+            className="sr-only"
+            disabled={uploading}
+            onChange={(e) => {
+              uploadImages(e.target.files);
+              e.currentTarget.value = "";
+            }}
+          />
+        </label>
         <textarea
           rows={5}
           className={inputCls}
@@ -195,7 +246,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
           placeholder={"One image key or URL per line\ncreatine\nhttps://example.com/product-side.jpg\nhttps://example.com/product-back.jpg"}
         />
         <p className="mt-2 text-[11px] text-muted-foreground">
-          Use existing image keys like creatine, body-balm, pen, syringe, cartridge, needles, or paste image URLs. The first image is used on product cards.
+          Upload images from your computer, or use existing image keys like creatine, body-balm, pen, syringe, cartridge, needles. The first image is used on product cards.
         </p>
       </div>
 

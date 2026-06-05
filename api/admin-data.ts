@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { randomUUID } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
@@ -133,6 +134,28 @@ const defaultProducts = [
 const defaultProductBaseFields = defaultProducts.map(
   ({ track_stock, stock_qty, options, ...product }) => product,
 );
+
+const productImageBucket = "product-images";
+
+function cleanFileName(fileName: string) {
+  const safeName = fileName
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return safeName || "product-image";
+}
+
+async function ensureProductImageBucket(supabase: SupabaseClient) {
+  const { data: buckets } = await supabase.storage.listBuckets();
+  if (buckets?.some((bucket) => bucket.name === productImageBucket)) return;
+
+  const { error } = await supabase.storage.createBucket(productImageBucket, {
+    public: true,
+    fileSizeLimit: 10 * 1024 * 1024,
+    allowedMimeTypes: ["image/png", "image/jpeg", "image/webp", "image/gif"],
+  });
+  if (error && !error.message.toLowerCase().includes("already exists")) throw error;
+}
 
 function withoutStockFields(product: Record<string, unknown>) {
   const { track_stock, stock_qty, options, ...baseProduct } = product;
@@ -466,6 +489,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const error = await insertProduct(supabase, payload);
         if (error) return res.status(500).json({ error: error.message });
         return res.status(200).json({ success: true });
+      }
+
+      if (action === "create-product-image-upload") {
+        const fileName = String(payload?.fileName ?? "");
+        const contentType = String(payload?.contentType ?? "");
+        if (!fileName || !contentType.startsWith("image/")) {
+          return res.status(400).json({ error: "A valid image file is required" });
+        }
+
+        await ensureProductImageBucket(supabase);
+
+        const ext = cleanFileName(fileName).split(".").pop() || "jpg";
+      const path = `products/${Date.now()}-${randomUUID()}.${ext}`;
+        const { data, error } = await supabase.storage
+          .from(productImageBucket)
+          .createSignedUploadUrl(path);
+        if (error || !data) return res.status(500).json({ error: error?.message || "Upload URL failed" });
+
+        const { data: publicData } = supabase.storage.from(productImageBucket).getPublicUrl(path);
+        return res.status(200).json({
+          path,
+          token: data.token,
+          publicUrl: publicData.publicUrl,
+        });
       }
 
       if (action === "update-product") {
