@@ -561,15 +561,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const ext = cleanFileName(fileName).split(".").pop() || "mp4";
         const path = `products/${Date.now()}-${randomUUID()}.${ext}`;
-        const { data, error } = await supabase.storage
-          .from(productVideoBucket)
-          .createSignedUploadUrl(path);
-        if (error || !data) return res.status(500).json({ error: error?.message || "Upload URL failed" });
-
         const { data: publicData } = supabase.storage.from(productVideoBucket).getPublicUrl(path);
         return res.status(200).json({
           path,
-          token: data.token,
           publicUrl: publicData.publicUrl,
           endpoint: storageUploadEndpoint(),
         });

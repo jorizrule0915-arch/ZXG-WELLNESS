@@ -239,16 +239,18 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
       const upload = await readApiJson<{
         endpoint: string;
         path: string;
-        token: string;
         publicUrl: string;
       }>(res);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) throw new Error("You need to sign in again before uploading videos.");
 
       await new Promise<void>((resolve, reject) => {
         const tusUpload = new tus.Upload(file, {
           endpoint: upload.endpoint,
           retryDelays: [0, 3000, 5000, 10000, 20000],
           headers: {
-            "x-signature": upload.token,
+            authorization: `Bearer ${accessToken}`,
           },
           uploadDataDuringCreation: true,
           removeFingerprintOnSuccess: true,
