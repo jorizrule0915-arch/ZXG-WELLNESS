@@ -253,6 +253,9 @@ function ProductDetail() {
             <div className="aspect-video overflow-hidden border border-gold/15 bg-black">
               <video
                 src={product.featuredVideo}
+                autoPlay
+                muted
+                loop
                 controls
                 playsInline
                 className="h-full w-full object-cover"

@@ -451,7 +451,11 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
             <div className="aspect-video overflow-hidden border border-gold/20 bg-black">
               <video
                 src={form.featuredVideo}
+                autoPlay
+                muted
+                loop
                 controls
+                playsInline
                 className="h-full w-full object-cover"
               />
             </div>
