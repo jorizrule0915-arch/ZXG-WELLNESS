@@ -53,6 +53,7 @@ const empty: ProductInput = {
 const inputCls =
   "w-full bg-obsidian border border-gold/20 px-4 py-3 text-sm font-body focus:border-gold focus:outline-none transition-colors";
 const labelCls = "block text-[10px] uppercase tracking-luxury text-gold mb-2";
+const maxVideoSizeMb = 500;
 
 export function ProductForm({ initial }: { initial?: ProductInput }) {
   const nav = useNavigate();
@@ -212,6 +213,10 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
   const uploadVideo = async (files: FileList | null) => {
     const file = Array.from(files ?? []).find((item) => item.type.startsWith("video/"));
     if (!file) return;
+    if (file.size > maxVideoSizeMb * 1024 * 1024) {
+      toast.error(`Video is too large. Please upload a file under ${maxVideoSizeMb}MB.`);
+      return;
+    }
 
     setUploadingVideo(true);
     try {
@@ -430,7 +435,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
           />
         )}
         <p className="mt-2 text-[11px] text-muted-foreground">
-          Add one product video. It appears under the product details on the storefront.
+          Add one product video up to {maxVideoSizeMb}MB. It appears under the product details on the storefront.
         </p>
       </div>
 

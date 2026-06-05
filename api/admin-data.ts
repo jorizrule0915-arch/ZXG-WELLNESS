@@ -137,6 +137,7 @@ const defaultProductBaseFields = defaultProducts.map(
 
 const productImageBucket = "product-images";
 const productVideoBucket = "product-videos";
+const productVideoMaxSize = 500 * 1024 * 1024;
 
 function cleanFileName(fileName: string) {
   const safeName = fileName
@@ -160,11 +161,19 @@ async function ensureProductImageBucket(supabase: SupabaseClient) {
 
 async function ensureProductVideoBucket(supabase: SupabaseClient) {
   const { data: buckets } = await supabase.storage.listBuckets();
-  if (buckets?.some((bucket) => bucket.name === productVideoBucket)) return;
+  if (buckets?.some((bucket) => bucket.name === productVideoBucket)) {
+    const { error } = await supabase.storage.updateBucket(productVideoBucket, {
+      public: true,
+      fileSizeLimit: productVideoMaxSize,
+      allowedMimeTypes: ["video/mp4", "video/webm", "video/quicktime"],
+    });
+    if (error) throw error;
+    return;
+  }
 
   const { error } = await supabase.storage.createBucket(productVideoBucket, {
     public: true,
-    fileSizeLimit: 100 * 1024 * 1024,
+    fileSizeLimit: productVideoMaxSize,
     allowedMimeTypes: ["video/mp4", "video/webm", "video/quicktime"],
   });
   if (error && !error.message.toLowerCase().includes("already exists")) throw error;
