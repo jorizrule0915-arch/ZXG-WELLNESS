@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { ImagePlus, Plus, X } from "lucide-react";
+import { ArrowDown, ArrowUp, ImagePlus, Plus, Star, X } from "lucide-react";
 import { authFetch, readApiJson } from "@/lib/api";
-import { imageRefsFrom } from "@/lib/productImages";
+import { imageRefFor, imageRefsFrom } from "@/lib/productImages";
 import { supabase } from "@/integrations/supabase/client";
 
 export type ProductOption = {
@@ -69,6 +69,30 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
 
   const set = <K extends keyof ProductInput>(k: K, v: ProductInput[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  const gallery = form.galleryImages.length ? form.galleryImages : imageRefsFrom(form.image);
+
+  const updateGalleryImage = (idx: number, value: string) => {
+    set(
+      "galleryImages",
+      gallery.map((item, itemIdx) => (itemIdx === idx ? value : item)),
+    );
+  };
+
+  const removeGalleryImage = (idx: number) => {
+    set(
+      "galleryImages",
+      gallery.filter((_, itemIdx) => itemIdx !== idx),
+    );
+  };
+
+  const moveGalleryImage = (idx: number, direction: -1 | 1) => {
+    const nextIdx = idx + direction;
+    if (nextIdx < 0 || nextIdx >= gallery.length) return;
+    const next = [...gallery];
+    [next[idx], next[nextIdx]] = [next[nextIdx], next[idx]];
+    set("galleryImages", next);
+  };
 
   // ── Options helpers ──────────────────────────────────────────
   const addOption = () => {
@@ -168,7 +192,10 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
         uploadedUrls.push(upload.publicUrl);
       }
 
-      set("galleryImages", [...form.galleryImages, ...uploadedUrls]);
+      setForm((current) => ({
+        ...current,
+        galleryImages: [...current.galleryImages, ...uploadedUrls],
+      }));
       toast.success(`${uploadedUrls.length} image${uploadedUrls.length === 1 ? "" : "s"} uploaded`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to upload images");
@@ -230,23 +257,89 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
             }}
           />
         </label>
-        <textarea
-          rows={5}
-          className={inputCls}
-          value={(form.galleryImages.length ? form.galleryImages : imageRefsFrom(form.image)).join("\n")}
-          onChange={(e) =>
-            set(
-              "galleryImages",
-              e.target.value
-                .split(/\r?\n/)
-                .map((item) => item.trim())
-                .filter(Boolean),
-            )
-          }
-          placeholder={"One image key or URL per line\ncreatine\nhttps://example.com/product-side.jpg\nhttps://example.com/product-back.jpg"}
-        />
+
+        {gallery.length > 0 ? (
+          <div className="space-y-3">
+            {gallery.map((ref, idx) => (
+              <div
+                key={`${ref}-${idx}`}
+                className="grid gap-3 border border-gold/15 bg-obsidian p-3 sm:grid-cols-[112px_1fr_auto]"
+              >
+                <div className="relative h-28 w-28 overflow-hidden border border-gold/20 bg-black">
+                  <img
+                    src={imageRefFor(ref, form.slug)}
+                    alt={`${form.name || "Product"} image ${idx + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                  {idx === 0 && (
+                    <div className="absolute left-1 top-1 flex items-center gap-1 bg-gold px-2 py-1 text-[9px] uppercase tracking-luxury text-obsidian">
+                      <Star className="h-3 w-3 fill-current" />
+                      Main
+                    </div>
+                  )}
+                </div>
+
+                <div className="min-w-0 space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[10px] uppercase tracking-luxury text-gold">
+                      Image {idx + 1}
+                    </span>
+                    {idx === 0 && (
+                      <span className="text-[10px] uppercase tracking-luxury text-muted-foreground">
+                        Product card image
+                      </span>
+                    )}
+                  </div>
+                  <input
+                    className={inputCls}
+                    value={ref}
+                    onChange={(e) => updateGalleryImage(idx, e.target.value)}
+                    placeholder="Image key or uploaded URL"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 sm:flex-col sm:items-stretch">
+                  <button
+                    type="button"
+                    onClick={() => moveGalleryImage(idx, -1)}
+                    disabled={idx === 0}
+                    className="border border-gold/30 p-3 text-gold transition-colors hover:bg-gold hover:text-obsidian disabled:cursor-not-allowed disabled:opacity-35"
+                    aria-label={`Move image ${idx + 1} earlier`}
+                    title="Move earlier"
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveGalleryImage(idx, 1)}
+                    disabled={idx === gallery.length - 1}
+                    className="border border-gold/30 p-3 text-gold transition-colors hover:bg-gold hover:text-obsidian disabled:cursor-not-allowed disabled:opacity-35"
+                    aria-label={`Move image ${idx + 1} later`}
+                    title="Move later"
+                  >
+                    <ArrowDown className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeGalleryImage(idx)}
+                    className="border border-destructive/40 p-3 text-destructive transition-colors hover:bg-destructive hover:text-white"
+                    aria-label={`Remove image ${idx + 1}`}
+                    title="Remove image"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="border border-gold/15 bg-obsidian p-6 text-center text-sm text-muted-foreground">
+            No images yet. Upload images to build the product carousel.
+          </div>
+        )}
+
         <p className="mt-2 text-[11px] text-muted-foreground">
-          Upload images from your computer, or use existing image keys like creatine, body-balm, pen, syringe, cartridge, needles. The first image is used on product cards.
+          Use the arrow buttons to control the carousel order. The first image is used on product cards.
         </p>
       </div>
 
