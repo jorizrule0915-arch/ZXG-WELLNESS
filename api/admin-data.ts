@@ -136,6 +136,7 @@ const defaultProductBaseFields = defaultProducts.map(
 );
 
 const productImageBucket = "product-images";
+const productVideoBucket = "product-videos";
 
 function cleanFileName(fileName: string) {
   const safeName = fileName
@@ -153,6 +154,18 @@ async function ensureProductImageBucket(supabase: SupabaseClient) {
     public: true,
     fileSizeLimit: 10 * 1024 * 1024,
     allowedMimeTypes: ["image/png", "image/jpeg", "image/webp", "image/gif"],
+  });
+  if (error && !error.message.toLowerCase().includes("already exists")) throw error;
+}
+
+async function ensureProductVideoBucket(supabase: SupabaseClient) {
+  const { data: buckets } = await supabase.storage.listBuckets();
+  if (buckets?.some((bucket) => bucket.name === productVideoBucket)) return;
+
+  const { error } = await supabase.storage.createBucket(productVideoBucket, {
+    public: true,
+    fileSizeLimit: 100 * 1024 * 1024,
+    allowedMimeTypes: ["video/mp4", "video/webm", "video/quicktime"],
   });
   if (error && !error.message.toLowerCase().includes("already exists")) throw error;
 }
@@ -321,7 +334,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (resource === "products") {
         const { data, error } = await supabase
           .from("products")
-          .select("id, slug, name, tagline, description, price, category, image, ingredients, benefits, active, featured, track_stock, stock_qty, options")
+          .select("id, slug, name, tagline, description, price, category, image, featured_video, ingredients, benefits, active, featured, track_stock, stock_qty, options")
           .order("name", { ascending: true });
         if (error) {
           // Fallback: columns may not exist yet — fetch without new columns
@@ -349,7 +362,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const { data: seeded, error: seedError } = await supabase
             .from("products")
             .upsert(defaultProducts, { onConflict: "slug" })
-            .select("id, slug, name, tagline, description, price, category, image, ingredients, benefits, active, featured, track_stock, stock_qty, options")
+            .select("id, slug, name, tagline, description, price, category, image, featured_video, ingredients, benefits, active, featured, track_stock, stock_qty, options")
             .order("name", { ascending: true });
           if (seedError) return res.status(500).json({ error: seedError.message });
           return res.status(200).json(seeded ?? []);
@@ -501,13 +514,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await ensureProductImageBucket(supabase);
 
         const ext = cleanFileName(fileName).split(".").pop() || "jpg";
-      const path = `products/${Date.now()}-${randomUUID()}.${ext}`;
+        const path = `products/${Date.now()}-${randomUUID()}.${ext}`;
         const { data, error } = await supabase.storage
           .from(productImageBucket)
           .createSignedUploadUrl(path);
         if (error || !data) return res.status(500).json({ error: error?.message || "Upload URL failed" });
 
         const { data: publicData } = supabase.storage.from(productImageBucket).getPublicUrl(path);
+        return res.status(200).json({
+          path,
+          token: data.token,
+          publicUrl: publicData.publicUrl,
+        });
+      }
+
+      if (action === "create-product-video-upload") {
+        const fileName = String(payload?.fileName ?? "");
+        const contentType = String(payload?.contentType ?? "");
+        if (!fileName || !contentType.startsWith("video/")) {
+          return res.status(400).json({ error: "A valid video file is required" });
+        }
+
+        await ensureProductVideoBucket(supabase);
+
+        const ext = cleanFileName(fileName).split(".").pop() || "mp4";
+        const path = `products/${Date.now()}-${randomUUID()}.${ext}`;
+        const { data, error } = await supabase.storage
+          .from(productVideoBucket)
+          .createSignedUploadUrl(path);
+        if (error || !data) return res.status(500).json({ error: error?.message || "Upload URL failed" });
+
+        const { data: publicData } = supabase.storage.from(productVideoBucket).getPublicUrl(path);
         return res.status(200).json({
           path,
           token: data.token,

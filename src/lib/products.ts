@@ -22,6 +22,7 @@ export type Product = {
   category: string;
   image: string;
   gallery?: string[];
+  featuredVideo?: string | null;
   ingredients: string[];
   benefits: string[];
   featured: boolean;
@@ -39,6 +40,7 @@ type Row = {
   price: number;
   category: string;
   image: string;
+  featured_video?: string | null;
   ingredients: string[];
   benefits: string[];
   featured: boolean;
@@ -56,6 +58,7 @@ const mapRow = (r: Row): Product => {
     price: Number(r.price),
     image: gallery[0] ?? imageFor(r.slug),
     gallery,
+    featuredVideo: r.featured_video ?? null,
   };
 };
 

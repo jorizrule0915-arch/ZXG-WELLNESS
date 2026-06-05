@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, ImagePlus, Plus, Star, X } from "lucide-react";
+import { ArrowDown, ArrowUp, ImagePlus, Plus, Star, Video, X } from "lucide-react";
 import { authFetch, readApiJson } from "@/lib/api";
 import { imageRefFor, imageRefsFrom } from "@/lib/productImages";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,7 @@ export type ProductInput = {
   category: string;
   image: string;
   galleryImages: string[];
+  featuredVideo: string;
   ingredients: string[];
   benefits: string[];
   featured: boolean;
@@ -39,6 +40,7 @@ const empty: ProductInput = {
   category: "elixir",
   image: "",
   galleryImages: [],
+  featuredVideo: "",
   ingredients: [],
   benefits: [],
   featured: false,
@@ -58,6 +60,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
     const base = initial ?? empty;
     return {
       ...base,
+      featuredVideo: base.featuredVideo ?? "",
       galleryImages: base.galleryImages?.length
         ? base.galleryImages
         : imageRefsFrom(base.image),
@@ -65,6 +68,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
   const [newOptName, setNewOptName] = useState("");
 
   const set = <K extends keyof ProductInput>(k: K, v: ProductInput[K]) =>
@@ -140,6 +144,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
         .join("\n") || form.slug.trim(),
       ingredients: form.ingredients,
       benefits: form.benefits,
+      featured_video: form.featuredVideo.trim() || null,
       featured: form.featured,
       active: form.active,
       track_stock: form.track_stock,
@@ -201,6 +206,35 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
       toast.error(error instanceof Error ? error.message : "Failed to upload images");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const uploadVideo = async (files: FileList | null) => {
+    const file = Array.from(files ?? []).find((item) => item.type.startsWith("video/"));
+    if (!file) return;
+
+    setUploadingVideo(true);
+    try {
+      const res = await authFetch("/api/admin-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "create-product-video-upload",
+          payload: { fileName: file.name, contentType: file.type },
+        }),
+      });
+      const upload = await readApiJson<{ path: string; token: string; publicUrl: string }>(res);
+      const { error } = await supabase.storage
+        .from("product-videos")
+        .uploadToSignedUrl(upload.path, upload.token, file);
+      if (error) throw error;
+
+      set("featuredVideo", upload.publicUrl);
+      toast.success("Featured video uploaded");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to upload video");
+    } finally {
+      setUploadingVideo(false);
     }
   };
 
@@ -340,6 +374,63 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
 
         <p className="mt-2 text-[11px] text-muted-foreground">
           Use the arrow buttons to control the carousel order. The first image is used on product cards.
+        </p>
+      </div>
+
+      <div>
+        <label className={labelCls}>Featured Video</label>
+        <label className="mb-3 flex cursor-pointer items-center justify-center gap-2 border border-dashed border-gold/30 bg-obsidian px-4 py-6 text-center text-[11px] uppercase tracking-luxury text-gold transition-colors hover:border-gold hover:bg-gold/5">
+          <Video className="h-4 w-4" />
+          {uploadingVideo ? "Uploading..." : "Upload Video"}
+          <input
+            type="file"
+            accept="video/mp4,video/webm,video/quicktime"
+            className="sr-only"
+            disabled={uploadingVideo}
+            onChange={(e) => {
+              uploadVideo(e.target.files);
+              e.currentTarget.value = "";
+            }}
+          />
+        </label>
+
+        {form.featuredVideo ? (
+          <div className="space-y-3 border border-gold/15 bg-obsidian p-3">
+            <div className="aspect-video overflow-hidden border border-gold/20 bg-black">
+              <video
+                src={form.featuredVideo}
+                controls
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div className="flex gap-2">
+              <input
+                className={inputCls}
+                value={form.featuredVideo}
+                onChange={(e) => set("featuredVideo", e.target.value)}
+                placeholder="Uploaded video URL or external video URL"
+              />
+              <button
+                type="button"
+                onClick={() => set("featuredVideo", "")}
+                className="border border-destructive/40 px-4 text-destructive transition-colors hover:bg-destructive hover:text-white"
+                aria-label="Remove featured video"
+                title="Remove featured video"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <input
+            className={inputCls}
+            value={form.featuredVideo}
+            onChange={(e) => set("featuredVideo", e.target.value)}
+            placeholder="Optional video URL"
+          />
+        )}
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          Add one product video. It appears under the product details on the storefront.
         </p>
       </div>
 

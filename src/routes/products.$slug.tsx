@@ -247,6 +247,20 @@ function ProductDetail() {
           </motion.div>
         </div>
 
+        {product.featuredVideo && (
+          <section className="mt-20 border-t border-gold/10 pt-16">
+            <div className="mb-6 text-xs uppercase tracking-luxury text-gold">Featured Video</div>
+            <div className="aspect-video overflow-hidden border border-gold/15 bg-black">
+              <video
+                src={product.featuredVideo}
+                controls
+                playsInline
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </section>
+        )}
+
         {related.length > 0 && (
           <div className="mt-32 border-t border-gold/10 pt-16">
             <div className="text-xs uppercase tracking-luxury text-gold mb-8">You may also like</div>

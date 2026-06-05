@@ -33,6 +33,7 @@ function EditProduct() {
         category: data.category,
         image: data.image,
         galleryImages: imageRefsFrom(data.image),
+        featuredVideo: (data as any).featured_video ?? "",
         ingredients: data.ingredients ?? [],
         benefits: data.benefits ?? [],
         featured: data.featured,
