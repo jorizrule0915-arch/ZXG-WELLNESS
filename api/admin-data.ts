@@ -147,6 +147,15 @@ function cleanFileName(fileName: string) {
   return safeName || "product-image";
 }
 
+function storageUploadEndpoint() {
+  const rawUrl = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").replace(
+    ".supabase.com",
+    ".supabase.co",
+  );
+  const projectRef = new URL(rawUrl).hostname.split(".")[0];
+  return `https://${projectRef}.storage.supabase.co/storage/v1/upload/resumable`;
+}
+
 async function ensureProductImageBucket(supabase: SupabaseClient) {
   const { data: buckets } = await supabase.storage.listBuckets();
   if (buckets?.some((bucket) => bucket.name === productImageBucket)) return;
@@ -537,6 +546,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           path,
           token: data.token,
           publicUrl: publicData.publicUrl,
+          endpoint: storageUploadEndpoint(),
         });
       }
 
@@ -561,6 +571,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           path,
           token: data.token,
           publicUrl: publicData.publicUrl,
+          endpoint: storageUploadEndpoint(),
         });
       }
 

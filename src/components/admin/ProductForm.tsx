@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
+import * as tus from "tus-js-client";
 import { ArrowDown, ArrowUp, ImagePlus, Plus, Star, Video, X } from "lucide-react";
 import { authFetch, readApiJson } from "@/lib/api";
 import { imageRefFor, imageRefsFrom } from "@/lib/productImages";
@@ -74,6 +75,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoUploadProgress, setVideoUploadProgress] = useState<number | null>(null);
   const [newOptName, setNewOptName] = useState("");
 
   const set = <K extends keyof ProductInput>(k: K, v: ProductInput[K]) =>
@@ -224,6 +226,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
     }
 
     setUploadingVideo(true);
+    setVideoUploadProgress(0);
     try {
       const res = await authFetch("/api/admin-data", {
         method: "POST",
@@ -233,11 +236,38 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
           payload: { fileName: file.name, contentType: file.type },
         }),
       });
-      const upload = await readApiJson<{ path: string; token: string; publicUrl: string }>(res);
-      const { error } = await supabase.storage
-        .from("product-videos")
-        .uploadToSignedUrl(upload.path, upload.token, file);
-      if (error) throw error;
+      const upload = await readApiJson<{
+        endpoint: string;
+        path: string;
+        token: string;
+        publicUrl: string;
+      }>(res);
+
+      await new Promise<void>((resolve, reject) => {
+        const tusUpload = new tus.Upload(file, {
+          endpoint: upload.endpoint,
+          retryDelays: [0, 3000, 5000, 10000, 20000],
+          headers: {
+            "x-signature": upload.token,
+          },
+          uploadDataDuringCreation: true,
+          removeFingerprintOnSuccess: true,
+          metadata: {
+            bucketName: "product-videos",
+            objectName: upload.path,
+            contentType: file.type || "video/mp4",
+            cacheControl: "3600",
+          },
+          chunkSize: 6 * 1024 * 1024,
+          onError: reject,
+          onProgress: (bytesUploaded, bytesTotal) => {
+            setVideoUploadProgress(Math.round((bytesUploaded / bytesTotal) * 100));
+          },
+          onSuccess: () => resolve(),
+        });
+
+        tusUpload.start();
+      });
 
       set("featuredVideo", upload.publicUrl);
       toast.success("Featured video uploaded");
@@ -252,6 +282,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
       }
     } finally {
       setUploadingVideo(false);
+      setVideoUploadProgress(null);
     }
   };
 
@@ -398,7 +429,9 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
         <label className={labelCls}>Featured Video</label>
         <label className="mb-3 flex cursor-pointer items-center justify-center gap-2 border border-dashed border-gold/30 bg-obsidian px-4 py-6 text-center text-[11px] uppercase tracking-luxury text-gold transition-colors hover:border-gold hover:bg-gold/5">
           <Video className="h-4 w-4" />
-          {uploadingVideo ? "Uploading..." : "Upload Video"}
+          {uploadingVideo
+            ? `Uploading${videoUploadProgress === null ? "" : ` ${videoUploadProgress}%`}`
+            : "Upload Video"}
           <input
             type="file"
             accept="video/mp4,video/webm,video/quicktime"
