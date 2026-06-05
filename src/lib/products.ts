@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { imageFor, galleryFor } from "./productImages";
+import { imageFor, galleryFor, imageRefFor, imageRefsFrom } from "./productImages";
 
 export type ProductVariant = {
   label: string;
@@ -21,6 +21,7 @@ export type Product = {
   price: number;
   category: string;
   image: string;
+  gallery?: string[];
   ingredients: string[];
   benefits: string[];
   featured: boolean;
@@ -44,11 +45,19 @@ type Row = {
   variants?: ProductVariant[];
 };
 
-const mapRow = (r: Row): Product => ({
-  ...r,
-  price: Number(r.price),
-  image: imageFor(r.slug),
-});
+const mapRow = (r: Row): Product => {
+  const refs = imageRefsFrom(r.image);
+  const gallery = refs.length > 0
+    ? refs.map((ref) => imageRefFor(ref, r.slug))
+    : galleryFor(r.slug);
+
+  return {
+    ...r,
+    price: Number(r.price),
+    image: gallery[0] ?? imageFor(r.slug),
+    gallery,
+  };
+};
 
 export const localProducts: Product[] = [
   {

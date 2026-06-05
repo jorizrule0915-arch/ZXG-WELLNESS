@@ -52,3 +52,24 @@ export const fallbackImage = creatineFront;
 
 export const imageFor = (slug: string) => productImages[slug] ?? fallbackImage;
 export const galleryFor = (slug: string) => productGallery[slug] ?? [imageFor(slug)];
+
+export function imageRefFor(ref: string, fallbackSlug?: string) {
+  const value = ref.trim();
+  if (!value) return fallbackSlug ? imageFor(fallbackSlug) : fallbackImage;
+  if (
+    value.startsWith("http://") ||
+    value.startsWith("https://") ||
+    value.startsWith("/") ||
+    value.startsWith("data:")
+  ) {
+    return value;
+  }
+  return productImages[value] ?? (fallbackSlug ? imageFor(fallbackSlug) : fallbackImage);
+}
+
+export function imageRefsFrom(value?: string | null) {
+  return String(value ?? "")
+    .split(/\r?\n|,/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}

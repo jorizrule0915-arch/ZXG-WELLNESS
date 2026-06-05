@@ -56,7 +56,7 @@ function ProductDetail() {
   }
 
   // For pen: gallery driven by selected color
-  const baseGallery = galleryFor(product.slug);
+  const baseGallery = product.gallery?.length ? product.gallery : galleryFor(product.slug);
   const gallery =
     product.slug === "pen" && selectedColor
       ? [penColorImages[selectedColor.value] ?? baseGallery[0], ...baseGallery.slice(1)]

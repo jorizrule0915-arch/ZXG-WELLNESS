@@ -298,20 +298,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (resource === "products") {
         const { data, error } = await supabase
           .from("products")
-          .select("id, slug, name, category, price, active, featured, track_stock, stock_qty, options")
+          .select("id, slug, name, tagline, description, price, category, image, ingredients, benefits, active, featured, track_stock, stock_qty, options")
           .order("name", { ascending: true });
         if (error) {
           // Fallback: columns may not exist yet — fetch without new columns
           const { data: data2, error: error2 } = await supabase
             .from("products")
-            .select("id, slug, name, category, price, active, featured")
+            .select("id, slug, name, tagline, description, price, category, image, ingredients, benefits, active, featured")
             .order("name", { ascending: true });
           if (error2) return res.status(500).json({ error: error2.message });
           if ((data2 ?? []).length === 0) {
             const { data: seeded, error: seedError } = await supabase
               .from("products")
               .upsert(defaultProductBaseFields, { onConflict: "slug" })
-              .select("id, slug, name, category, price, active, featured")
+              .select("id, slug, name, tagline, description, price, category, image, ingredients, benefits, active, featured")
               .order("name", { ascending: true });
             if (seedError) return res.status(500).json({ error: seedError.message });
             return res.status(200).json((seeded ?? []).map((p: any) => ({
@@ -326,7 +326,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const { data: seeded, error: seedError } = await supabase
             .from("products")
             .upsert(defaultProducts, { onConflict: "slug" })
-            .select("id, slug, name, category, price, active, featured, track_stock, stock_qty, options")
+            .select("id, slug, name, tagline, description, price, category, image, ingredients, benefits, active, featured, track_stock, stock_qty, options")
             .order("name", { ascending: true });
           if (seedError) return res.status(500).json({ error: seedError.message });
           return res.status(200).json(seeded ?? []);

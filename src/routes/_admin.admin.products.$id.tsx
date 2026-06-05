@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { ProductForm, type ProductInput } from "@/components/admin/ProductForm";
 import { authFetch, readApiJson } from "@/lib/api";
+import { imageRefsFrom } from "@/lib/productImages";
 
 export const Route = createFileRoute("/_admin/admin/products/$id")({ component: EditProduct });
 
@@ -31,6 +32,7 @@ function EditProduct() {
         price: Number(data.price),
         category: data.category,
         image: data.image,
+        galleryImages: imageRefsFrom(data.image),
         ingredients: data.ingredients ?? [],
         benefits: data.benefits ?? [],
         featured: data.featured,

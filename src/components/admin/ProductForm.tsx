@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Plus, X } from "lucide-react";
 import { authFetch, readApiJson } from "@/lib/api";
+import { imageRefsFrom } from "@/lib/productImages";
 
 export type ProductOption = {
   name: string;   // e.g. "Size"
@@ -18,6 +19,7 @@ export type ProductInput = {
   price: number;
   category: string;
   image: string;
+  galleryImages: string[];
   ingredients: string[];
   benefits: string[];
   featured: boolean;
@@ -35,6 +37,7 @@ const empty: ProductInput = {
   price: 0,
   category: "elixir",
   image: "",
+  galleryImages: [],
   ingredients: [],
   benefits: [],
   featured: false,
@@ -50,7 +53,15 @@ const labelCls = "block text-[10px] uppercase tracking-luxury text-gold mb-2";
 
 export function ProductForm({ initial }: { initial?: ProductInput }) {
   const nav = useNavigate();
-  const [form, setForm] = useState<ProductInput>(initial ?? empty);
+  const [form, setForm] = useState<ProductInput>(() => {
+    const base = initial ?? empty;
+    return {
+      ...base,
+      galleryImages: base.galleryImages?.length
+        ? base.galleryImages
+        : imageRefsFrom(base.image),
+    };
+  });
   const [saving, setSaving] = useState(false);
   const [newOptName, setNewOptName] = useState("");
 
@@ -97,7 +108,10 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
       description: form.description.trim(),
       price: Number(form.price),
       category: form.category.trim(),
-      image: form.image.trim() || form.slug.trim(),
+      image: (form.galleryImages.length > 0 ? form.galleryImages : [form.image])
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .join("\n") || form.slug.trim(),
       ingredients: form.ingredients,
       benefits: form.benefits,
       featured: form.featured,
@@ -152,7 +166,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
         <textarea rows={5} className={inputCls} required value={form.description} onChange={(e) => set("description", e.target.value)} />
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-6">
+      <div className="grid sm:grid-cols-2 gap-6">
         <div>
           <label className={labelCls}>Price (USD)</label>
           <input type="number" step="0.01" min="0" required className={inputCls} value={form.price} onChange={(e) => set("price", parseFloat(e.target.value) || 0)} />
@@ -161,10 +175,28 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
           <label className={labelCls}>Category</label>
           <input className={inputCls} required value={form.category} onChange={(e) => set("category", e.target.value)} />
         </div>
-        <div>
-          <label className={labelCls}>Image key</label>
-          <input className={inputCls} value={form.image} onChange={(e) => set("image", e.target.value)} placeholder="defaults to slug" />
-        </div>
+      </div>
+
+      <div>
+        <label className={labelCls}>Images / Carousel</label>
+        <textarea
+          rows={5}
+          className={inputCls}
+          value={(form.galleryImages.length ? form.galleryImages : imageRefsFrom(form.image)).join("\n")}
+          onChange={(e) =>
+            set(
+              "galleryImages",
+              e.target.value
+                .split(/\r?\n/)
+                .map((item) => item.trim())
+                .filter(Boolean),
+            )
+          }
+          placeholder={"One image key or URL per line\ncreatine\nhttps://example.com/product-side.jpg\nhttps://example.com/product-back.jpg"}
+        />
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          Use existing image keys like creatine, body-balm, pen, syringe, cartridge, needles, or paste image URLs. The first image is used on product cards.
+        </p>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-6">
