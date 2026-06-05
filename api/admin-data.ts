@@ -137,7 +137,7 @@ const defaultProductBaseFields = defaultProducts.map(
 
 const productImageBucket = "product-images";
 const productVideoBucket = "product-videos";
-const productVideoMaxSize = 500 * 1024 * 1024;
+const productVideoMaxSize = 50 * 1024 * 1024;
 
 function cleanFileName(fileName: string) {
   const safeName = fileName

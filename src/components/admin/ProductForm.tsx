@@ -54,7 +54,7 @@ const empty: ProductInput = {
 const inputCls =
   "w-full bg-obsidian border border-gold/20 px-4 py-3 text-sm font-body focus:border-gold focus:outline-none transition-colors";
 const labelCls = "block text-[10px] uppercase tracking-luxury text-gold mb-2";
-const maxVideoSizeMb = 500;
+const maxVideoSizeMb = 50;
 
 function fileSizeMb(file: File) {
   return file.size / (1024 * 1024);
