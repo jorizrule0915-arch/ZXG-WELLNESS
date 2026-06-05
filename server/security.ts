@@ -11,7 +11,10 @@ export function setJsonHeaders(res: VercelResponse) {
 }
 
 export function getSupabaseAdmin(): SupabaseClient {
-  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const url = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").replace(
+    ".supabase.com",
+    ".supabase.co",
+  );
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) throw new Error("Supabase admin env vars missing.");
   return createClient(url, key, {
