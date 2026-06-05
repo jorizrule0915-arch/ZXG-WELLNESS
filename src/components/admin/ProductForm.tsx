@@ -55,6 +55,10 @@ const inputCls =
 const labelCls = "block text-[10px] uppercase tracking-luxury text-gold mb-2";
 const maxVideoSizeMb = 500;
 
+function fileSizeMb(file: File) {
+  return file.size / (1024 * 1024);
+}
+
 export function ProductForm({ initial }: { initial?: ProductInput }) {
   const nav = useNavigate();
   const [form, setForm] = useState<ProductInput>(() => {
@@ -213,8 +217,9 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
   const uploadVideo = async (files: FileList | null) => {
     const file = Array.from(files ?? []).find((item) => item.type.startsWith("video/"));
     if (!file) return;
-    if (file.size > maxVideoSizeMb * 1024 * 1024) {
-      toast.error(`Video is too large. Please upload a file under ${maxVideoSizeMb}MB.`);
+    const sizeMb = fileSizeMb(file);
+    if (sizeMb > maxVideoSizeMb) {
+      toast.error(`Video is ${sizeMb.toFixed(1)}MB. Please upload a file under ${maxVideoSizeMb}MB.`);
       return;
     }
 
@@ -237,7 +242,14 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
       set("featuredVideo", upload.publicUrl);
       toast.success("Featured video uploaded");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to upload video");
+      const message = error instanceof Error ? error.message : "Failed to upload video";
+      if (message.toLowerCase().includes("maximum allowed size")) {
+        toast.error(
+          `Video is ${sizeMb.toFixed(1)}MB. Supabase Storage is still limiting uploads below that size. Increase the Storage global file size limit and the product-videos bucket limit, or upload a smaller/compressed video.`,
+        );
+      } else {
+        toast.error(message);
+      }
     } finally {
       setUploadingVideo(false);
     }
@@ -435,7 +447,7 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
           />
         )}
         <p className="mt-2 text-[11px] text-muted-foreground">
-          Add one product video up to {maxVideoSizeMb}MB. It appears under the product details on the storefront.
+          Add one product video up to {maxVideoSizeMb}MB if your Supabase Storage plan and global limit allow it.
         </p>
       </div>
 
