@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -28,11 +28,16 @@ function StockBadge({ track_stock, stock_qty }: { track_stock: boolean; stock_qt
 }
 
 function AdminProducts() {
+  const pathname = useRouterState({ select: (r) => r.location.pathname });
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const activeCount = rows.filter((row) => row.active).length;
   const featuredCount = rows.filter((row) => row.featured).length;
+
+  if (pathname !== "/admin/products" && pathname !== "/admin/products/") {
+    return <Outlet />;
+  }
 
   const load = async () => {
     setLoading(true);
