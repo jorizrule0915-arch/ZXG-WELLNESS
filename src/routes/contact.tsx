@@ -15,58 +15,40 @@ function ContactPage() {
   return (
     <>
       <Helmet>
-        <title>Contact Us — ZXG Wellness</title>
+        <title>Contact Us - ZXG Wellness</title>
       </Helmet>
-      <div className="mx-auto max-w-5xl px-6 lg:px-10 py-20 md:py-28 grid lg:grid-cols-2 gap-16">
-        <div>
-          <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">Concierge</div>
-          <h1 className="font-display text-5xl md:text-6xl leading-tight">
-            Reach the <span className="text-gradient-gold italic">team</span>.
-          </h1>
-          <p className="mt-6 text-foreground/75 leading-relaxed max-w-md">
-            For private consultations, partnerships, press inquiries, or simply to say hello — we
-            read every note personally.
+      <div className="mx-auto max-w-3xl px-6 py-20 md:py-28">
+        <div className="mb-10">
+          <div className="mb-4 text-[10px] uppercase tracking-luxury text-gold">Contact</div>
+          <h1 className="font-display text-4xl leading-tight md:text-5xl">Contact Us</h1>
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            Have a question about an order, product, or return? Send us a message and we will get
+            back to you as soon as possible.
           </p>
-          <div className="mt-12 space-y-6 text-sm">
-            <div>
-              <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">General</div>
-              <div className="text-foreground/85">g@zxgwellness.com</div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">
-                Press &amp; Partnerships
-              </div>
-              <div className="text-foreground/85">g@zxgwellness.com</div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">Studios</div>
-              <div className="text-foreground/85">Stockholm · New York</div>
-            </div>
-          </div>
+          <a
+            href="mailto:g@zxgwellness.com"
+            className="mt-6 inline-block text-sm text-gold transition-colors hover:text-gold-light"
+          >
+            g@zxgwellness.com
+          </a>
         </div>
 
-        <form
-          onSubmit={onSubmit}
-          className="bg-charcoal border border-gold/15 p-8 md:p-10 space-y-6"
-        >
+        <form onSubmit={onSubmit} className="space-y-5 border border-gold/15 bg-charcoal p-6 md:p-8">
           {sent ? (
-            <div className="text-center py-12">
-              <div className="font-display text-4xl text-gradient-gold">Received</div>
-              <p className="mt-4 text-muted-foreground">
-                Our concierge will respond within one business day.
-              </p>
+            <div className="py-10 text-center">
+              <div className="font-display text-3xl text-gradient-gold">Message received</div>
+              <p className="mt-3 text-sm text-muted-foreground">Thank you. We will reply soon.</p>
             </div>
           ) : (
             <>
               <Field label="Name" name="name" />
               <Field label="Email" name="email" type="email" />
-              <Field label="Subject" name="subject" />
               <Field label="Message" name="message" textarea />
               <button
                 type="submit"
-                className="w-full py-4 bg-gold text-obsidian text-[11px] uppercase tracking-luxury font-medium hover:bg-gold-light transition-colors glow-gold-sm"
+                className="w-full bg-gold px-6 py-4 text-[11px] font-medium uppercase tracking-luxury text-obsidian transition-colors hover:bg-gold-light"
               >
-                Send to Concierge →
+                Send Message
               </button>
             </>
           )}
@@ -89,20 +71,20 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="block text-[10px] uppercase tracking-luxury text-gold mb-2">{label}</span>
+      <span className="mb-2 block text-[10px] uppercase tracking-luxury text-gold">{label}</span>
       {textarea ? (
         <textarea
           name={name}
           required
           rows={5}
-          className="w-full bg-transparent border-b border-gold/30 focus:border-gold outline-none py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors resize-none"
+          className="w-full resize-none border-b border-gold/30 bg-transparent py-2 text-sm text-foreground outline-none transition-colors focus:border-gold"
         />
       ) : (
         <input
           type={type}
           name={name}
           required
-          className="w-full bg-transparent border-b border-gold/30 focus:border-gold outline-none py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors"
+          className="w-full border-b border-gold/30 bg-transparent py-2 text-sm text-foreground outline-none transition-colors focus:border-gold"
         />
       )}
     </label>
