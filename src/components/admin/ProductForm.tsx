@@ -56,6 +56,26 @@ const inputCls =
 const labelCls = "block text-[10px] uppercase tracking-luxury text-gold mb-2";
 const maxVideoSizeMb = 50;
 
+const toStringList = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value
+        .map((item) => String(item ?? "").trim())
+        .filter(Boolean)
+    : [];
+
+const toProductOptions = (value: unknown): ProductOption[] =>
+  Array.isArray(value)
+    ? value
+        .map((option) => {
+          const source = option && typeof option === "object" ? option as Partial<ProductOption> : {};
+          return {
+            name: String(source.name ?? "").trim(),
+            values: toStringList(source.values),
+          };
+        })
+        .filter((option) => option.name)
+    : [];
+
 function fileSizeMb(file: File) {
   return file.size / (1024 * 1024);
 }
@@ -64,12 +84,16 @@ export function ProductForm({ initial }: { initial?: ProductInput }) {
   const nav = useNavigate();
   const [form, setForm] = useState<ProductInput>(() => {
     const base = initial ?? empty;
+    const galleryImages = toStringList(base.galleryImages);
     return {
       ...base,
-      featuredVideo: base.featuredVideo ?? "",
-      galleryImages: base.galleryImages?.length
-        ? base.galleryImages
+      featuredVideo: String(base.featuredVideo ?? ""),
+      galleryImages: galleryImages.length
+        ? galleryImages
         : imageRefsFrom(base.image),
+      ingredients: toStringList(base.ingredients),
+      benefits: toStringList(base.benefits),
+      options: toProductOptions(base.options),
     };
   });
   const [saving, setSaving] = useState(false);

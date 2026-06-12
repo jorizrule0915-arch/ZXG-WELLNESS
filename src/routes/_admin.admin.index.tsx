@@ -28,6 +28,21 @@ type Stats = {
   topProducts: { name: string; qty: number }[];
 };
 
+const toFiniteNumber = (value: unknown) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : 0;
+};
+
+const normalizeStats = (data: Partial<Stats> | null | undefined): Stats => ({
+  revenue: toFiniteNumber(data?.revenue),
+  orderCount: toFiniteNumber(data?.orderCount),
+  productCount: toFiniteNumber(data?.productCount),
+  customerCount: toFiniteNumber(data?.customerCount),
+  recentOrders: Array.isArray(data?.recentOrders) ? data.recentOrders : [],
+  revenueByDay: Array.isArray(data?.revenueByDay) ? data.revenueByDay : [],
+  topProducts: Array.isArray(data?.topProducts) ? data.topProducts : [],
+});
+
 function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +50,7 @@ function AdminDashboard() {
   useEffect(() => {
     authFetch("/api/admin-data?resource=dashboard")
       .then((r) => readApiJson<Stats>(r))
-      .then((data) => setStats(data))
+      .then((data) => setStats(normalizeStats(data)))
       .catch((e) => setError(e.message));
   }, []);
 

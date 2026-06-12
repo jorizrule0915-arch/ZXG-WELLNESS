@@ -50,9 +50,10 @@ function AdminUsers() {
     try {
       const res = await authFetch("/api/admin-data?resource=users");
       const rows = await readApiJson<UserRow[]>(res);
-      setUsers(rows);
+      const nextUsers = Array.isArray(rows) ? rows : [];
+      setUsers(nextUsers);
       const initialNotes: Record<string, string> = {};
-      rows.forEach((r) => { initialNotes[r.id] = r.admin_notes ?? ""; });
+      nextUsers.forEach((r) => { initialNotes[r.id] = r.admin_notes ?? ""; });
       setNotes(initialNotes);
     } catch {
       toast.error("Failed to load users");
@@ -150,7 +151,7 @@ function AdminUsers() {
   const filtered = users.filter(
     (u) =>
       u.email.toLowerCase().includes(search.toLowerCase()) ||
-      u.full_name.toLowerCase().includes(search.toLowerCase()),
+      (u.full_name ?? "").toLowerCase().includes(search.toLowerCase()),
   );
 
   return (

@@ -41,11 +41,18 @@ type Row = {
   category: string;
   image: string;
   featured_video?: string | null;
-  ingredients: string[];
-  benefits: string[];
-  featured: boolean;
+  ingredients?: unknown;
+  benefits?: unknown;
+  featured?: boolean | null;
   variants?: ProductVariant[];
 };
+
+const toStringList = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value
+        .map((item) => String(item ?? "").trim())
+        .filter(Boolean)
+    : [];
 
 const mapRow = (r: Row): Product => {
   const refs = imageRefsFrom(r.image);
@@ -55,10 +62,13 @@ const mapRow = (r: Row): Product => {
 
   return {
     ...r,
-    price: Number(r.price),
+    price: Number.isFinite(Number(r.price)) ? Number(r.price) : 0,
     image: gallery[0] ?? imageFor(r.slug),
     gallery,
     featuredVideo: r.featured_video ?? null,
+    ingredients: toStringList(r.ingredients),
+    benefits: toStringList(r.benefits),
+    featured: Boolean(r.featured),
   };
 };
 
@@ -189,7 +199,8 @@ export async function fetchProducts(): Promise<Product[]> {
 
     if (error) throw error;
 
-    const products = (data as Row[]).map(mapRow);
+    const rows = Array.isArray(data) ? (data as Row[]) : [];
+    const products = rows.map(mapRow);
     return products.length > 0 ? products : localProducts;
   } catch {
     return localProducts;

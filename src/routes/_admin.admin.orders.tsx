@@ -36,7 +36,7 @@ function AdminOrders() {
     try {
       const res = await authFetch("/api/admin-data?resource=orders");
       const data = await readApiJson<Order[]>(res);
-      setOrders(data);
+      setOrders(Array.isArray(data) ? data : []);
     } catch (e) {
       toast.error("Failed to load orders");
     } finally {

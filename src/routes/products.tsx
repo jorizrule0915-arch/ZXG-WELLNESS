@@ -17,7 +17,7 @@ function ProductsPage() {
 
   useEffect(() => {
     fetchProducts()
-      .then(setProducts)
+      .then((data) => setProducts(Array.isArray(data) ? data : []))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);

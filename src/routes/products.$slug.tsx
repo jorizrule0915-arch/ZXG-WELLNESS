@@ -38,8 +38,8 @@ function ProductDetail() {
     fetchProduct(slug).then((p) => {
       if (!p) { nav({ to: "/products" }); return; }
       setProduct(p);
-      setSelectedVariant(p.variants?.[0] ?? null);
-      setSelectedColor(p.colorVariants?.[0] ?? null);
+      setSelectedVariant(Array.isArray(p.variants) ? p.variants[0] ?? null : null);
+      setSelectedColor(Array.isArray(p.colorVariants) ? p.colorVariants[0] ?? null : null);
       setLoading(false);
     });
   }, [slug, nav]);
@@ -56,11 +56,16 @@ function ProductDetail() {
   }
 
   // For pen: gallery driven by selected color
-  const baseGallery = product.gallery?.length ? product.gallery : galleryFor(product.slug);
+  const productGallery = Array.isArray(product.gallery) ? product.gallery : [];
+  const baseGallery = productGallery.length ? productGallery : galleryFor(product.slug);
   const gallery =
     product.slug === "pen" && selectedColor
       ? [penColorImages[selectedColor.value] ?? baseGallery[0], ...baseGallery.slice(1)]
       : baseGallery;
+  const colorVariants = Array.isArray(product.colorVariants) ? product.colorVariants : [];
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const benefits = Array.isArray(product.benefits) ? product.benefits : [];
+  const ingredients = Array.isArray(product.ingredients) ? product.ingredients : [];
 
   const displayPrice = selectedColor
     ? selectedColor.price
@@ -154,13 +159,13 @@ function ProductDetail() {
             <p className="mt-8 text-base leading-relaxed">{product.description}</p>
 
             {/* Color picker — pen */}
-            {product.colorVariants && product.colorVariants.length > 0 && (
+            {colorVariants.length > 0 && (
               <div className="mt-8">
                 <div className="text-xs uppercase tracking-luxury text-gold mb-3">
                   Color — <span className="text-foreground">{selectedColor?.label}</span>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  {product.colorVariants.map((c) => (
+                  {colorVariants.map((c) => (
                     <button
                       key={c.value}
                       title={c.label}
@@ -181,11 +186,11 @@ function ProductDetail() {
             )}
 
             {/* Option picker — syringe / needles / body-balm */}
-            {product.variants && product.variants.length > 0 && (
+            {variants.length > 0 && (
               <div className="mt-8">
                 <div className="text-sm font-medium text-gold mb-3">Choose option</div>
                 <div className="flex flex-wrap gap-3">
-                  {product.variants.map((v) => (
+                  {variants.map((v) => (
                     <button
                       key={v.label}
                       onClick={() => setSelectedVariant(v)}
@@ -206,7 +211,7 @@ function ProductDetail() {
             <div className="mt-8">
               <div className="text-xs uppercase tracking-luxury text-gold mb-3">Product Highlights</div>
               <ul className="space-y-2">
-                {product.benefits.map((b) => (
+                {benefits.map((b) => (
                   <li key={b} className="flex items-center gap-2 text-sm">
                     <span className="text-gold">✓</span> {b}
                   </li>
@@ -217,7 +222,7 @@ function ProductDetail() {
             <div className="mt-8">
               <div className="text-xs uppercase tracking-luxury text-gold mb-3">Details</div>
               <div className="flex flex-wrap gap-2">
-                {product.ingredients.map((b) => (
+                {ingredients.map((b) => (
                   <span
                     key={b}
                     className="text-xs uppercase tracking-luxury border border-gold/30 px-3 py-1 text-foreground/80"
