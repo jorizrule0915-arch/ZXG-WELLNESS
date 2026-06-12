@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { useState, type FormEvent } from "react";
-import { useCart, cartTotal, SHIPPING_FEE, type CartItem } from "@/lib/cart";
+import { useCart, cartTotal, SHIPPING_FEE, cartItemKey, type CartItem } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { imageFor } from "@/lib/productImages";
 import { StripeProvider } from "@/components/site/StripeProvider";
@@ -248,11 +248,11 @@ function CheckoutPage() {
             </div>
             <ul className="space-y-4">
               {items.map((i) => (
-                <li key={i.slug} className="flex items-center gap-3 text-sm">
+                <li key={cartItemKey(i)} className="flex items-center gap-3 text-sm">
                   <img
-                    src={imageFor(i.slug) || i.image}
+                    src={i.image || imageFor(i.slug)}
                     alt=""
-                    className="h-14 w-12 object-cover bg-surface-2"
+                    className="h-14 w-12 object-contain bg-surface-2"
                   />
                   <div className="flex-1">
                     <div className="font-display text-base">{i.name}</div>
@@ -274,7 +274,9 @@ function CheckoutPage() {
             </div>
             <div className="mt-6 pt-6 border-t border-gold/15 flex justify-between items-center">
               <span className="text-[11px] uppercase tracking-luxury">Total</span>
-              <span className="font-display text-3xl text-gold">${(total + SHIPPING_FEE).toFixed(2)}</span>
+              <span className="font-display text-3xl text-gold">
+                ${(total + SHIPPING_FEE).toFixed(2)}
+              </span>
             </div>
             {err && <div className="mt-4 text-xs text-destructive">{err}</div>}
             <button
@@ -328,11 +330,11 @@ function CheckoutPaymentForm({
             </div>
             <ul className="space-y-4">
               {items.map((i) => (
-                <li key={i.slug} className="flex items-center gap-3 text-sm">
+                <li key={cartItemKey(i)} className="flex items-center gap-3 text-sm">
                   <img
-                    src={imageFor(i.slug) || i.image}
+                    src={i.image || imageFor(i.slug)}
                     alt=""
-                    className="h-14 w-12 object-cover bg-surface-2"
+                    className="h-14 w-12 object-contain bg-surface-2"
                   />
                   <div className="flex-1">
                     <div className="font-display text-base">{i.name}</div>
@@ -354,7 +356,9 @@ function CheckoutPaymentForm({
             </div>
             <div className="mt-6 pt-6 border-t border-gold/15 flex justify-between items-center">
               <span className="text-[11px] uppercase tracking-luxury">Total</span>
-              <span className="font-display text-3xl text-gold">${(total + SHIPPING_FEE).toFixed(2)}</span>
+              <span className="font-display text-3xl text-gold">
+                ${(total + SHIPPING_FEE).toFixed(2)}
+              </span>
             </div>
           </aside>
         </div>

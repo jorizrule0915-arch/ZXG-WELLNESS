@@ -2,7 +2,13 @@ import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-r
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { fetchProduct, fetchProducts, type Product, type ProductVariant, type ProductColorVariant } from "@/lib/products";
+import {
+  fetchProduct,
+  fetchProducts,
+  type Product,
+  type ProductVariant,
+  type ProductColorVariant,
+} from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { ProductCard } from "@/components/site/ProductCard";
 import { galleryFor, penColorImages } from "@/lib/productImages";
@@ -36,10 +42,13 @@ function ProductDetail() {
   useEffect(() => {
     setLoading(true);
     fetchProduct(slug).then((p) => {
-      if (!p) { nav({ to: "/products" }); return; }
+      if (!p) {
+        nav({ to: "/products" });
+        return;
+      }
       setProduct(p);
-      setSelectedVariant(Array.isArray(p.variants) ? p.variants[0] ?? null : null);
-      setSelectedColor(Array.isArray(p.colorVariants) ? p.colorVariants[0] ?? null : null);
+      setSelectedVariant(Array.isArray(p.variants) ? (p.variants[0] ?? null) : null);
+      setSelectedColor(Array.isArray(p.colorVariants) ? (p.colorVariants[0] ?? null) : null);
       setLoading(false);
     });
   }, [slug, nav]);
@@ -60,24 +69,32 @@ function ProductDetail() {
   const baseGallery = productGallery.length ? productGallery : galleryFor(product.slug);
   const gallery =
     product.slug === "pen" && selectedColor
-      ? [penColorImages[selectedColor.value] ?? baseGallery[0], ...baseGallery.slice(1)]
+      ? [
+          selectedColor.image ?? penColorImages[selectedColor.value] ?? baseGallery[0],
+          ...baseGallery.slice(1),
+        ]
       : baseGallery;
   const colorVariants = Array.isArray(product.colorVariants) ? product.colorVariants : [];
   const variants = Array.isArray(product.variants) ? product.variants : [];
   const benefits = Array.isArray(product.benefits) ? product.benefits : [];
   const ingredients = Array.isArray(product.ingredients) ? product.ingredients : [];
+  const selectedColorImage = selectedColor
+    ? (selectedColor.image ?? penColorImages[selectedColor.value] ?? gallery[0])
+    : undefined;
+  const selectedColorInStock = selectedColor?.inStock !== false;
+  const prefersContainedImage = product.slug === "pen";
 
   const displayPrice = selectedColor
     ? selectedColor.price
     : selectedVariant
-    ? selectedVariant.price
-    : product.price;
+      ? selectedVariant.price
+      : product.price;
 
   const cartName = selectedColor
     ? `${product.name} - ${selectedColor.label}`
     : selectedVariant
-    ? `${product.name} - ${selectedVariant.label}`
-    : product.name;
+      ? `${product.name} - ${selectedVariant.label}`
+      : product.name;
 
   return (
     <>
@@ -107,7 +124,9 @@ function ProductDetail() {
                 key={gallery[activeImg]}
                 src={gallery[activeImg]}
                 alt={product.name}
-                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500"
+                className={`absolute inset-0 h-full w-full transition-opacity duration-500 ${
+                  prefersContainedImage ? "object-contain p-6" : "object-cover"
+                }`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-obsidian/30 to-transparent" />
               {gallery.length > 1 && (
@@ -137,7 +156,11 @@ function ProductDetail() {
                       activeImg === i ? "border-gold" : "border-gold/20 hover:border-gold/50"
                     }`}
                   >
-                    <img src={img} alt="" className="h-full w-full object-cover" />
+                    <img
+                      src={img}
+                      alt=""
+                      className={`h-full w-full ${prefersContainedImage ? "object-contain p-1" : "object-cover"}`}
+                    />
                   </button>
                 ))}
               </div>
@@ -151,7 +174,9 @@ function ProductDetail() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-col"
           >
-            <div className="text-xs uppercase tracking-luxury text-gold mb-4">{product.category}</div>
+            <div className="text-xs uppercase tracking-luxury text-gold mb-4">
+              {product.category}
+            </div>
             <h1 className="font-display text-4xl md:text-5xl leading-[1.05]">{product.name}</h1>
             <p className="mt-3 text-lg text-foreground/70 italic font-display">{product.tagline}</p>
             <div className="mt-6 font-display text-4xl text-gold">${displayPrice.toFixed(2)}</div>
@@ -164,23 +189,48 @@ function ProductDetail() {
                 <div className="text-xs uppercase tracking-luxury text-gold mb-3">
                   Color — <span className="text-foreground">{selectedColor?.label}</span>
                 </div>
-                <div className="flex flex-wrap gap-3">
-                  {colorVariants.map((c) => (
-                    <button
-                      key={c.value}
-                      title={c.label}
-                      onClick={() => {
-                        setSelectedColor(c);
-                        setActiveImg(0);
-                      }}
-                      className={`h-8 w-8 rounded-full border-2 transition-all ${
-                        selectedColor?.value === c.value
-                          ? "border-gold scale-110"
-                          : "border-transparent hover:border-gold/50"
-                      }`}
-                      style={{ backgroundColor: COLOR_SWATCHES[c.value] ?? "#888" }}
-                    />
-                  ))}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {colorVariants.map((c) => {
+                    const optionImage = c.image ?? penColorImages[c.value] ?? product.image;
+                    const disabled = c.inStock === false;
+                    const selected = selectedColor?.value === c.value;
+
+                    return (
+                      <button
+                        key={c.value}
+                        type="button"
+                        title={c.label}
+                        disabled={disabled}
+                        onClick={() => {
+                          setSelectedColor(c);
+                          setActiveImg(0);
+                        }}
+                        className={`flex items-center gap-3 border p-2 text-left transition-all ${
+                          selected
+                            ? "border-gold bg-gold/10"
+                            : "border-gold/20 hover:border-gold/60"
+                        } ${disabled ? "cursor-not-allowed opacity-45" : ""}`}
+                      >
+                        <span
+                          className="flex h-14 w-14 shrink-0 items-center justify-center border border-gold/15 bg-black"
+                          style={{ backgroundColor: COLOR_SWATCHES[c.value] ?? undefined }}
+                        >
+                          <img
+                            src={optionImage}
+                            alt={c.label}
+                            className="h-full w-full object-contain p-1"
+                            loading="lazy"
+                          />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-medium">{c.label}</span>
+                          <span className="mt-0.5 block text-xs text-gold">
+                            ${Number(c.price).toFixed(2)}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -201,7 +251,9 @@ function ProductDetail() {
                       }`}
                     >
                       {v.label}
-                      <span className="block text-xs font-normal mt-0.5 opacity-80">${v.price.toFixed(2)}</span>
+                      <span className="block text-xs font-normal mt-0.5 opacity-80">
+                        ${v.price.toFixed(2)}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -209,7 +261,9 @@ function ProductDetail() {
             )}
 
             <div className="mt-8">
-              <div className="text-xs uppercase tracking-luxury text-gold mb-3">Product Highlights</div>
+              <div className="text-xs uppercase tracking-luxury text-gold mb-3">
+                Product Highlights
+              </div>
               <ul className="space-y-2">
                 {benefits.map((b) => (
                   <li key={b} className="flex items-center gap-2 text-sm">
@@ -239,14 +293,16 @@ function ProductDetail() {
                 onClick={() =>
                   add({
                     ...product,
+                    image: selectedColorImage ?? gallery[0] ?? product.image,
                     price: displayPrice,
                     name: cartName,
                     selectedOptionLabel: selectedColor?.label ?? selectedVariant?.label,
                   })
                 }
-                className="w-full py-4 bg-gold text-obsidian text-xs uppercase tracking-luxury font-semibold hover:bg-gold-light transition-all glow-gold-sm"
+                disabled={!selectedColorInStock}
+                className="w-full py-4 bg-gold text-obsidian text-xs uppercase tracking-luxury font-semibold hover:bg-gold-light transition-all glow-gold-sm disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Add to Cart →
+                {selectedColorInStock ? "Add to Cart →" : "Selected Color Unavailable"}
               </button>
             </div>
           </motion.div>
@@ -271,7 +327,9 @@ function ProductDetail() {
 
         {related.length > 0 && (
           <div className="mt-32 border-t border-gold/10 pt-16">
-            <div className="text-xs uppercase tracking-luxury text-gold mb-8">You may also like</div>
+            <div className="text-xs uppercase tracking-luxury text-gold mb-8">
+              You may also like
+            </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {related.map((p, i) => (
                 <ProductCard key={p.slug} product={p} index={i} />

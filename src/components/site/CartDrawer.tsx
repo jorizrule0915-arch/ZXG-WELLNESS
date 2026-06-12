@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { X, Plus, Minus } from "lucide-react";
-import { useCart, cartTotal } from "@/lib/cart";
+import { useCart, cartTotal, cartItemKey } from "@/lib/cart";
 import { imageFor } from "@/lib/productImages";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -62,44 +62,48 @@ export function CartDrawer() {
                 </div>
               ) : (
                 <ul className="space-y-6">
-                  {items.map((i) => (
-                    <li key={i.slug} className="flex gap-4">
-                      <img
-                        src={imageFor(i.slug) || i.image}
-                        alt={i.name}
-                        className="h-24 w-20 object-cover bg-surface-2 rounded-sm"
-                        loading="lazy"
-                      />
-                      <div className="flex-1 flex flex-col">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="font-display text-lg leading-tight">{i.name}</div>
-                          <button
-                            onClick={() => remove(i.slug)}
-                            className="text-muted-foreground hover:text-gold text-xs"
-                            aria-label="Remove"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
+                  {items.map((i) => {
+                    const key = cartItemKey(i);
+
+                    return (
+                      <li key={key} className="flex gap-4">
+                        <img
+                          src={i.image || imageFor(i.slug)}
+                          alt={i.name}
+                          className="h-24 w-20 object-contain bg-surface-2 rounded-sm"
+                          loading="lazy"
+                        />
+                        <div className="flex-1 flex flex-col">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="font-display text-lg leading-tight">{i.name}</div>
+                            <button
+                              onClick={() => remove(key)}
+                              className="text-muted-foreground hover:text-gold text-xs"
+                              aria-label="Remove"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                          <div className="mt-1 text-sm text-gold">${i.price}</div>
+                          <div className="mt-auto flex items-center gap-3">
+                            <button
+                              onClick={() => setQty(key, i.quantity - 1)}
+                              className="h-7 w-7 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition-colors flex items-center justify-center"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="w-6 text-center text-sm">{i.quantity}</span>
+                            <button
+                              onClick={() => setQty(key, i.quantity + 1)}
+                              className="h-7 w-7 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition-colors flex items-center justify-center"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
                         </div>
-                        <div className="mt-1 text-sm text-gold">${i.price}</div>
-                        <div className="mt-auto flex items-center gap-3">
-                          <button
-                            onClick={() => setQty(i.slug, i.quantity - 1)}
-                            className="h-7 w-7 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition-colors flex items-center justify-center"
-                          >
-                            <Minus className="h-3 w-3" />
-                          </button>
-                          <span className="w-6 text-center text-sm">{i.quantity}</span>
-                          <button
-                            onClick={() => setQty(i.slug, i.quantity + 1)}
-                            className="h-7 w-7 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition-colors flex items-center justify-center"
-                          >
-                            <Plus className="h-3 w-3" />
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>

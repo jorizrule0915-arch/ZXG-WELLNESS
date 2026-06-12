@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { imageFor, galleryFor, imageRefFor, imageRefsFrom } from "./productImages";
+import { imageFor, galleryFor, imageRefFor, imageRefsFrom, penColorImages } from "./productImages";
 
 export type ProductVariant = {
   label: string;
@@ -10,6 +10,8 @@ export type ProductColorVariant = {
   label: string;
   value: string;
   price: number;
+  image?: string;
+  inStock?: boolean;
 };
 
 export type Product = {
@@ -45,30 +47,160 @@ type Row = {
   benefits?: unknown;
   featured?: boolean | null;
   variants?: ProductVariant[];
+  options?: unknown;
 };
 
+const penColorVariants: ProductColorVariant[] = [
+  { label: "Blue", value: "blue", price: 20, image: penColorImages.blue, inStock: true },
+  { label: "Black", value: "black", price: 20, image: penColorImages.black, inStock: true },
+  {
+    label: "Dark Gray",
+    value: "dark-gray",
+    price: 20,
+    image: penColorImages["dark-gray"],
+    inStock: true,
+  },
+  { label: "Gold", value: "gold", price: 20, image: penColorImages.gold, inStock: true },
+  { label: "Gray", value: "gray", price: 20, image: penColorImages.gray, inStock: true },
+  {
+    label: "Light Blue",
+    value: "light-blue",
+    price: 20,
+    image: penColorImages["light-blue"],
+    inStock: true,
+  },
+  { label: "Pink", value: "pink", price: 20, image: penColorImages.pink, inStock: true },
+  { label: "Red", value: "red", price: 20, image: penColorImages.red, inStock: true },
+  { label: "Silver", value: "silver", price: 20, image: penColorImages.silver, inStock: true },
+];
+
 const toStringList = (value: unknown): string[] =>
-  Array.isArray(value)
-    ? value
-        .map((item) => String(item ?? "").trim())
-        .filter(Boolean)
-    : [];
+  Array.isArray(value) ? value.map((item) => String(item ?? "").trim()).filter(Boolean) : [];
+
+const toFinitePrice = (value: unknown, fallback = 0) => {
+  const price = Number(value);
+  return Number.isFinite(price) ? price : fallback;
+};
+
+const toOptionValue = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const penColorAliases: Record<string, string> = {
+  darkgray: "dark-gray",
+  "dark-grey": "dark-gray",
+  darkgrey: "dark-gray",
+  lightblue: "light-blue",
+  "light-grey": "gray",
+  lightgrey: "gray",
+  grey: "gray",
+  "matte-black": "black",
+  "rose-gold": "gold",
+};
+
+const normalizePenColorValue = (value: string) => {
+  const normalized = toOptionValue(value);
+  return penColorAliases[normalized] ?? normalized;
+};
+
+const isPenColorValue = (value: string) =>
+  Object.prototype.hasOwnProperty.call(penColorImages, value);
+
+function optionVariantsFrom(options: unknown, slug: string, basePrice: number) {
+  const variants: ProductVariant[] = [];
+  const colorVariants = new Map<string, ProductColorVariant>();
+
+  if (!Array.isArray(options)) {
+    return { variants, colorVariants: [] };
+  }
+
+  options.forEach((option) => {
+    if (!option || typeof option !== "object" || Array.isArray(option)) return;
+    const source = option as Record<string, unknown>;
+    const optionType = String(source.type ?? "")
+      .trim()
+      .toLowerCase();
+    const optionName = String(source.name ?? "")
+      .trim()
+      .toLowerCase();
+    const rawValues = source.values;
+
+    if (Array.isArray(rawValues)) {
+      rawValues.forEach((value) => {
+        const label = String(value ?? "").trim();
+        if (!label) return;
+        const colorValue = normalizePenColorValue(label);
+
+        if ((slug === "pen" || optionName.includes("color")) && isPenColorValue(colorValue)) {
+          colorVariants.set(colorValue, {
+            label,
+            value: colorValue,
+            price: basePrice,
+            image: penColorImages[colorValue],
+            inStock: true,
+          });
+          return;
+        }
+
+        variants.push({ label, price: basePrice });
+      });
+      return;
+    }
+
+    const label = String(source.label ?? "").trim();
+    if (!label) return;
+    const rawValue = String(source.value ?? label).trim();
+    const value = normalizePenColorValue(rawValue);
+    const price = toFinitePrice(source.price, basePrice);
+    const isColor = optionType === "color" || (slug === "pen" && isPenColorValue(value));
+
+    if (isColor) {
+      colorVariants.set(value, {
+        label,
+        value,
+        price,
+        image: penColorImages[value],
+        inStock: typeof source.inStock === "boolean" ? source.inStock : true,
+      });
+      return;
+    }
+
+    variants.push({ label, price });
+  });
+
+  return {
+    variants,
+    colorVariants: [...colorVariants.values()],
+  };
+}
 
 const mapRow = (r: Row): Product => {
   const refs = imageRefsFrom(r.image);
-  const gallery = refs.length > 0
-    ? refs.map((ref) => imageRefFor(ref, r.slug))
-    : galleryFor(r.slug);
+  const gallery =
+    refs.length > 0 ? refs.map((ref) => imageRefFor(ref, r.slug)) : galleryFor(r.slug);
+  const price = toFinitePrice(r.price);
+  const optionVariants = optionVariantsFrom(r.options, r.slug, price);
 
   return {
     ...r,
-    price: Number.isFinite(Number(r.price)) ? Number(r.price) : 0,
+    price,
     image: gallery[0] ?? imageFor(r.slug),
     gallery,
     featuredVideo: r.featured_video ?? null,
     ingredients: toStringList(r.ingredients),
     benefits: toStringList(r.benefits),
     featured: Boolean(r.featured),
+    variants: optionVariants.variants.length > 0 ? optionVariants.variants : r.variants,
+    colorVariants:
+      optionVariants.colorVariants.length > 0
+        ? optionVariants.colorVariants
+        : r.slug === "pen"
+          ? penColorVariants
+          : undefined,
   };
 };
 
@@ -86,17 +218,7 @@ export const localProducts: Product[] = [
     ingredients: ["Metal construction", "Adjustable dial", "Reusable design"],
     benefits: ["Premium metal finish", "Smooth dose control", "Designed for long-term use"],
     featured: false,
-    colorVariants: [
-      { label: "Blue", value: "blue", price: 20 },
-      { label: "Black", value: "black", price: 20 },
-      { label: "Dark Gray", value: "dark-gray", price: 20 },
-      { label: "Gold", value: "gold", price: 20 },
-      { label: "Gray", value: "gray", price: 20 },
-      { label: "Light Blue", value: "light-blue", price: 20 },
-      { label: "Pink", value: "pink", price: 20 },
-      { label: "Red", value: "red", price: 20 },
-      { label: "Silver", value: "silver", price: 20 },
-    ],
+    colorVariants: penColorVariants,
   },
   {
     id: "local-syringe",

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { Plus, Minus, X } from "lucide-react";
-import { useCart, cartTotal, SHIPPING_FEE } from "@/lib/cart";
+import { useCart, cartTotal, SHIPPING_FEE, cartItemKey } from "@/lib/cart";
 
 export const Route = createFileRoute("/cart")({ component: CartPage });
 
@@ -23,9 +23,7 @@ function CartPage() {
         {items.length === 0 ? (
           <div className="mt-20 text-center py-20 border-y border-gold/15">
             <div className="font-display text-3xl text-gold/80">Empty</div>
-            <p className="mt-3 text-muted-foreground">
-              Your cart awaits its first treasure.
-            </p>
+            <p className="mt-3 text-muted-foreground">Your cart awaits its first treasure.</p>
             <Link
               to="/products"
               className="mt-8 inline-block px-8 py-3 border border-gold text-gold text-[11px] uppercase tracking-luxury hover:bg-gold hover:text-obsidian transition-colors"
@@ -36,51 +34,55 @@ function CartPage() {
         ) : (
           <div className="mt-12 grid lg:grid-cols-[1fr,360px] gap-12">
             <ul className="border-t border-gold/15">
-              {items.map((i) => (
-                <li key={i.slug} className="border-b border-gold/15 py-6 flex gap-6">
-                  <img
-                    src={i.image}
-                    alt={i.name}
-                    className="h-32 w-28 object-cover bg-surface-2"
-                    loading="lazy"
-                  />
-                  <div className="flex-1 flex flex-col">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-display text-2xl">{i.name}</h3>
-                        <div className="mt-1 text-sm text-gold">${i.price} each</div>
-                      </div>
-                      <button
-                        onClick={() => remove(i.slug)}
-                        aria-label="Remove"
-                        className="text-muted-foreground hover:text-gold"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                    <div className="mt-auto flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+              {items.map((i) => {
+                const key = cartItemKey(i);
+
+                return (
+                  <li key={key} className="border-b border-gold/15 py-6 flex gap-6">
+                    <img
+                      src={i.image}
+                      alt={i.name}
+                      className="h-32 w-28 object-contain bg-surface-2"
+                      loading="lazy"
+                    />
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-display text-2xl">{i.name}</h3>
+                          <div className="mt-1 text-sm text-gold">${i.price} each</div>
+                        </div>
                         <button
-                          onClick={() => setQty(i.slug, i.quantity - 1)}
-                          className="h-8 w-8 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition flex items-center justify-center"
+                          onClick={() => remove(key)}
+                          aria-label="Remove"
+                          className="text-muted-foreground hover:text-gold"
                         >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="w-6 text-center">{i.quantity}</span>
-                        <button
-                          onClick={() => setQty(i.slug, i.quantity + 1)}
-                          className="h-8 w-8 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition flex items-center justify-center"
-                        >
-                          <Plus className="h-3 w-3" />
+                          <X className="h-4 w-4" />
                         </button>
                       </div>
-                      <div className="font-display text-xl text-gold">
-                        ${(i.price * i.quantity).toFixed(0)}
+                      <div className="mt-auto flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => setQty(key, i.quantity - 1)}
+                            className="h-8 w-8 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition flex items-center justify-center"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="w-6 text-center">{i.quantity}</span>
+                          <button
+                            onClick={() => setQty(key, i.quantity + 1)}
+                            className="h-8 w-8 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition flex items-center justify-center"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </button>
+                        </div>
+                        <div className="font-display text-xl text-gold">
+                          ${(i.price * i.quantity).toFixed(0)}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
 
             <aside className="bg-charcoal border border-gold/20 p-8 h-fit sticky top-24">
@@ -94,7 +96,9 @@ function CartPage() {
               </div>
               <div className="mt-6 pt-6 border-t border-gold/15 flex items-center justify-between">
                 <span className="text-[11px] uppercase tracking-luxury">Total</span>
-                <span className="font-display text-3xl text-gold">${(total + SHIPPING_FEE).toFixed(2)}</span>
+                <span className="font-display text-3xl text-gold">
+                  ${(total + SHIPPING_FEE).toFixed(2)}
+                </span>
               </div>
               <Link
                 to="/checkout"
