@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { enforceRateLimit, requireAdmin, sendApiError, setJsonHeaders } from "../server/security";
+import { enforceRateLimit, requireAdmin, sendApiError, setJsonHeaders } from "./_utils/security";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   setJsonHeaders(res);
@@ -10,7 +10,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     enforceRateLimit(req, "admin-reset-password", { limit: 5, windowMs: 60_000 });
     const { supabase } = await requireAdmin(req);
     const { userId, password } = req.body || {};
-    if (!userId || !password) return res.status(400).json({ error: "userId and password required" });
+    if (!userId || !password)
+      return res.status(400).json({ error: "userId and password required" });
     if (password.length < 6) return res.status(400).json({ error: "Password too short" });
 
     const { error } = await supabase.auth.admin.updateUserById(userId, { password });

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import Stripe from "stripe";
-import { calculateTrustedCart } from "../server/checkout";
-import { enforceRateLimit, requireUser, sendApiError, setJsonHeaders } from "../server/security";
+import { calculateTrustedCart } from "./_utils/checkout";
+import { enforceRateLimit, requireUser, sendApiError, setJsonHeaders } from "./_utils/security";
 
 function getStripe() {
   const secretKey = process.env.STRIPE_SECRET_KEY;

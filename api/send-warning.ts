@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
-import { enforceRateLimit, requireAdmin, sendApiError, setJsonHeaders } from "../server/security";
+import { enforceRateLimit, requireAdmin, sendApiError, setJsonHeaders } from "./_utils/security";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   setJsonHeaders(res);
@@ -16,10 +16,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { error } = await resend.emails.send({
-    from: "ZXG Wellness <admin@zxgwellness.com>",
-    to: email,
-    subject: "Important Notice — ZXG Wellness",
-    html: `
+      from: "ZXG Wellness <admin@zxgwellness.com>",
+      to: email,
+      subject: "Important Notice — ZXG Wellness",
+      html: `
 <!DOCTYPE html>
 <html>
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:Georgia,serif;">
@@ -49,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   </table>
 </body>
 </html>`,
-  });
+    });
 
     if (error) return res.status(500).json({ error: "Failed to send email" });
     return res.status(200).json({ success: true });
