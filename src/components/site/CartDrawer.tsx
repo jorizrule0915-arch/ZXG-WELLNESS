@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { X, Plus, Minus } from "lucide-react";
-import { useCart, cartTotal, cartItemKey } from "@/lib/cart";
+import { useCart, cartSummary, cartItemKey } from "@/lib/cart";
 import { imageFor } from "@/lib/productImages";
 import { AnimatePresence, motion } from "framer-motion";
 
 export function CartDrawer() {
   const { items, isOpen, close, setQty, remove } = useCart();
-  const total = cartTotal(items);
+  const summary = cartSummary(items);
 
   return (
     <AnimatePresence>
@@ -110,11 +110,48 @@ export function CartDrawer() {
 
             {items.length > 0 && (
               <div className="border-t border-gold/15 px-6 py-5 space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="uppercase tracking-luxury text-[11px] text-muted-foreground">
-                    Subtotal
-                  </span>
-                  <span className="font-display text-2xl text-gold">${total.toFixed(0)}</span>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="uppercase tracking-luxury text-[11px] text-muted-foreground">
+                      Subtotal
+                    </span>
+                    <span>${summary.subtotal.toFixed(2)}</span>
+                  </div>
+                  {summary.penDiscount > 0 && (
+                    <div className="flex items-center justify-between text-emerald-400">
+                      <span className="uppercase tracking-luxury text-[11px]">5+ Pen Discount</span>
+                      <span>-${summary.penDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="uppercase tracking-luxury text-[11px] text-muted-foreground">
+                      Shipping
+                    </span>
+                    <span>{summary.freeShipping ? "Free" : `$${summary.shipping.toFixed(2)}`}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-gold/15 pt-3">
+                    <span className="uppercase tracking-luxury text-[11px] text-muted-foreground">
+                      Total
+                    </span>
+                    <span className="font-display text-2xl text-gold">
+                      ${summary.total.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-1 text-[11px] text-muted-foreground">
+                  <p>
+                    {summary.freeShipping
+                      ? "Free shipping unlocked."
+                      : `$${summary.freeShippingRemaining.toFixed(2)} away from free shipping.`}
+                  </p>
+                  {summary.penDiscountApplied ? (
+                    <p className="text-emerald-400">10% reusable pen discount applied.</p>
+                  ) : summary.penQuantity > 0 ? (
+                    <p>
+                      Add {summary.penDiscountRemaining} more reusable pen
+                      {summary.penDiscountRemaining === 1 ? "" : "s"} for 10% off.
+                    </p>
+                  ) : null}
                 </div>
                 <Link
                   to="/checkout"

@@ -41,6 +41,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       userId: user.id,
       customerEmail: String(email),
       cartTotal: trustedCart.total.toFixed(2),
+      discount: trustedCart.discount.toFixed(2),
+      shipping: trustedCart.shipping.toFixed(2),
       cartHash: trustedCart.cartHash,
     });
     if (!paymentIntent.client_secret)

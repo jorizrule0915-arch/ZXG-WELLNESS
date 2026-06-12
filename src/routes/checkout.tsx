@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { useState, type FormEvent } from "react";
-import { useCart, cartTotal, SHIPPING_FEE, cartItemKey, type CartItem } from "@/lib/cart";
+import { useCart, cartSummary, cartItemKey, type CartItem } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { imageFor } from "@/lib/productImages";
 import { StripeProvider } from "@/components/site/StripeProvider";
@@ -10,10 +10,12 @@ import { authFetch } from "@/lib/api";
 
 export const Route = createFileRoute("/checkout")({ component: CheckoutPage });
 
+type CartSummary = ReturnType<typeof cartSummary>;
+
 function CheckoutPage() {
   const { items, clear } = useCart();
   const { user } = useAuth();
-  const total = cartTotal(items);
+  const summary = cartSummary(items);
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -35,7 +37,7 @@ function CheckoutPage() {
     try {
       // Create payment intent
       const email = fd.get("email");
-      if (!total || total <= 0) {
+      if (!summary.total || summary.total <= 0) {
         throw new Error("Cart total is invalid");
       }
       if (!email) {
@@ -186,7 +188,6 @@ function CheckoutPage() {
           onSuccess={handlePaymentSuccess}
           onError={handlePaymentError}
           items={items}
-          total={total}
         />
       </StripeProvider>
     );
@@ -246,38 +247,8 @@ function CheckoutPage() {
             <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">
               Order Summary
             </div>
-            <ul className="space-y-4">
-              {items.map((i) => (
-                <li key={cartItemKey(i)} className="flex items-center gap-3 text-sm">
-                  <img
-                    src={i.image || imageFor(i.slug)}
-                    alt=""
-                    className="h-14 w-12 object-contain bg-surface-2"
-                  />
-                  <div className="flex-1">
-                    <div className="font-display text-base">{i.name}</div>
-                    <div className="text-xs text-muted-foreground">Qty {i.quantity}</div>
-                  </div>
-                  <div className="text-gold">${(i.price * i.quantity).toFixed(0)}</div>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 pt-6 border-t border-gold/15 space-y-2 text-sm text-foreground/80">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping</span>
-                <span>${SHIPPING_FEE.toFixed(2)}</span>
-              </div>
-            </div>
-            <div className="mt-6 pt-6 border-t border-gold/15 flex justify-between items-center">
-              <span className="text-[11px] uppercase tracking-luxury">Total</span>
-              <span className="font-display text-3xl text-gold">
-                ${(total + SHIPPING_FEE).toFixed(2)}
-              </span>
-            </div>
+            <CartLineItems items={items} />
+            <OrderSummaryTotals summary={summary} />
             {err && <div className="mt-4 text-xs text-destructive">{err}</div>}
             <button
               type="submit"
@@ -299,15 +270,15 @@ function CheckoutPaymentForm({
   onSuccess,
   onError,
   items,
-  total,
 }: {
   clientSecret: string;
   isProcessing: boolean;
   onSuccess: (paymentIntentId: string) => void;
   onError: (err: string) => void;
   items: CartItem[];
-  total: number;
 }) {
+  const summary = cartSummary(items);
+
   return (
     <>
       <Helmet>
@@ -328,40 +299,73 @@ function CheckoutPaymentForm({
             <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">
               Order Summary
             </div>
-            <ul className="space-y-4">
-              {items.map((i) => (
-                <li key={cartItemKey(i)} className="flex items-center gap-3 text-sm">
-                  <img
-                    src={i.image || imageFor(i.slug)}
-                    alt=""
-                    className="h-14 w-12 object-contain bg-surface-2"
-                  />
-                  <div className="flex-1">
-                    <div className="font-display text-base">{i.name}</div>
-                    <div className="text-xs text-muted-foreground">Qty {i.quantity}</div>
-                  </div>
-                  <div className="text-gold">${(i.price * i.quantity).toFixed(0)}</div>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 pt-6 border-t border-gold/15 space-y-2 text-sm text-foreground/80">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping</span>
-                <span>${SHIPPING_FEE.toFixed(2)}</span>
-              </div>
-            </div>
-            <div className="mt-6 pt-6 border-t border-gold/15 flex justify-between items-center">
-              <span className="text-[11px] uppercase tracking-luxury">Total</span>
-              <span className="font-display text-3xl text-gold">
-                ${(total + SHIPPING_FEE).toFixed(2)}
-              </span>
-            </div>
+            <CartLineItems items={items} />
+            <OrderSummaryTotals summary={summary} />
           </aside>
         </div>
+      </div>
+    </>
+  );
+}
+
+function CartLineItems({ items }: { items: CartItem[] }) {
+  return (
+    <ul className="space-y-4">
+      {items.map((i) => (
+        <li key={cartItemKey(i)} className="flex items-center gap-3 text-sm">
+          <img
+            src={i.image || imageFor(i.slug)}
+            alt=""
+            className="h-14 w-12 object-contain bg-surface-2"
+          />
+          <div className="flex-1">
+            <div className="font-display text-base">{i.name}</div>
+            <div className="text-xs text-muted-foreground">Qty {i.quantity}</div>
+          </div>
+          <div className="text-gold">${(i.price * i.quantity).toFixed(2)}</div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function OrderSummaryTotals({ summary }: { summary: CartSummary }) {
+  return (
+    <>
+      <div className="mt-6 pt-6 border-t border-gold/15 space-y-2 text-sm text-foreground/80">
+        <div className="flex justify-between">
+          <span>Subtotal</span>
+          <span>${summary.subtotal.toFixed(2)}</span>
+        </div>
+        {summary.penDiscount > 0 && (
+          <div className="flex justify-between text-emerald-400">
+            <span>5+ Pen Discount</span>
+            <span>-${summary.penDiscount.toFixed(2)}</span>
+          </div>
+        )}
+        <div className="flex justify-between">
+          <span>Shipping</span>
+          <span>{summary.freeShipping ? "Free" : `$${summary.shipping.toFixed(2)}`}</span>
+        </div>
+      </div>
+      <div className="mt-4 space-y-1 text-xs text-muted-foreground">
+        <p>
+          {summary.freeShipping
+            ? "Free shipping unlocked on this order."
+            : `$${summary.freeShippingRemaining.toFixed(2)} away from free shipping.`}
+        </p>
+        {summary.penDiscountApplied ? (
+          <p className="text-emerald-400">10% reusable pen discount applied.</p>
+        ) : summary.penQuantity > 0 ? (
+          <p>
+            Add {summary.penDiscountRemaining} more reusable pen
+            {summary.penDiscountRemaining === 1 ? "" : "s"} for 10% off.
+          </p>
+        ) : null}
+      </div>
+      <div className="mt-6 pt-6 border-t border-gold/15 flex justify-between items-center">
+        <span className="text-[11px] uppercase tracking-luxury">Total</span>
+        <span className="font-display text-3xl text-gold">${summary.total.toFixed(2)}</span>
       </div>
     </>
   );

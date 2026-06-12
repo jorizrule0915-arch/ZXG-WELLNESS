@@ -1,13 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { Plus, Minus, X } from "lucide-react";
-import { useCart, cartTotal, SHIPPING_FEE, cartItemKey } from "@/lib/cart";
+import { useCart, cartSummary, cartItemKey } from "@/lib/cart";
 
 export const Route = createFileRoute("/cart")({ component: CartPage });
 
 function CartPage() {
   const { items, setQty, remove } = useCart();
-  const total = cartTotal(items);
+  const summary = cartSummary(items);
 
   return (
     <>
@@ -90,15 +90,38 @@ function CartPage() {
                 Order Summary
               </div>
               <div className="space-y-3 text-sm">
-                <Row label="Subtotal" value={`${total.toFixed(2)}`} />
-                <Row label="Shipping" value={`${SHIPPING_FEE.toFixed(2)}`} />
+                <Row label="Subtotal" value={`${summary.subtotal.toFixed(2)}`} />
+                {summary.penDiscount > 0 && (
+                  <Row
+                    label="5+ pen discount"
+                    value={`-${summary.penDiscount.toFixed(2)}`}
+                    tone="success"
+                  />
+                )}
+                <Row
+                  label="Shipping"
+                  value={summary.freeShipping ? "Free" : `${summary.shipping.toFixed(2)}`}
+                />
                 <Row label="Estimated tax" value="At checkout" />
+              </div>
+              <div className="mt-5 space-y-1 text-[11px] text-muted-foreground">
+                <p>
+                  {summary.freeShipping
+                    ? "Free shipping unlocked on this order."
+                    : `$${summary.freeShippingRemaining.toFixed(2)} away from free shipping.`}
+                </p>
+                {summary.penDiscountApplied ? (
+                  <p className="text-emerald-400">10% reusable pen discount applied.</p>
+                ) : summary.penQuantity > 0 ? (
+                  <p>
+                    Add {summary.penDiscountRemaining} more reusable pen
+                    {summary.penDiscountRemaining === 1 ? "" : "s"} for 10% off.
+                  </p>
+                ) : null}
               </div>
               <div className="mt-6 pt-6 border-t border-gold/15 flex items-center justify-between">
                 <span className="text-[11px] uppercase tracking-luxury">Total</span>
-                <span className="font-display text-3xl text-gold">
-                  ${(total + SHIPPING_FEE).toFixed(2)}
-                </span>
+                <span className="font-display text-3xl text-gold">${summary.total.toFixed(2)}</span>
               </div>
               <Link
                 to="/checkout"
@@ -114,9 +137,13 @@ function CartPage() {
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({ label, value, tone }: { label: string; value: string; tone?: "success" }) {
   return (
-    <div className="flex items-center justify-between text-foreground/80">
+    <div
+      className={`flex items-center justify-between ${
+        tone === "success" ? "text-emerald-400" : "text-foreground/80"
+      }`}
+    >
       <span>{label}</span>
       <span>{value}</span>
     </div>

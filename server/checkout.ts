@@ -2,6 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createHash } from "crypto";
 
 export const SHIPPING_FEE = 10;
+export const FREE_SHIPPING_THRESHOLD = 50;
+export const PEN_DISCOUNT_MIN_QTY = 5;
+export const PEN_DISCOUNT_RATE = 0.1;
 
 type CheckoutItemInput = {
   slug: string;
@@ -95,12 +98,18 @@ function cents(amount: number) {
   return Math.round(amount * 100);
 }
 
-function hashCart(items: Array<{
-  product_slug: string;
-  product_name: string;
-  unit_price: number;
-  quantity: number;
-}>) {
+function money(amount: number) {
+  return Math.round(amount * 100) / 100;
+}
+
+function hashCart(
+  items: Array<{
+    product_slug: string;
+    product_name: string;
+    unit_price: number;
+    quantity: number;
+  }>,
+) {
   const canonicalItems = [...items].sort((a, b) =>
     `${a.product_slug}:${a.product_name}`.localeCompare(`${b.product_slug}:${b.product_name}`),
   );
@@ -121,7 +130,12 @@ export async function calculateTrustedCart(
     optionLabel: normalizeOption(item),
   }));
 
-  if (normalized.some((item) => !item.slug || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99)) {
+  if (
+    normalized.some(
+      (item) =>
+        !item.slug || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99,
+    )
+  ) {
     throw Object.assign(new Error("Invalid cart item"), { statusCode: 400 });
   }
 
@@ -144,7 +158,7 @@ export async function calculateTrustedCart(
   );
   const localProductMap = new Map(localProducts.map((product) => [product.slug, product]));
 
-  const trustedItems = normalized.map((item) => {
+  const pricedItems = normalized.map((item) => {
     const dbProduct = dbProducts.get(item.slug);
     const localProduct = localProductMap.get(item.slug);
     const product = dbProduct ?? localProduct;
@@ -168,12 +182,31 @@ export async function calculateTrustedCart(
     };
   });
 
-  const subtotal = trustedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
-  const total = subtotal + SHIPPING_FEE;
+  const merchandiseSubtotal = money(
+    pricedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0),
+  );
+  const penQuantity = pricedItems
+    .filter((item) => item.product_slug === "pen")
+    .reduce((quantity, item) => quantity + item.quantity, 0);
+  const penDiscountApplies = penQuantity >= PEN_DISCOUNT_MIN_QTY;
+  const trustedItems = pricedItems.map((item) =>
+    penDiscountApplies && item.product_slug === "pen"
+      ? { ...item, unit_price: money(item.unit_price * (1 - PEN_DISCOUNT_RATE)) }
+      : item,
+  );
+  const subtotal = money(
+    trustedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0),
+  );
+  const discount = money(merchandiseSubtotal - subtotal);
+  const shipping = merchandiseSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  const total = money(subtotal + shipping);
 
   return {
     items: trustedItems,
+    merchandiseSubtotal,
     subtotal,
+    discount,
+    shipping,
     total,
     amountCents: cents(total),
     cartHash: hashCart(trustedItems),
