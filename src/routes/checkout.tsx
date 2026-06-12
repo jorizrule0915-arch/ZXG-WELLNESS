@@ -58,15 +58,19 @@ function CheckoutPage() {
         }),
       });
 
-      let responseData;
+      const responseText = await response.text();
+      let responseData = null;
       try {
-        responseData = await response.json();
+        responseData = responseText ? JSON.parse(responseText) : null;
       } catch {
-        throw new Error(`Invalid response from server: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(responseText.slice(0, 160) || `Payment server error: ${response.status}`);
+        }
+        throw new Error("Invalid payment response from server");
       }
 
       if (!response.ok) {
-        throw new Error(responseData?.error || `Server error: ${response.status}`);
+        throw new Error(responseData?.error || `Payment server error: ${response.status}`);
       }
 
       const { clientSecret: secret } = responseData;

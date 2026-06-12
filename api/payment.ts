@@ -54,6 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       amount: trustedCart.total,
     });
   } catch (error) {
+    console.error("[api/payment]", error);
     return sendApiError(res, error);
   }
 }
