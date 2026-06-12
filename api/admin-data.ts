@@ -21,15 +21,10 @@ const defaultProducts = [
     track_stock: false,
     stock_qty: 0,
     options: [
-      { label: "Blue", price: 20 },
-      { label: "Black", price: 20 },
-      { label: "Dark Gray", price: 20 },
-      { label: "Gold", price: 20 },
-      { label: "Gray", price: 20 },
-      { label: "Light Blue", price: 20 },
-      { label: "Pink", price: 20 },
-      { label: "Red", price: 20 },
-      { label: "Silver", price: 20 },
+      {
+        name: "Color",
+        values: ["Blue", "Black", "Dark Gray", "Gold", "Gray", "Light Blue", "Pink", "Red", "Silver"],
+      },
     ],
   },
   {
@@ -48,9 +43,10 @@ const defaultProducts = [
     track_stock: false,
     stock_qty: 0,
     options: [
-      { label: "Small (1ml 30g)", price: 15 },
-      { label: "Mini (0.5ml 30g)", price: 15 },
-      { label: "Large (3ml 23g)", price: 15 },
+      {
+        name: "Size",
+        values: ["Small (1ml 30g)", "Mini (0.5ml 30g)", "Large (3ml 23g)"],
+      },
     ],
   },
   {
@@ -86,9 +82,10 @@ const defaultProducts = [
     track_stock: false,
     stock_qty: 0,
     options: [
-      { label: "32g x 4mm", price: 10 },
-      { label: "31g x 8mm", price: 10 },
-      { label: "6mm 31G", price: 10 },
+      {
+        name: "Size",
+        values: ["32g x 4mm", "31g x 8mm", "6mm 31G"],
+      },
     ],
   },
   {
@@ -124,9 +121,10 @@ const defaultProducts = [
     track_stock: false,
     stock_qty: 0,
     options: [
-      { label: "Aloe Scent", price: 16.99 },
-      { label: "Unscented", price: 16.99 },
-      { label: "Pack (Both)", price: 23.99 },
+      {
+        name: "Scent",
+        values: ["Aloe Scent", "Unscented", "Pack (Both)"],
+      },
     ],
   },
 ];
@@ -189,7 +187,7 @@ async function ensureProductVideoBucket(supabase: SupabaseClient) {
 }
 
 function withoutStockFields(product: Record<string, unknown>) {
-  const { track_stock, stock_qty, options, ...baseProduct } = product;
+  const { track_stock, stock_qty, ...baseProduct } = product;
   return baseProduct;
 }
 
