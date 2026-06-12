@@ -18,7 +18,7 @@ function EditProduct() {
       const rows = await authFetch("/api/admin-data?resource=products")
         .then((res) => readApiJson<any[]>(res))
         .catch(() => []);
-      const data = rows.find((row) => row.id === id);
+      const data = (Array.isArray(rows) ? rows : []).find((row) => row.id === id);
       if (!data) {
         setMissing(true);
         return;

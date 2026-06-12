@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
@@ -29,23 +29,20 @@ function StockBadge({ track_stock, stock_qty }: { track_stock: boolean; stock_qt
 
 function AdminProducts() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const isProductsIndex = pathname === "/admin/products" || pathname === "/admin/products/";
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const activeCount = rows.filter((row) => row.active).length;
   const featuredCount = rows.filter((row) => row.featured).length;
 
-  if (pathname !== "/admin/products" && pathname !== "/admin/products/") {
-    return <Outlet />;
-  }
-
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
     try {
       const res = await authFetch("/api/admin-data?resource=products");
       const data = await readApiJson<Row[]>(res);
-      setRows(data);
+      setRows(Array.isArray(data) ? data : []);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to load products";
       setLoadError(message);
@@ -53,11 +50,12 @@ function AdminProducts() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    if (!isProductsIndex) return;
     load();
-  }, []);
+  }, [isProductsIndex, load]);
 
   const toggleActive = async (id: string, current: boolean) => {
     try {
@@ -89,6 +87,10 @@ function AdminProducts() {
       toast.error("Failed to delete product");
     }
   };
+
+  if (!isProductsIndex) {
+    return <Outlet />;
+  }
 
   return (
     <>
