@@ -60,6 +60,12 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
     price: 10,
     active: true,
     optionPrices: {
+      "32G x 4mm - Box of 100": 10,
+      "31G x 6mm - Box of 100": 10,
+      "31G x 8mm - Box of 100": 10,
+      "32Gx4mm": 10,
+      "31Gx6mm": 10,
+      "31Gx8mm": 10,
       "32g x 4mm": 10,
       "31g x 8mm": 10,
       "32g × 4mm": 10,
@@ -67,6 +73,8 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
       "32g Ã— 4mm": 10,
       "31g Ã— 8mm": 10,
       "6mm 31G": 10,
+      "6mm x 31G": 10,
+      "31G x 6mm": 10,
     },
   },
   {

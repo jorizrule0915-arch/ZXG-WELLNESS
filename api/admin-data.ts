@@ -80,7 +80,8 @@ const defaultProducts = [
     slug: "needles",
     name: "ZXG Wellness Single-Use Pen Needles",
     tagline: "Ultra-fine micro-tip - 100 per box",
-    description: "Single-use pen needles designed for a smoother attachment experience.",
+    description:
+      "Single-use pen needles designed for a smoother attachment experience. Each box includes 100 needles.",
     price: 10,
     category: "Accessories",
     image: "needles",
@@ -93,7 +94,26 @@ const defaultProducts = [
     options: [
       {
         name: "Size",
-        values: ["32g x 4mm", "31g x 8mm", "6mm 31G"],
+        values: [
+          {
+            label: "32G x 4mm - Box of 100",
+            value: "32g-x-4mm",
+            price: 10,
+            inStock: true,
+          },
+          {
+            label: "31G x 6mm - Box of 100",
+            value: "31g-x-6mm",
+            price: 10,
+            inStock: true,
+          },
+          {
+            label: "31G x 8mm - Box of 100",
+            value: "31g-x-8mm",
+            price: 10,
+            inStock: true,
+          },
+        ],
       },
     ],
   },

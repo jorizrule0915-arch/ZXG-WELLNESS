@@ -63,6 +63,12 @@ const penColorVariants: ProductColorVariant[] = [
   { label: "Silver", value: "silver", price: 20, image: penColorImages.silver, inStock: true },
 ];
 
+const needleVariants: ProductVariant[] = [
+  { label: "32G x 4mm - Box of 100", price: 10 },
+  { label: "31G x 6mm - Box of 100", price: 10 },
+  { label: "31G x 8mm - Box of 100", price: 10 },
+];
+
 const toStringList = (value: unknown): string[] =>
   Array.isArray(value) ? value.map((item) => String(item ?? "").trim()).filter(Boolean) : [];
 
@@ -215,9 +221,11 @@ const mapRow = (r: Row): Product => {
     variants:
       r.slug === "pen"
         ? undefined
-        : optionVariants.variants.length > 0
-          ? optionVariants.variants
-          : r.variants,
+        : r.slug === "needles"
+          ? needleVariants
+          : optionVariants.variants.length > 0
+            ? optionVariants.variants
+            : r.variants,
     colorVariants:
       colorVariants.length > 0 ? colorVariants : r.slug === "pen" ? penColorVariants : undefined,
   };
@@ -285,11 +293,7 @@ export const localProducts: Product[] = [
     ingredients: ["Ultra-fine micro-tip", "100 per box", "Clean sterile finish"],
     benefits: ["Works with ZXG pens", "Designed for controlled use", "Easy-to-store packaging"],
     featured: false,
-    variants: [
-      { label: "32g × 4mm", price: 10 },
-      { label: "31g × 8mm", price: 10 },
-      { label: "6mm 31G", price: 10 },
-    ],
+    variants: needleVariants,
   },
   {
     id: "local-creatine",

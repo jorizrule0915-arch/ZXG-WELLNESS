@@ -80,6 +80,12 @@ const penColorDefaults: ProductOptionValue[] = [
   { label: "Silver", value: "silver", image: "silver", inStock: true },
 ];
 
+const needleSizeDefaults: ProductOptionValue[] = [
+  { label: "32G x 4mm - Box of 100", value: "32g-x-4mm", price: 10, inStock: true },
+  { label: "31G x 6mm - Box of 100", value: "31g-x-6mm", price: 10, inStock: true },
+  { label: "31G x 8mm - Box of 100", value: "31g-x-8mm", price: 10, inStock: true },
+];
+
 const toOptionValue = (value: string) =>
   value
     .toLowerCase()
@@ -99,6 +105,14 @@ const normalizePenColorValue = (value: string) => {
 
 const isPenColorValue = (value: string) =>
   Object.prototype.hasOwnProperty.call(penColorImages, value);
+
+const normalizeNeedleSizeValue = (value: string) => {
+  const normalized = toOptionValue(value);
+  if (normalized.includes("32g") && normalized.includes("4mm")) return "32g-x-4mm";
+  if (normalized.includes("31g") && normalized.includes("6mm")) return "31g-x-6mm";
+  if (normalized.includes("31g") && normalized.includes("8mm")) return "31g-x-8mm";
+  return normalized;
+};
 
 const toOptionalPrice = (value: unknown) => {
   if (value === undefined || value === null || value === "") return undefined;
@@ -166,6 +180,35 @@ const withPenColorDefaults = (options: ProductOption[], slug: string): ProductOp
   return options.map((option, index) => (index === colorIndex ? mergedColorOption : option));
 };
 
+const withNeedleSizeDefaults = (options: ProductOption[], slug: string): ProductOption[] => {
+  if (slug !== "needles") return options;
+
+  const sizeIndex = options.findIndex((option) => option.name.toLowerCase() === "size");
+  const sizeOption =
+    sizeIndex >= 0 ? options[sizeIndex] : ({ name: "Size", values: [] } satisfies ProductOption);
+  const existingByValue = new Map(
+    sizeOption.values.map((value) => [normalizeNeedleSizeValue(value.value || value.label), value]),
+  );
+  const mergedSizeOption = {
+    ...sizeOption,
+    values: needleSizeDefaults.map((defaultValue) => {
+      const existing = existingByValue.get(defaultValue.value || defaultValue.label);
+
+      return {
+        ...defaultValue,
+        ...existing,
+        label: defaultValue.label,
+        value: defaultValue.value,
+        price: existing?.price ?? defaultValue.price,
+        inStock: existing?.inStock ?? defaultValue.inStock,
+      };
+    }),
+  };
+
+  if (sizeIndex < 0) return [mergedSizeOption, ...options];
+  return options.map((option, index) => (index === sizeIndex ? mergedSizeOption : option));
+};
+
 const toProductOptions = (value: unknown, slug: string): ProductOption[] => {
   const options = Array.isArray(value)
     ? value
@@ -182,7 +225,7 @@ const toProductOptions = (value: unknown, slug: string): ProductOption[] => {
         .filter((option) => option.name)
     : [];
 
-  return withPenColorDefaults(options, slug);
+  return withNeedleSizeDefaults(withPenColorDefaults(options, slug), slug);
 };
 
 const cleanProductOptions = (options: ProductOption[]) =>
