@@ -212,7 +212,12 @@ const mapRow = (r: Row): Product => {
     ingredients: toStringList(r.ingredients),
     benefits: toStringList(r.benefits),
     featured: Boolean(r.featured),
-    variants: optionVariants.variants.length > 0 ? optionVariants.variants : r.variants,
+    variants:
+      r.slug === "pen"
+        ? undefined
+        : optionVariants.variants.length > 0
+          ? optionVariants.variants
+          : r.variants,
     colorVariants:
       colorVariants.length > 0 ? colorVariants : r.slug === "pen" ? penColorVariants : undefined,
   };
