@@ -23,7 +23,17 @@ const defaultProducts = [
     options: [
       {
         name: "Color",
-        values: ["Blue", "Black", "Dark Gray", "Gold", "Gray", "Light Blue", "Pink", "Red", "Silver"],
+        values: [
+          { label: "Blue", value: "blue", image: "blue", inStock: true },
+          { label: "Black", value: "black", image: "black", inStock: true },
+          { label: "Dark Gray", value: "dark-gray", image: "dark-gray", inStock: true },
+          { label: "Gold", value: "gold", image: "gold", inStock: true },
+          { label: "Gray", value: "gray", image: "gray", inStock: true },
+          { label: "Light Blue", value: "light-blue", image: "light-blue", inStock: true },
+          { label: "Pink", value: "pink", image: "pink", inStock: true },
+          { label: "Red", value: "red", image: "red", inStock: true },
+          { label: "Silver", value: "silver", image: "silver", inStock: true },
+        ],
       },
     ],
   },
@@ -53,8 +63,7 @@ const defaultProducts = [
     slug: "cartridge",
     name: "ZXG Wellness Disposable 3mL Cartridges",
     tagline: "Standard 3mL - 10 per set",
-    description:
-      "Disposable cartridges built for a clean fit inside reusable ZXG injection pens.",
+    description: "Disposable cartridges built for a clean fit inside reusable ZXG injection pens.",
     price: 10,
     category: "Accessories",
     image: "cartridge",
@@ -70,8 +79,7 @@ const defaultProducts = [
     slug: "needles",
     name: "ZXG Wellness Single-Use Pen Needles",
     tagline: "Ultra-fine micro-tip - 100 per box",
-    description:
-      "Single-use pen needles designed for a smoother attachment experience.",
+    description: "Single-use pen needles designed for a smoother attachment experience.",
     price: 10,
     category: "Accessories",
     image: "needles",
@@ -109,13 +117,16 @@ const defaultProducts = [
     slug: "body-balm",
     name: "ZXG Wellness Nourishing Body Balm",
     tagline: "Deeply moisturizing skin treatment",
-    description:
-      "Moisturizing body balm formulated with cocoa butter, shea butter, and squalane.",
+    description: "Moisturizing body balm formulated with cocoa butter, shea butter, and squalane.",
     price: 16.99,
     category: "Skincare",
     image: "body-balm",
     ingredients: ["Cocoa Butter", "Shea Butter", "Squalane"],
-    benefits: ["Deep moisture for dry skin", "Lightweight and non-greasy", "Comfortable daily-use finish"],
+    benefits: [
+      "Deep moisture for dry skin",
+      "Lightweight and non-greasy",
+      "Comfortable daily-use finish",
+    ],
     featured: true,
     active: true,
     track_stock: false,
@@ -336,7 +347,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const resource = req.query.resource as string;
 
   try {
-    enforceRateLimit(req, "admin-data", { limit: req.method === "GET" ? 120 : 30, windowMs: 60_000 });
+    enforceRateLimit(req, "admin-data", {
+      limit: req.method === "GET" ? 120 : 30,
+      windowMs: 60_000,
+    });
     const { supabase } = await requireAdmin(req);
 
     // ── GET requests ──────────────────────────────────────────────
@@ -353,35 +367,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (resource === "products") {
         const { data, error } = await supabase
           .from("products")
-          .select("id, slug, name, tagline, description, price, category, image, featured_video, ingredients, benefits, active, featured, track_stock, stock_qty, options")
+          .select(
+            "id, slug, name, tagline, description, price, category, image, featured_video, ingredients, benefits, active, featured, track_stock, stock_qty, options",
+          )
           .order("name", { ascending: true });
         if (error) {
           // Fallback: columns may not exist yet — fetch without new columns
           const { data: data2, error: error2 } = await supabase
             .from("products")
-            .select("id, slug, name, tagline, description, price, category, image, ingredients, benefits, active, featured")
+            .select(
+              "id, slug, name, tagline, description, price, category, image, ingredients, benefits, active, featured",
+            )
             .order("name", { ascending: true });
           if (error2) return res.status(500).json({ error: error2.message });
           if ((data2 ?? []).length === 0) {
             const { data: seeded, error: seedError } = await supabase
               .from("products")
               .upsert(defaultProductBaseFields, { onConflict: "slug" })
-              .select("id, slug, name, tagline, description, price, category, image, ingredients, benefits, active, featured")
+              .select(
+                "id, slug, name, tagline, description, price, category, image, ingredients, benefits, active, featured",
+              )
               .order("name", { ascending: true });
             if (seedError) return res.status(500).json({ error: seedError.message });
-            return res.status(200).json((seeded ?? []).map((p: any) => ({
-              ...p, track_stock: false, stock_qty: 0, options: []
-            })));
+            return res.status(200).json(
+              (seeded ?? []).map((p: any) => ({
+                ...p,
+                track_stock: false,
+                stock_qty: 0,
+                options: [],
+              })),
+            );
           }
-          return res.status(200).json((data2 ?? []).map((p: any) => ({
-            ...p, track_stock: false, stock_qty: 0, options: []
-          })));
+          return res.status(200).json(
+            (data2 ?? []).map((p: any) => ({
+              ...p,
+              track_stock: false,
+              stock_qty: 0,
+              options: [],
+            })),
+          );
         }
         if ((data ?? []).length === 0) {
           const { data: seeded, error: seedError } = await supabase
             .from("products")
             .upsert(defaultProducts, { onConflict: "slug" })
-            .select("id, slug, name, tagline, description, price, category, image, featured_video, ingredients, benefits, active, featured, track_stock, stock_qty, options")
+            .select(
+              "id, slug, name, tagline, description, price, category, image, featured_video, ingredients, benefits, active, featured, track_stock, stock_qty, options",
+            )
             .order("name", { ascending: true });
           if (seedError) return res.status(500).json({ error: seedError.message });
           return res.status(200).json(seeded ?? []);
@@ -391,8 +423,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (resource === "users") {
         // Get auth users (has email)
-        const { data: authData, error: authError } =
-          await supabase.auth.admin.listUsers({ perPage: 1000 });
+        const { data: authData, error: authError } = await supabase.auth.admin.listUsers({
+          perPage: 1000,
+        });
         if (authError) return res.status(500).json({ error: authError.message });
 
         const authUsers = authData.users;
@@ -404,14 +437,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .order("created_at", { ascending: false });
 
         // Get roles
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("user_id, role");
+        const { data: roles } = await supabase.from("user_roles").select("user_id, role");
 
         // Get orders
-        const { data: orders } = await supabase
-          .from("orders")
-          .select("user_id, total");
+        const { data: orders } = await supabase.from("orders").select("user_id, total");
 
         const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
         const adminIds = new Set(
@@ -537,7 +566,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { data, error } = await supabase.storage
           .from(productImageBucket)
           .createSignedUploadUrl(path);
-        if (error || !data) return res.status(500).json({ error: error?.message || "Upload URL failed" });
+        if (error || !data)
+          return res.status(500).json({ error: error?.message || "Upload URL failed" });
 
         const { data: publicData } = supabase.storage.from(productImageBucket).getPublicUrl(path);
         return res.status(200).json({

@@ -131,22 +131,32 @@ function optionVariantsFrom(options: unknown, slug: string, basePrice: number) {
 
     if (Array.isArray(rawValues)) {
       rawValues.forEach((value) => {
-        const label = String(value ?? "").trim();
+        const valueSource =
+          value && typeof value === "object" && !Array.isArray(value)
+            ? (value as Record<string, unknown>)
+            : null;
+        const label = String(
+          valueSource?.label ?? valueSource?.name ?? valueSource?.value ?? value ?? "",
+        ).trim();
         if (!label) return;
-        const colorValue = normalizePenColorValue(label);
+        const rawValue = String(valueSource?.value ?? label).trim();
+        const colorValue = normalizePenColorValue(rawValue);
+        const price = toFinitePrice(valueSource?.price, basePrice);
+        const imageRef = String(valueSource?.image ?? "").trim();
+        const inStock = typeof valueSource?.inStock === "boolean" ? valueSource.inStock : true;
 
         if ((slug === "pen" || optionName.includes("color")) && isPenColorValue(colorValue)) {
           colorVariants.set(colorValue, {
             label,
             value: colorValue,
-            price: basePrice,
-            image: penColorImages[colorValue],
-            inStock: true,
+            price,
+            image: imageRef ? imageRefFor(imageRef, slug) : penColorImages[colorValue],
+            inStock,
           });
           return;
         }
 
-        variants.push({ label, price: basePrice });
+        variants.push({ label, price });
       });
       return;
     }

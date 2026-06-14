@@ -64,7 +64,11 @@ export function imageRefFor(ref: string, fallbackSlug?: string) {
   ) {
     return value;
   }
-  return productImages[value] ?? (fallbackSlug ? imageFor(fallbackSlug) : fallbackImage);
+  return (
+    productImages[value] ??
+    penColorImages[value] ??
+    (fallbackSlug ? imageFor(fallbackSlug) : fallbackImage)
+  );
 }
 
 export function imageRefsFrom(value?: string | null) {
