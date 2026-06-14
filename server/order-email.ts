@@ -3,7 +3,7 @@ import { Resend } from "resend";
 const PEN_DISCOUNT_MIN_QTY = 5;
 const PEN_DISCOUNT_RATE = 0.1;
 const FREE_SHIPPING_THRESHOLD = 50;
-const DEFAULT_FROM_EMAIL = "ZXG Wellness <admin@zxgwellness.com>";
+const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
 const DEFAULT_ADMIN_EMAILS = [
   "jorizrule0@gmail.com",
   "g@gxzpeptides.com",
@@ -43,10 +43,6 @@ function getResend() {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY is not configured.");
   return new Resend(key);
-}
-
-function getFromEmail() {
-  return process.env.ORDER_FROM_EMAIL || process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL;
 }
 
 function getAdminEmails(customerEmail: string) {
@@ -273,7 +269,7 @@ export function buildOrderEmailHtml(order: OrderEmail) {
 export async function sendOrderConfirmationEmail(order: OrderEmail): Promise<OrderEmailResult> {
   const resend = getResend();
   const shortId = order.id.slice(0, 8).toUpperCase();
-  const from = getFromEmail();
+  const from = DEFAULT_FROM_EMAIL;
   const html = buildOrderEmailHtml(order);
   const adminEmails = getAdminEmails(order.email);
   const result: OrderEmailResult = {

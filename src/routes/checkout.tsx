@@ -27,7 +27,7 @@ function friendlyEmailError(error?: string) {
     lower.includes("domain") ||
     lower.includes("from")
   ) {
-    return "Email sender domain is not verified in Resend yet.";
+    return "Resend rejected the sender domain. Make sure Vercel uses a RESEND_API_KEY from the same Resend account where zxgwellness.com is verified.";
   }
 
   if (lower.includes("only send testing emails")) {
