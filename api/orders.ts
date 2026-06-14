@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
-import { sendOrderConfirmationEmail } from "./send-confirmation";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
 const PEN_DISCOUNT_MIN_QTY = 5;
 const PEN_DISCOUNT_RATE = 0.1;
+const EMAIL_TIMEOUT_MS = 8_000;
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -170,6 +170,12 @@ function sendApiError(res: VercelResponse, error: unknown) {
   const err = error as Error & { statusCode?: number };
   const status = err.statusCode ?? 500;
   return res.status(status).json({ error: err.message || "Server error" });
+}
+
+function timeoutAfter(ms: number, message: string) {
+  return new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error(message)), ms);
+  });
 }
 
 function normalizeOption(item: CheckoutItemInput) {
@@ -399,10 +405,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let emailSent = false;
     let emailError: string | undefined;
     try {
-      await sendOrderConfirmationEmail({
-        ...order,
-        items: trustedCart.items,
-      });
+      const { sendOrderConfirmationEmail } = await import("../server/order-email");
+      await Promise.race([
+        sendOrderConfirmationEmail({
+          ...order,
+          items: trustedCart.items,
+        }),
+        timeoutAfter(EMAIL_TIMEOUT_MS, "Confirmation email timed out"),
+      ]);
       emailSent = true;
     } catch (error) {
       emailError = error instanceof Error ? error.message : "Confirmation email failed";
