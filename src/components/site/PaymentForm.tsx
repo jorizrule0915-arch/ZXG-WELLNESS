@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 
 interface PaymentFormProps {
   isProcessing: boolean;
-  onSuccess: (paymentIntentId: string) => void;
+  onSuccess: (paymentIntentId: string) => void | Promise<void>;
   onError: (error: string) => void;
 }
 
@@ -32,9 +32,25 @@ export function PaymentForm({ isProcessing, onSuccess, onError }: PaymentFormPro
 
       if (error) {
         onError(error.message || "Payment failed");
-      } else if (paymentIntent?.status === "succeeded") {
-        onSuccess(paymentIntent.id);
+        return;
       }
+
+      if (!paymentIntent) {
+        onError("Payment was not completed. Please try again.");
+        return;
+      }
+
+      if (paymentIntent.status === "succeeded") {
+        await onSuccess(paymentIntent.id);
+        return;
+      }
+
+      if (paymentIntent.status === "processing") {
+        onError("Payment is still processing. Please wait a moment and try checking your account.");
+        return;
+      }
+
+      onError(`Payment status is ${paymentIntent.status}. Please try again or use another card.`);
     } catch (e) {
       onError(e instanceof Error ? e.message : "Payment failed");
     } finally {

@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { imageFor } from "@/lib/productImages";
 import { StripeProvider } from "@/components/site/StripeProvider";
 import { PaymentForm } from "@/components/site/PaymentForm";
-import { authFetch } from "@/lib/api";
+import { authFetch, readApiJson } from "@/lib/api";
 
 export const Route = createFileRoute("/checkout")({ component: CheckoutPage });
 
@@ -21,6 +21,7 @@ function CheckoutPage() {
   const [err, setErr] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const nav = useNavigate();
 
   const handleShippingSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -113,19 +114,18 @@ function CheckoutPage() {
           })),
         }),
       });
-      const orderData = await orderResponse.json();
-      if (!orderResponse.ok) throw new Error(orderData?.error || "Order creation failed");
-
-      // Send order confirmation + invoice email
-      try {
-        await authFetch("/api/send-confirmation", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId: orderData.orderId }),
-        });
-      } catch (emailErr) {
-        // Non-blocking — don't fail the order if email fails
-        console.error("Email send failed:", emailErr);
+      const orderData = await readApiJson<{
+        success: boolean;
+        orderId: string;
+        emailSent?: boolean;
+        emailError?: string;
+      }>(orderResponse);
+      if (orderData.emailSent === false) {
+        setNotice(
+          "Your paid order was saved, but the confirmation email could not be sent automatically. Please check the admin orders page.",
+        );
+      } else {
+        setNotice(null);
       }
 
       clear();
@@ -150,6 +150,7 @@ function CheckoutPage() {
           Your order has been received and is being prepared with care. View it anytime in your
           account.
         </p>
+        {notice && <p className="mt-4 text-sm text-gold max-w-lg">{notice}</p>}
         <div className="mt-10 flex gap-4">
           <Link
             to="/account"
@@ -191,6 +192,7 @@ function CheckoutPage() {
           isProcessing={submitting}
           onSuccess={handlePaymentSuccess}
           onError={handlePaymentError}
+          errorMessage={err}
           items={items}
         />
       </StripeProvider>
@@ -273,12 +275,14 @@ function CheckoutPaymentForm({
   isProcessing,
   onSuccess,
   onError,
+  errorMessage,
   items,
 }: {
   clientSecret: string;
   isProcessing: boolean;
-  onSuccess: (paymentIntentId: string) => void;
+  onSuccess: (paymentIntentId: string) => void | Promise<void>;
   onError: (err: string) => void;
+  errorMessage?: string | null;
   items: CartItem[];
 }) {
   const summary = cartSummary(items);
@@ -296,6 +300,7 @@ function CheckoutPaymentForm({
           <div>
             <FormSection title="Card Details">
               <PaymentForm isProcessing={isProcessing} onSuccess={onSuccess} onError={onError} />
+              {errorMessage && <div className="mt-4 text-sm text-destructive">{errorMessage}</div>}
             </FormSection>
           </div>
 

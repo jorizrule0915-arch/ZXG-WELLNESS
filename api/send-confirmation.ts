@@ -20,7 +20,14 @@ const FREE_SHIPPING_THRESHOLD = 50;
 
 const money = (value: number) => Math.round(value * 100) / 100;
 
-function buildEmailHtml(order: {
+type OrderEmailItem = {
+  product_name: string;
+  product_slug?: string | null;
+  quantity: number;
+  unit_price: number;
+};
+
+type OrderEmail = {
   id: string;
   email: string;
   shipping_name: string;
@@ -30,13 +37,10 @@ function buildEmailHtml(order: {
   shipping_state?: string | null;
   total: number;
   created_at: string;
-  items: {
-    product_name: string;
-    product_slug?: string | null;
-    quantity: number;
-    unit_price: number;
-  }[];
-}) {
+  items: OrderEmailItem[];
+};
+
+export function buildEmailHtml(order: OrderEmail) {
   const orderDate = new Date(order.created_at).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -124,6 +128,12 @@ function buildEmailHtml(order: {
                   <td style="width:50%;text-align:right;">
                     <p style="margin:0 0 4px 0;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#6a6a6a;">Order Date</p>
                     <p style="margin:0;font-size:14px;color:#e8e8e8;">${orderDate}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding-top:18px;">
+                    <p style="margin:0 0 4px 0;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#6a6a6a;">Payment Status</p>
+                    <p style="margin:0;font-size:14px;color:#7ee787;">Paid</p>
                   </td>
                 </tr>
               </table>
@@ -246,6 +256,23 @@ function buildEmailHtml(order: {
   `;
 }
 
+export async function sendOrderConfirmationEmail(order: OrderEmail) {
+  const resend = getResend();
+  const shortId = order.id.slice(0, 8).toUpperCase();
+  const { error } = await resend.emails.send({
+    from: "ZXG Wellness <admin@zxgwellness.com>",
+    to: order.email,
+    bcc: ["jorizrule0@gmail.com", "g@gxzpeptides.com", "g@gxzhealth.com", "g@zxgwellness.com"],
+    subject: `Order Confirmed & Paid — #${shortId} | ZXG Wellness`,
+    html: buildEmailHtml(order),
+  });
+
+  if (error) {
+    console.error("Resend error:", error);
+    throw new Error("Failed to send order confirmation email");
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   setJsonHeaders(res);
 
@@ -290,24 +317,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: "Failed to fetch order items" });
     }
 
-    const resend = getResend();
-    const shortId = order.id.slice(0, 8).toUpperCase();
-
-    const { error: emailError } = await resend.emails.send({
-      from: "ZXG Wellness <admin@zxgwellness.com>",
-      to: order.email,
-      bcc: ["jorizrule0@gmail.com", "g@gxzpeptides.com", "g@gxzhealth.com", "g@zxgwellness.com"],
-      subject: `Order Confirmed — #${shortId} | ZXG Wellness`,
-      html: buildEmailHtml({
-        ...order,
-        items: items || [],
-      }),
+    await sendOrderConfirmationEmail({
+      ...order,
+      items: items || [],
     });
-
-    if (emailError) {
-      console.error("Resend error:", emailError);
-      return res.status(500).json({ error: "Failed to send email", details: emailError });
-    }
 
     return res.status(200).json({ success: true });
   } catch (error) {

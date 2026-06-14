@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
+import { sendOrderConfirmationEmail } from "./send-confirmation";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
@@ -382,7 +383,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         shipping_zip: String(shipping.zip),
         stripe_payment_intent_id: paymentIntent.id,
       })
-      .select("id")
+      .select("*")
       .single();
 
     if (orderError || !order) throw orderError ?? new Error("Order creation failed");
@@ -395,7 +396,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
     if (itemsError) throw itemsError;
 
-    return res.status(200).json({ success: true, orderId: order.id });
+    let emailSent = false;
+    let emailError: string | undefined;
+    try {
+      await sendOrderConfirmationEmail({
+        ...order,
+        items: trustedCart.items,
+      });
+      emailSent = true;
+    } catch (error) {
+      emailError = error instanceof Error ? error.message : "Confirmation email failed";
+      console.error("[api/orders] confirmation email failed", error);
+    }
+
+    return res.status(200).json({ success: true, orderId: order.id, emailSent, emailError });
   } catch (error) {
     console.error("[api/orders]", error);
     return sendApiError(res, error);

@@ -312,7 +312,7 @@ async function createPaymentIntent(
   body.set("amount", String(amountCents));
   body.set("currency", "usd");
   body.set("receipt_email", email);
-  body.set("automatic_payment_methods[enabled]", "true");
+  body.append("payment_method_types[]", "card");
   Object.entries(metadata).forEach(([key, value]) => {
     body.set(`metadata[${key}]`, value);
   });
