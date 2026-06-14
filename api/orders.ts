@@ -368,13 +368,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "Payment cart does not match submitted order" });
     }
 
-    const { data: existing } = await supabase
-      .from("orders")
-      .select("id")
-      .eq("stripe_payment_intent_id", paymentIntent.id)
-      .maybeSingle();
-    if (existing) return res.status(200).json({ success: true, orderId: existing.id });
-
     const shippingState = String(shipping.state ?? "").trim();
     const shippingCity = String(shipping.city ?? "").trim();
     const shippingCityLine = shippingState ? `${shippingCity}, ${shippingState}` : shippingCity;
@@ -390,7 +383,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         shipping_address: String(shipping.address),
         shipping_city: shippingCityLine,
         shipping_zip: String(shipping.zip),
-        stripe_payment_intent_id: paymentIntent.id,
       })
       .select("*")
       .single();
