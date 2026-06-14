@@ -3,6 +3,13 @@ import { Resend } from "resend";
 const PEN_DISCOUNT_MIN_QTY = 5;
 const PEN_DISCOUNT_RATE = 0.1;
 const FREE_SHIPPING_THRESHOLD = 50;
+const DEFAULT_FROM_EMAIL = "ZXG Wellness <admin@zxgwellness.com>";
+const DEFAULT_ADMIN_EMAILS = [
+  "jorizrule0@gmail.com",
+  "g@gxzpeptides.com",
+  "g@gxzhealth.com",
+  "g@zxgwellness.com",
+];
 
 const money = (value: number) => Math.round(value * 100) / 100;
 
@@ -30,6 +37,33 @@ function getResend() {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY is not configured.");
   return new Resend(key);
+}
+
+function getFromEmail() {
+  return process.env.ORDER_FROM_EMAIL || process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL;
+}
+
+function getAdminEmails(customerEmail: string) {
+  const configured = (process.env.ORDER_NOTIFICATION_EMAILS || "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean);
+  const emails = configured.length > 0 ? configured : DEFAULT_ADMIN_EMAILS;
+  const customer = customerEmail.toLowerCase();
+  return [...new Set(emails)].filter((email) => email.toLowerCase() !== customer);
+}
+
+function resendErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string") return message;
+  }
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return "Unknown Resend error";
+  }
 }
 
 export function buildOrderEmailHtml(order: OrderEmail) {
@@ -220,16 +254,46 @@ export function buildOrderEmailHtml(order: OrderEmail) {
 export async function sendOrderConfirmationEmail(order: OrderEmail) {
   const resend = getResend();
   const shortId = order.id.slice(0, 8).toUpperCase();
-  const { error } = await resend.emails.send({
-    from: "ZXG Wellness <admin@zxgwellness.com>",
-    to: order.email,
-    bcc: ["jorizrule0@gmail.com", "g@gxzpeptides.com", "g@gxzhealth.com", "g@zxgwellness.com"],
-    subject: `Order Confirmed & Paid — #${shortId} | ZXG Wellness`,
-    html: buildOrderEmailHtml(order),
-  });
+  const from = getFromEmail();
+  const html = buildOrderEmailHtml(order);
+  const adminEmails = getAdminEmails(order.email);
+  const sendJobs: Array<Promise<{ label: string; error: unknown } | null>> = [
+    resend.emails
+      .send({
+        from,
+        to: order.email,
+        replyTo: "admin@zxgwellness.com",
+        subject: `Order Confirmed & Paid — #${shortId} | ZXG Wellness`,
+        html,
+      })
+      .then(({ error }) => (error ? { label: "customer confirmation", error } : null))
+      .catch((error) => ({ label: "customer confirmation", error })),
+  ];
 
-  if (error) {
-    console.error("Resend error:", error);
-    throw new Error("Failed to send order confirmation email");
+  if (adminEmails.length > 0) {
+    sendJobs.push(
+      resend.emails
+        .send({
+          from,
+          to: adminEmails,
+          replyTo: order.email,
+          subject: `Paid Order Received — #${shortId} | ZXG Wellness`,
+          html,
+        })
+        .then(({ error }) => (error ? { label: "admin notification", error } : null))
+        .catch((error) => ({ label: "admin notification", error })),
+    );
+  }
+
+  const failures = (await Promise.all(sendJobs)).filter(
+    (failure): failure is { label: string; error: unknown } => Boolean(failure),
+  );
+
+  if (failures.length > 0) {
+    const message = failures
+      .map((failure) => `${failure.label}: ${resendErrorMessage(failure.error)}`)
+      .join("; ");
+    console.error("Resend order email error:", message);
+    throw new Error(message);
   }
 }
