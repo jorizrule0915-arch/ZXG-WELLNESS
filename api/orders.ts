@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
+import { sendOrderConfirmationEmail } from "../server/order-email";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
@@ -393,7 +394,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let emailSent = false;
     let emailError: string | undefined;
     try {
-      const { sendOrderConfirmationEmail } = await import("../server/order-email");
       const emailResult = await sendOrderConfirmationEmail({
         ...order,
         items: trustedCart.items,
