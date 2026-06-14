@@ -303,8 +303,7 @@ function getStripeSecretKey() {
   return secretKey;
 }
 
-function getStripeMode() {
-  const secretKey = getStripeSecretKey();
+function getStripeMode(secretKey = getStripeSecretKey()) {
   if (secretKey.startsWith("sk_test_")) return "test";
   if (secretKey.startsWith("sk_live_")) return "live";
   throw Object.assign(new Error("STRIPE_SECRET_KEY must be a valid sk_test or sk_live key."), {
@@ -333,24 +332,57 @@ function assertStripeModeMatches(clientMode: unknown) {
   return serverMode;
 }
 
-async function createPaymentIntent(
-  amountCents: number,
+function getOrigin(req: VercelRequest) {
+  const origin = req.headers.origin;
+  if (origin && !Array.isArray(origin)) return origin;
+  const host = req.headers.host;
+  return host ? `https://${host}` : "https://www.zxgwellness.com";
+}
+
+async function createCheckoutSession(
+  req: VercelRequest,
+  cart: Awaited<ReturnType<typeof calculateTrustedCart>>,
   email: string,
   metadata: Record<string, string>,
 ) {
+  const secretKey = getStripeSecretKey();
   const body = new URLSearchParams();
-  body.set("amount", String(amountCents));
-  body.set("currency", "usd");
-  body.set("receipt_email", email);
+  body.set("mode", "payment");
+  body.set("ui_mode", "elements");
+  body.set("customer_email", email);
+  body.set("client_reference_id", metadata.userId);
+  body.set("payment_intent_data[receipt_email]", email);
+  body.set("return_url", `${getOrigin(req)}/checkout?checkout_session_id={CHECKOUT_SESSION_ID}`);
   body.append("payment_method_types[]", "card");
-  Object.entries(metadata).forEach(([key, value]) => {
-    body.set(`metadata[${key}]`, value);
+
+  let lineItemIndex = 0;
+  cart.items.forEach((item) => {
+    body.set(`line_items[${lineItemIndex}][price_data][currency]`, "usd");
+    body.set(`line_items[${lineItemIndex}][price_data][product_data][name]`, item.product_name);
+    body.set(
+      `line_items[${lineItemIndex}][price_data][unit_amount]`,
+      String(cents(item.unit_price)),
+    );
+    body.set(`line_items[${lineItemIndex}][quantity]`, String(item.quantity));
+    lineItemIndex += 1;
   });
 
-  const response = await fetch("https://api.stripe.com/v1/payment_intents", {
+  if (cart.shipping > 0) {
+    body.set(`line_items[${lineItemIndex}][price_data][currency]`, "usd");
+    body.set(`line_items[${lineItemIndex}][price_data][product_data][name]`, "Shipping");
+    body.set(`line_items[${lineItemIndex}][price_data][unit_amount]`, String(cents(cart.shipping)));
+    body.set(`line_items[${lineItemIndex}][quantity]`, "1");
+  }
+
+  Object.entries(metadata).forEach(([key, value]) => {
+    body.set(`metadata[${key}]`, value);
+    body.set(`payment_intent_data[metadata][${key}]`, value);
+  });
+
+  const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${getStripeSecretKey()}`,
+      Authorization: `Bearer ${secretKey}`,
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body,
@@ -358,7 +390,7 @@ async function createPaymentIntent(
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data?.error?.message || "Stripe payment intent creation failed");
+    throw new Error(data?.error?.message || "Stripe Checkout Session creation failed");
   }
 
   return data;
@@ -378,7 +410,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const serverStripeMode = assertStripeModeMatches(stripeMode);
 
     const trustedCart = await calculateTrustedCart(supabase, items);
-    const paymentIntent = await createPaymentIntent(trustedCart.amountCents, email, {
+    const checkoutSession = await createCheckoutSession(req, trustedCart, email, {
       userId: user.id,
       customerEmail: String(email),
       cartTotal: trustedCart.total.toFixed(2),
@@ -387,12 +419,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       cartHash: trustedCart.cartHash,
       stripeMode: serverStripeMode,
     });
-    if (!paymentIntent.client_secret)
-      return res.status(500).json({ error: "Failed to get payment secret" });
+    if (!checkoutSession.client_secret)
+      return res.status(500).json({ error: "Failed to get checkout secret" });
 
     return res.status(200).json({
       success: true,
-      clientSecret: paymentIntent.client_secret,
+      clientSecret: checkoutSession.client_secret,
+      checkoutSessionId: checkoutSession.id,
       amount: trustedCart.total,
     });
   } catch (error) {

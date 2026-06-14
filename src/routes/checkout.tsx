@@ -93,7 +93,7 @@ function CheckoutPage() {
     }
   };
 
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
+  const handlePaymentSuccess = async (checkoutSessionId: string) => {
     if (!formData || !user) return;
     setSubmitting(true);
 
@@ -102,7 +102,7 @@ function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          paymentIntentId,
+          checkoutSessionId,
           shipping: {
             email: String(formData.get("email") ?? ""),
             name: `${formData.get("first") ?? ""} ${formData.get("last") ?? ""}`.trim(),
@@ -199,6 +199,7 @@ function CheckoutPage() {
           onError={handlePaymentError}
           errorMessage={err}
           items={items}
+          formData={formData}
         />
       </StripeProvider>
     );
@@ -288,15 +289,28 @@ function CheckoutPaymentForm({
   onError,
   errorMessage,
   items,
+  formData,
 }: {
   clientSecret: string;
   isProcessing: boolean;
-  onSuccess: (paymentIntentId: string) => void | Promise<void>;
+  onSuccess: (checkoutSessionId: string) => void | Promise<void>;
   onError: (err: string) => void;
   errorMessage?: string | null;
   items: CartItem[];
+  formData: FormData;
 }) {
   const summary = cartSummary(items);
+  const customerEmail = String(formData.get("email") ?? "");
+  const shippingContact = {
+    name: `${formData.get("first") ?? ""} ${formData.get("last") ?? ""}`.trim(),
+    address: {
+      country: "US",
+      line1: String(formData.get("address") ?? ""),
+      city: String(formData.get("city") ?? ""),
+      state: String(formData.get("state") ?? ""),
+      postal_code: String(formData.get("zip") ?? ""),
+    },
+  };
 
   return (
     <>
@@ -310,7 +324,13 @@ function CheckoutPaymentForm({
         <div className="grid lg:grid-cols-[1fr,400px] gap-12">
           <div>
             <FormSection title="Card Details">
-              <PaymentForm isProcessing={isProcessing} onSuccess={onSuccess} onError={onError} />
+              <PaymentForm
+                isProcessing={isProcessing}
+                onSuccess={onSuccess}
+                onError={onError}
+                customerEmail={customerEmail}
+                shippingContact={shippingContact}
+              />
               {errorMessage && <div className="mt-4 text-sm text-destructive">{errorMessage}</div>}
             </FormSection>
           </div>

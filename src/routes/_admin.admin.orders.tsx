@@ -18,7 +18,7 @@ type Order = {
   shipping_name: string;
   shipping_address: string;
   shipping_city: string;
-  shipping_state: string | null;
+  shipping_state?: string | null;
   shipping_zip: string;
   order_items: Item[];
 };
@@ -88,7 +88,9 @@ function AdminOrders() {
           <div className="border-b border-gold/15 pb-6">
             <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">Fulfillment</div>
             <h1 className="font-display text-3xl md:text-4xl">Orders</h1>
-            <p className="text-sm text-muted-foreground mt-2">Review payment status, shipping details, and fulfillment progress.</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Review payment status, shipping details, and fulfillment progress.
+            </p>
           </div>
         </motion.div>
 

@@ -310,9 +310,9 @@ function getStripeSecretKey() {
   return secretKey;
 }
 
-async function retrievePaymentIntent(paymentIntentId: string) {
+async function retrieveCheckoutSession(checkoutSessionId: string) {
   const response = await fetch(
-    `https://api.stripe.com/v1/payment_intents/${encodeURIComponent(paymentIntentId)}`,
+    `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(checkoutSessionId)}`,
     {
       headers: {
         Authorization: `Bearer ${getStripeSecretKey()}`,
@@ -322,7 +322,7 @@ async function retrievePaymentIntent(paymentIntentId: string) {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data?.error?.message || "Stripe payment lookup failed");
+    throw new Error(data?.error?.message || "Stripe Checkout Session lookup failed");
   }
 
   return data;
@@ -337,9 +337,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     enforceRateLimit(req, "orders", { limit: 20, windowMs: 60_000 });
     const { supabase, user } = await requireUser(req);
-    const { paymentIntentId, shipping, items } = req.body || {};
-    if (!paymentIntentId) {
-      return res.status(400).json({ error: "paymentIntentId is required" });
+    const { checkoutSessionId, shipping, items } = req.body || {};
+    if (!checkoutSessionId) {
+      return res.status(400).json({ error: "checkoutSessionId is required" });
     }
     if (
       !shipping?.email ||
@@ -353,19 +353,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const trustedCart = await calculateTrustedCart(supabase, items);
-    const paymentIntent = await retrievePaymentIntent(String(paymentIntentId));
+    const checkoutSession = await retrieveCheckoutSession(String(checkoutSessionId));
 
-    if (paymentIntent.status !== "succeeded") {
-      return res.status(400).json({ error: "Payment has not succeeded" });
+    if (checkoutSession.status !== "complete" || checkoutSession.payment_status !== "paid") {
+      return res.status(400).json({ error: "Checkout payment has not completed" });
     }
-    if (paymentIntent.metadata?.userId !== user.id) {
-      return res.status(403).json({ error: "Payment does not belong to this user" });
+    if (checkoutSession.metadata?.userId !== user.id) {
+      return res.status(403).json({ error: "Checkout Session does not belong to this user" });
     }
-    if (paymentIntent.amount_received !== trustedCart.amountCents) {
-      return res.status(400).json({ error: "Payment amount does not match cart total" });
+    if (checkoutSession.amount_total !== trustedCart.amountCents) {
+      return res.status(400).json({ error: "Checkout amount does not match cart total" });
     }
-    if (paymentIntent.metadata?.cartHash !== trustedCart.cartHash) {
-      return res.status(400).json({ error: "Payment cart does not match submitted order" });
+    if (checkoutSession.metadata?.cartHash !== trustedCart.cartHash) {
+      return res.status(400).json({ error: "Checkout cart does not match submitted order" });
     }
 
     const shippingState = String(shipping.state ?? "").trim();

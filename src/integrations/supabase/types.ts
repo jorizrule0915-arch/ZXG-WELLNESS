@@ -64,10 +64,8 @@ export type Database = {
           shipping_address: string;
           shipping_city: string;
           shipping_name: string;
-          shipping_state: string | null;
           shipping_zip: string;
           status: Database["public"]["Enums"]["order_status"];
-          stripe_payment_intent_id: string | null;
           total: number;
           updated_at: string;
           user_id: string;
@@ -79,10 +77,8 @@ export type Database = {
           shipping_address: string;
           shipping_city: string;
           shipping_name: string;
-          shipping_state?: string | null;
           shipping_zip: string;
           status?: Database["public"]["Enums"]["order_status"];
-          stripe_payment_intent_id?: string | null;
           total: number;
           updated_at?: string;
           user_id: string;
@@ -94,10 +90,8 @@ export type Database = {
           shipping_address?: string;
           shipping_city?: string;
           shipping_name?: string;
-          shipping_state?: string | null;
           shipping_zip?: string;
           status?: Database["public"]["Enums"]["order_status"];
-          stripe_payment_intent_id?: string | null;
           total?: number;
           updated_at?: string;
           user_id?: string;

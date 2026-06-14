@@ -1,4 +1,4 @@
-import { Elements } from "@stripe/react-stripe-js";
+import { CheckoutElementsProvider } from "@stripe/react-stripe-js/checkout";
 import { stripePromise } from "@/integrations/stripe/client";
 import type { PropsWithChildren } from "react";
 
@@ -8,14 +8,16 @@ export function StripeProvider({
 }: PropsWithChildren<{ clientSecret: string }>) {
   if (!stripePromise) return <>{children}</>;
   return (
-    <Elements
+    <CheckoutElementsProvider
       stripe={stripePromise}
       options={{
         clientSecret,
-        appearance: { theme: "night", variables: { colorPrimary: "#c9a84c" } },
+        elementsOptions: {
+          appearance: { theme: "night", variables: { colorPrimary: "#c9a84c" } },
+        },
       }}
     >
       {children}
-    </Elements>
+    </CheckoutElementsProvider>
   );
 }

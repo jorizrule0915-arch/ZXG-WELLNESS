@@ -1,56 +1,72 @@
-import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { PaymentElement, useCheckoutElements } from "@stripe/react-stripe-js/checkout";
 import { useState, type FormEvent } from "react";
 
 interface PaymentFormProps {
   isProcessing: boolean;
-  onSuccess: (paymentIntentId: string) => void | Promise<void>;
+  onSuccess: (checkoutSessionId: string) => void | Promise<void>;
   onError: (error: string) => void;
+  customerEmail: string;
+  shippingContact: {
+    name: string;
+    address: {
+      country: string;
+      line1: string;
+      city: string;
+      state: string;
+      postal_code: string;
+    };
+  };
 }
 
-export function PaymentForm({ isProcessing, onSuccess, onError }: PaymentFormProps) {
-  const stripe = useStripe();
-  const elements = useElements();
+export function PaymentForm({
+  isProcessing,
+  onSuccess,
+  onError,
+  customerEmail,
+  shippingContact,
+}: PaymentFormProps) {
+  const checkoutResult = useCheckoutElements();
   const [ready, setReady] = useState(false);
   const [localProcessing, setLocalProcessing] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!stripe || !elements) {
-      onError("Payment system not ready");
+    if (checkoutResult.type === "loading") {
+      onError("Payment system is still loading. Please try again in a moment.");
+      return;
+    }
+
+    if (checkoutResult.type === "error") {
+      onError(checkoutResult.error.message || "Payment system failed to load.");
       return;
     }
 
     setLocalProcessing(true);
 
     try {
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        confirmParams: { return_url: window.location.origin },
+      const result = await checkoutResult.checkout.confirm({
+        returnUrl: `${window.location.origin}/checkout`,
         redirect: "if_required",
+        email: customerEmail,
+        shippingAddress: shippingContact,
+        billingAddress: shippingContact,
       });
 
-      if (error) {
-        onError(error.message || "Payment failed");
+      if (result.type === "error") {
+        onError(result.error.message || "Payment failed");
         return;
       }
 
-      if (!paymentIntent) {
-        onError("Payment was not completed. Please try again.");
+      if (
+        result.session.status.type === "complete" &&
+        result.session.status.paymentStatus === "paid"
+      ) {
+        await onSuccess(result.session.id);
         return;
       }
 
-      if (paymentIntent.status === "succeeded") {
-        await onSuccess(paymentIntent.id);
-        return;
-      }
-
-      if (paymentIntent.status === "processing") {
-        onError("Payment is still processing. Please wait a moment and try checking your account.");
-        return;
-      }
-
-      onError(`Payment status is ${paymentIntent.status}. Please try again or use another card.`);
+      onError("Checkout did not complete. Please try again or use another card.");
     } catch (e) {
       onError(e instanceof Error ? e.message : "Payment failed");
     } finally {
@@ -64,7 +80,7 @@ export function PaymentForm({ isProcessing, onSuccess, onError }: PaymentFormPro
 
       <button
         type="submit"
-        disabled={!ready || isProcessing || localProcessing}
+        disabled={!ready || isProcessing || localProcessing || checkoutResult.type !== "success"}
         className="w-full px-6 py-3 bg-gold text-obsidian font-medium uppercase tracking-luxury disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gold-light transition-colors"
       >
         {isProcessing || localProcessing ? "Processing..." : "Complete Payment"}
