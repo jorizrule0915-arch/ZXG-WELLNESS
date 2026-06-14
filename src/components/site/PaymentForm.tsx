@@ -5,7 +5,6 @@ interface PaymentFormProps {
   isProcessing: boolean;
   onSuccess: (checkoutSessionId: string) => void | Promise<void>;
   onError: (error: string) => void;
-  customerEmail: string;
   shippingContact: {
     name: string;
     address: {
@@ -22,7 +21,6 @@ export function PaymentForm({
   isProcessing,
   onSuccess,
   onError,
-  customerEmail,
   shippingContact,
 }: PaymentFormProps) {
   const checkoutResult = useCheckoutElements();
@@ -47,7 +45,6 @@ export function PaymentForm({
     try {
       const result = await checkoutResult.checkout.confirm({
         redirect: "if_required",
-        email: customerEmail,
         shippingAddress: shippingContact,
         billingAddress: shippingContact,
       });

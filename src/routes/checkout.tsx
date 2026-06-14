@@ -300,7 +300,6 @@ function CheckoutPaymentForm({
   formData: FormData;
 }) {
   const summary = cartSummary(items);
-  const customerEmail = String(formData.get("email") ?? "");
   const shippingContact = {
     name: `${formData.get("first") ?? ""} ${formData.get("last") ?? ""}`.trim(),
     address: {
@@ -328,7 +327,6 @@ function CheckoutPaymentForm({
                 isProcessing={isProcessing}
                 onSuccess={onSuccess}
                 onError={onError}
-                customerEmail={customerEmail}
                 shippingContact={shippingContact}
               />
               {errorMessage && <div className="mt-4 text-sm text-destructive">{errorMessage}</div>}
