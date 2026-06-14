@@ -14,6 +14,12 @@ function getResend() {
   return new Resend(key);
 }
 
+const PEN_DISCOUNT_MIN_QTY = 5;
+const PEN_DISCOUNT_RATE = 0.1;
+const FREE_SHIPPING_THRESHOLD = 50;
+
+const money = (value: number) => Math.round(value * 100) / 100;
+
 function buildEmailHtml(order: {
   id: string;
   email: string;
@@ -24,7 +30,12 @@ function buildEmailHtml(order: {
   shipping_state?: string | null;
   total: number;
   created_at: string;
-  items: { product_name: string; quantity: number; unit_price: number }[];
+  items: {
+    product_name: string;
+    product_slug?: string | null;
+    quantity: number;
+    unit_price: number;
+  }[];
 }) {
   const orderDate = new Date(order.created_at).toLocaleDateString("en-US", {
     year: "numeric",
@@ -33,11 +44,30 @@ function buildEmailHtml(order: {
   });
 
   const shortId = order.id.slice(0, 8).toUpperCase();
-  const subtotal = order.items.reduce(
-    (sum, item) => sum + Number(item.unit_price) * Number(item.quantity),
-    0,
+  const discountedSubtotal = money(
+    order.items.reduce((sum, item) => sum + Number(item.unit_price) * Number(item.quantity), 0),
   );
-  const shipping = Math.max(0, Number(order.total) - subtotal);
+  const penQuantity = order.items
+    .filter((item) => item.product_slug === "pen")
+    .reduce((quantity, item) => quantity + Number(item.quantity), 0);
+  const penDiscountApplies = penQuantity >= PEN_DISCOUNT_MIN_QTY;
+  const penDiscount = money(
+    penDiscountApplies
+      ? order.items
+          .filter((item) => item.product_slug === "pen")
+          .reduce(
+            (sum, item) =>
+              sum +
+              Number(item.unit_price) *
+                Number(item.quantity) *
+                (PEN_DISCOUNT_RATE / (1 - PEN_DISCOUNT_RATE)),
+            0,
+          )
+      : 0,
+  );
+  const merchandiseSubtotal = money(discountedSubtotal + penDiscount);
+  const shipping = money(Math.max(0, Number(order.total) - discountedSubtotal));
+  const freeShippingApplies = shipping === 0 && merchandiseSubtotal >= FREE_SHIPPING_THRESHOLD;
 
   const itemRows = order.items
     .map(
@@ -125,14 +155,32 @@ function buildEmailHtml(order: {
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
                 <tr>
                   <td style="text-align:right;padding:6px 0;">
-                    <span style="font-size:12px;color:#6a6a6a;letter-spacing:1px;">Subtotal</span>
-                    <span style="font-size:14px;color:#e8e8e8;margin-left:32px;">$${subtotal.toFixed(2)}</span>
+                    <span style="font-size:12px;color:#6a6a6a;letter-spacing:1px;">Merchandise Subtotal</span>
+                    <span style="font-size:14px;color:#e8e8e8;margin-left:32px;">$${merchandiseSubtotal.toFixed(2)}</span>
+                  </td>
+                </tr>
+                ${
+                  penDiscount > 0
+                    ? `
+                <tr>
+                  <td style="text-align:right;padding:6px 0;">
+                    <span style="font-size:12px;color:#6a6a6a;letter-spacing:1px;">Reusable Pen Discount (10%)</span>
+                    <span style="font-size:14px;color:#7ee787;margin-left:32px;">-$${penDiscount.toFixed(2)}</span>
                   </td>
                 </tr>
                 <tr>
                   <td style="text-align:right;padding:6px 0;">
-                    <span style="font-size:12px;color:#6a6a6a;letter-spacing:1px;">Shipping</span>
-                    <span style="font-size:14px;color:#e8e8e8;margin-left:32px;">$${shipping.toFixed(2)}</span>
+                    <span style="font-size:12px;color:#6a6a6a;letter-spacing:1px;">Subtotal After Discount</span>
+                    <span style="font-size:14px;color:#e8e8e8;margin-left:32px;">$${discountedSubtotal.toFixed(2)}</span>
+                  </td>
+                </tr>
+                `
+                    : ""
+                }
+                <tr>
+                  <td style="text-align:right;padding:6px 0;">
+                    <span style="font-size:12px;color:#6a6a6a;letter-spacing:1px;">Shipping${freeShippingApplies ? " ($50+ Free Shipping)" : ""}</span>
+                    <span style="font-size:14px;color:#e8e8e8;margin-left:32px;">${shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
                   </td>
                 </tr>
                 <tr>
