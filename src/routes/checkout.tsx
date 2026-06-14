@@ -15,30 +15,7 @@ type CartSummary = ReturnType<typeof cartSummary>;
 
 function friendlyEmailError(error?: string) {
   if (!error) return "";
-  const lower = error.toLowerCase();
-
-  if (lower.includes("resend_api_key") || lower.includes("api key")) {
-    return "Email service key is missing or invalid in Vercel.";
-  }
-
-  if (
-    lower.includes("verify") ||
-    lower.includes("verified") ||
-    lower.includes("domain") ||
-    lower.includes("from")
-  ) {
-    return "Resend rejected the sender domain. Make sure Vercel uses a RESEND_API_KEY from the same Resend account where zxgwellness.com is verified.";
-  }
-
-  if (lower.includes("only send testing emails")) {
-    return "Resend test sender can only send to the Resend account email.";
-  }
-
-  if (lower.includes("timed out")) {
-    return "Email provider did not respond before the server timeout.";
-  }
-
-  return error.slice(0, 180);
+  return error.replace(/\s+/g, " ").trim().slice(0, 320);
 }
 
 function CheckoutPage() {

@@ -57,6 +57,7 @@ To test email delivery:
 - Check that `RESEND_API_KEY` is set in environment
 - Make sure `RESEND_API_KEY` belongs to the Resend account where `zxgwellness.com` is verified
 - Verify the sender domain is approved in Resend dashboard
+- The checkout thank-you page shows the exact Resend API error after a failed send
 - Check server logs for Resend API errors
 
 **Domain verification taking long?**
