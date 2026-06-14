@@ -53,24 +53,13 @@ type Row = {
 const penColorVariants: ProductColorVariant[] = [
   { label: "Blue", value: "blue", price: 20, image: penColorImages.blue, inStock: true },
   { label: "Black", value: "black", price: 20, image: penColorImages.black, inStock: true },
-  {
-    label: "Dark Gray",
-    value: "dark-gray",
-    price: 20,
-    image: penColorImages["dark-gray"],
-    inStock: true,
-  },
   { label: "Gold", value: "gold", price: 20, image: penColorImages.gold, inStock: true },
   { label: "Gray", value: "gray", price: 20, image: penColorImages.gray, inStock: true },
-  {
-    label: "Light Blue",
-    value: "light-blue",
-    price: 20,
-    image: penColorImages["light-blue"],
-    inStock: true,
-  },
   { label: "Pink", value: "pink", price: 20, image: penColorImages.pink, inStock: true },
+  { label: "Purple", value: "purple", price: 20, image: penColorImages.purple, inStock: true },
   { label: "Red", value: "red", price: 20, image: penColorImages.red, inStock: true },
+  { label: "Green", value: "green", price: 20, image: penColorImages.green, inStock: true },
+  { label: "Bronze", value: "bronze", price: 20, image: penColorImages.bronze, inStock: true },
   { label: "Silver", value: "silver", price: 20, image: penColorImages.silver, inStock: true },
 ];
 
@@ -91,10 +80,6 @@ const toOptionValue = (value: string) =>
     .replace(/^-+|-+$/g, "");
 
 const penColorAliases: Record<string, string> = {
-  darkgray: "dark-gray",
-  "dark-grey": "dark-gray",
-  darkgrey: "dark-gray",
-  lightblue: "light-blue",
   "light-grey": "gray",
   lightgrey: "gray",
   grey: "gray",
@@ -156,6 +141,8 @@ function optionVariantsFrom(options: unknown, slug: string, basePrice: number) {
           return;
         }
 
+        if (slug === "pen" && optionName.includes("color")) return;
+
         variants.push({ label, price });
       });
       return;
@@ -179,6 +166,8 @@ function optionVariantsFrom(options: unknown, slug: string, basePrice: number) {
       return;
     }
 
+    if (slug === "pen" && optionName.includes("color")) return;
+
     variants.push({ label, price });
   });
 
@@ -188,12 +177,31 @@ function optionVariantsFrom(options: unknown, slug: string, basePrice: number) {
   };
 }
 
+const mergePenColorVariants = (colorVariants: ProductColorVariant[]) => {
+  const existingByValue = new Map(colorVariants.map((variant) => [variant.value, variant]));
+
+  return penColorVariants.map((defaultVariant) => {
+    const existing = existingByValue.get(defaultVariant.value);
+
+    return {
+      ...defaultVariant,
+      ...existing,
+      value: defaultVariant.value,
+      image: existing?.image || defaultVariant.image,
+    };
+  });
+};
+
 const mapRow = (r: Row): Product => {
   const refs = imageRefsFrom(r.image);
   const gallery =
     refs.length > 0 ? refs.map((ref) => imageRefFor(ref, r.slug)) : galleryFor(r.slug);
   const price = toFinitePrice(r.price);
   const optionVariants = optionVariantsFrom(r.options, r.slug, price);
+  const colorVariants =
+    r.slug === "pen"
+      ? mergePenColorVariants(optionVariants.colorVariants)
+      : optionVariants.colorVariants;
 
   return {
     ...r,
@@ -206,11 +214,7 @@ const mapRow = (r: Row): Product => {
     featured: Boolean(r.featured),
     variants: optionVariants.variants.length > 0 ? optionVariants.variants : r.variants,
     colorVariants:
-      optionVariants.colorVariants.length > 0
-        ? optionVariants.colorVariants
-        : r.slug === "pen"
-          ? penColorVariants
-          : undefined,
+      colorVariants.length > 0 ? colorVariants : r.slug === "pen" ? penColorVariants : undefined,
   };
 };
 

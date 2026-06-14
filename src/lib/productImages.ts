@@ -6,12 +6,13 @@ import bodyBalmLifestyle from "@/assets/body-balm/lifestylebalm.png";
 
 import penBlue from "@/assets/reusable-pen.png";
 import penBlack from "@/assets/reusable-pen-black.png";
-import penDarkGray from "@/assets/reusable-pen-darkgray.png";
 import penGold from "@/assets/reusable-pen-gold.png";
 import penGray from "@/assets/reusable-pen-gray.png";
-import penLightBlue from "@/assets/reusable-pen-lightblue.png";
 import penPink from "@/assets/reusable-pen-pink.png";
+import penPurple from "@/assets/reusable-pen-purple.png";
 import penRed from "@/assets/reusable-pen-red.png";
+import penGreen from "@/assets/reusable-pen-green.png";
+import penBronze from "@/assets/reusable-pen-bronze.png";
 import penSilver from "@/assets/reusable-pen-silver.png";
 import syringe from "@/assets/syringe.png";
 import cartridge from "@/assets/cartridge.png";
@@ -29,7 +30,18 @@ export const productImages: Record<string, string> = {
 export const productGallery: Record<string, string[]> = {
   creatine: [creatineFront, creatineBack],
   "body-balm": [bodyBalm, bodyBalmBack, bodyBalmLifestyle],
-  pen: [penBlue, penBlack, penDarkGray, penGold, penGray, penLightBlue, penPink, penRed, penSilver],
+  pen: [
+    penBlue,
+    penBlack,
+    penGold,
+    penGray,
+    penPink,
+    penPurple,
+    penRed,
+    penGreen,
+    penBronze,
+    penSilver,
+  ],
   syringe: [syringe],
   cartridge: [cartridge],
   needles: [needles],
@@ -39,12 +51,13 @@ export const productGallery: Record<string, string[]> = {
 export const penColorImages: Record<string, string> = {
   blue: penBlue,
   black: penBlack,
-  "dark-gray": penDarkGray,
   gold: penGold,
   gray: penGray,
-  "light-blue": penLightBlue,
   pink: penPink,
+  purple: penPurple,
   red: penRed,
+  green: penGreen,
+  bronze: penBronze,
   silver: penSilver,
 };
 

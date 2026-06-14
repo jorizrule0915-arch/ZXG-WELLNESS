@@ -19,12 +19,13 @@ export const Route = createFileRoute("/products/$slug")({ component: ProductDeta
 const COLOR_SWATCHES: Record<string, string> = {
   blue: "#4a90d9",
   black: "#1a1a1a",
-  "dark-gray": "#555",
   gold: "#c9a84c",
   gray: "#888",
-  "light-blue": "#7ec8e3",
   pink: "#f4a7b9",
+  purple: "#7e22ce",
   red: "#c0392b",
+  green: "#14843b",
+  bronze: "#b87333",
   silver: "#bdc3c7",
 };
 

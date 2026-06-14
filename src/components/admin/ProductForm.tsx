@@ -70,12 +70,13 @@ const toStringList = (value: unknown): string[] =>
 const penColorDefaults: ProductOptionValue[] = [
   { label: "Blue", value: "blue", image: "blue", inStock: true },
   { label: "Black", value: "black", image: "black", inStock: true },
-  { label: "Dark Gray", value: "dark-gray", image: "dark-gray", inStock: true },
   { label: "Gold", value: "gold", image: "gold", inStock: true },
   { label: "Gray", value: "gray", image: "gray", inStock: true },
-  { label: "Light Blue", value: "light-blue", image: "light-blue", inStock: true },
   { label: "Pink", value: "pink", image: "pink", inStock: true },
+  { label: "Purple", value: "purple", image: "purple", inStock: true },
   { label: "Red", value: "red", image: "red", inStock: true },
+  { label: "Green", value: "green", image: "green", inStock: true },
+  { label: "Bronze", value: "bronze", image: "bronze", inStock: true },
   { label: "Silver", value: "silver", image: "silver", inStock: true },
 ];
 
@@ -88,10 +89,6 @@ const toOptionValue = (value: string) =>
     .replace(/^-+|-+$/g, "");
 
 const penColorAliases: Record<string, string> = {
-  darkgray: "dark-gray",
-  "dark-grey": "dark-gray",
-  darkgrey: "dark-gray",
-  lightblue: "light-blue",
   grey: "gray",
 };
 
