@@ -33,6 +33,12 @@ export type OrderEmail = {
   items: OrderEmailItem[];
 };
 
+export type OrderEmailResult = {
+  customerSent: boolean;
+  adminSent: boolean;
+  errors: string[];
+};
+
 function getResend() {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY is not configured.");
@@ -63,6 +69,19 @@ function resendErrorMessage(error: unknown) {
     return JSON.stringify(error);
   } catch {
     return "Unknown Resend error";
+  }
+}
+
+async function sendEmail(
+  resend: Resend,
+  payload: Parameters<Resend["emails"]["send"]>[0],
+  label: string,
+) {
+  try {
+    const { error } = await resend.emails.send(payload);
+    return error ? `${label}: ${resendErrorMessage(error)}` : null;
+  } catch (error) {
+    return `${label}: ${resendErrorMessage(error)}`;
   }
 }
 
@@ -251,51 +270,59 @@ export function buildOrderEmailHtml(order: OrderEmail) {
   `;
 }
 
-export async function sendOrderConfirmationEmail(order: OrderEmail) {
+export async function sendOrderConfirmationEmail(order: OrderEmail): Promise<OrderEmailResult> {
   const resend = getResend();
   const shortId = order.id.slice(0, 8).toUpperCase();
   const from = getFromEmail();
   const html = buildOrderEmailHtml(order);
   const adminEmails = getAdminEmails(order.email);
-  const sendJobs: Array<Promise<{ label: string; error: unknown } | null>> = [
-    resend.emails
-      .send({
-        from,
-        to: order.email,
-        replyTo: "admin@zxgwellness.com",
-        subject: `Order Confirmed & Paid — #${shortId} | ZXG Wellness`,
-        html,
-      })
-      .then(({ error }) => (error ? { label: "customer confirmation", error } : null))
-      .catch((error) => ({ label: "customer confirmation", error })),
-  ];
+  const result: OrderEmailResult = {
+    customerSent: false,
+    adminSent: adminEmails.length === 0,
+    errors: [],
+  };
 
-  for (const adminEmail of adminEmails) {
-    sendJobs.push(
-      resend.emails
-        .send({
-          from,
-          to: adminEmail,
-          replyTo: order.email,
-          subject: `Paid Order Received — #${shortId} | ZXG Wellness`,
-          html,
-        })
-        .then(({ error }) =>
-          error ? { label: `admin notification (${adminEmail})`, error } : null,
-        )
-        .catch((error) => ({ label: `admin notification (${adminEmail})`, error })),
-    );
-  }
-
-  const failures = (await Promise.all(sendJobs)).filter(
-    (failure): failure is { label: string; error: unknown } => Boolean(failure),
+  const customerError = await sendEmail(
+    resend,
+    {
+      from,
+      to: order.email,
+      replyTo: "admin@zxgwellness.com",
+      subject: `Order Confirmed & Paid — #${shortId} | ZXG Wellness`,
+      html,
+    },
+    "customer confirmation",
   );
 
-  if (failures.length > 0) {
-    const message = failures
-      .map((failure) => `${failure.label}: ${resendErrorMessage(failure.error)}`)
-      .join("; ");
-    console.error("Resend order email error:", message);
-    throw new Error(message);
+  if (customerError) {
+    result.errors.push(customerError);
+  } else {
+    result.customerSent = true;
   }
+
+  if (adminEmails.length > 0) {
+    const adminError = await sendEmail(
+      resend,
+      {
+        from,
+        to: adminEmails,
+        replyTo: order.email,
+        subject: `Paid Order Received — #${shortId} | ZXG Wellness`,
+        html,
+      },
+      `admin notification (${adminEmails.join(", ")})`,
+    );
+
+    if (adminError) {
+      result.errors.push(adminError);
+    } else {
+      result.adminSent = true;
+    }
+  }
+
+  if (result.errors.length > 0) {
+    console.error("Resend order email error:", result.errors.join("; "));
+  }
+
+  return result;
 }

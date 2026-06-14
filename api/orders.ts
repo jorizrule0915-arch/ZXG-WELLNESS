@@ -6,7 +6,6 @@ const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
 const PEN_DISCOUNT_MIN_QTY = 5;
 const PEN_DISCOUNT_RATE = 0.1;
-const EMAIL_TIMEOUT_MS = 8_000;
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -170,12 +169,6 @@ function sendApiError(res: VercelResponse, error: unknown) {
   const err = error as Error & { statusCode?: number };
   const status = err.statusCode ?? 500;
   return res.status(status).json({ error: err.message || "Server error" });
-}
-
-function timeoutAfter(ms: number, message: string) {
-  return new Promise<never>((_, reject) => {
-    setTimeout(() => reject(new Error(message)), ms);
-  });
 }
 
 function normalizeOption(item: CheckoutItemInput) {
@@ -401,14 +394,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let emailError: string | undefined;
     try {
       const { sendOrderConfirmationEmail } = await import("../server/order-email");
-      await Promise.race([
-        sendOrderConfirmationEmail({
-          ...order,
-          items: trustedCart.items,
-        }),
-        timeoutAfter(EMAIL_TIMEOUT_MS, "Confirmation email timed out"),
-      ]);
-      emailSent = true;
+      const emailResult = await sendOrderConfirmationEmail({
+        ...order,
+        items: trustedCart.items,
+      });
+      emailSent = emailResult.customerSent && emailResult.adminSent;
+      if (!emailSent) {
+        emailError = emailResult.errors.join("; ");
+      }
     } catch (error) {
       emailError = error instanceof Error ? error.message : "Confirmation email failed";
       console.error("[api/orders] confirmation email failed", error);
