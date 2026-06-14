@@ -46,7 +46,6 @@ export function PaymentForm({
 
     try {
       const result = await checkoutResult.checkout.confirm({
-        returnUrl: `${window.location.origin}/checkout`,
         redirect: "if_required",
         email: customerEmail,
         shippingAddress: shippingContact,
@@ -76,7 +75,14 @@ export function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <PaymentElement onReady={() => setReady(true)} />
+      <PaymentElement
+        onReady={() => setReady(true)}
+        options={{
+          layout: { type: "accordion", defaultCollapsed: false, radios: "never" },
+          paymentMethodOrder: ["card"],
+          wallets: { applePay: "never", googlePay: "never", link: "never" },
+        }}
+      />
 
       <button
         type="submit"
