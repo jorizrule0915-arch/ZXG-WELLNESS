@@ -79,8 +79,15 @@ export function PaymentForm({
         onReady={() => setReady(true)}
         options={{
           layout: { type: "accordion", defaultCollapsed: false, radios: "never" },
-          paymentMethodOrder: ["card"],
-          wallets: { applePay: "never", googlePay: "never", link: "never" },
+          paymentMethodOrder: ["link", "card"],
+          wallets: { applePay: "never", googlePay: "never", link: "auto" },
+          fields: {
+            billingDetails: {
+              name: "never",
+              email: "never",
+              address: "never",
+            },
+          },
         }}
       />
 
