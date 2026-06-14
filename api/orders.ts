@@ -1,12 +1,14 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
-import { sendOrderConfirmationEmail } from "../server/order-email";
+import { Resend } from "resend";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
 const PEN_DISCOUNT_MIN_QTY = 5;
 const PEN_DISCOUNT_RATE = 0.1;
+const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
+const DEFAULT_ADMIN_EMAILS = ["jorizrule0@gmail.com"];
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -22,6 +24,31 @@ type TrustedProduct = {
   name: string;
   price: number;
   active: boolean;
+};
+
+type OrderEmailItem = {
+  product_name: string;
+  product_slug?: string | null;
+  quantity: number;
+  unit_price: number;
+};
+
+type OrderEmail = {
+  id: string;
+  email: string;
+  shipping_name: string;
+  shipping_address: string;
+  shipping_city: string;
+  shipping_zip: string;
+  total: number;
+  created_at: string;
+  items: OrderEmailItem[];
+};
+
+type OrderEmailResult = {
+  customerSent: boolean;
+  adminSent: boolean;
+  errors: string[];
 };
 
 const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, number> }> = [
@@ -188,6 +215,184 @@ function cents(amount: number) {
 
 function money(amount: number) {
   return Math.round(amount * 100) / 100;
+}
+
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new Error("RESEND_API_KEY is not configured.");
+  return new Resend(key);
+}
+
+function getAdminEmails(customerEmail: string) {
+  const configured = (process.env.ORDER_NOTIFICATION_EMAILS || "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean);
+  const emails = configured.length > 0 ? configured : DEFAULT_ADMIN_EMAILS;
+  const customer = customerEmail.toLowerCase();
+  return [...new Set(emails)].filter((email) => email.toLowerCase() !== customer);
+}
+
+function resendErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string") return message;
+  }
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return "Unknown Resend error";
+  }
+}
+
+async function sendEmail(
+  resend: Resend,
+  payload: Parameters<Resend["emails"]["send"]>[0],
+  label: string,
+) {
+  try {
+    const { error } = await resend.emails.send(payload);
+    return error ? `${label}: ${resendErrorMessage(error)}` : null;
+  } catch (error) {
+    return `${label}: ${resendErrorMessage(error)}`;
+  }
+}
+
+function escapeHtml(value: unknown) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function buildOrderEmailHtml(order: OrderEmail) {
+  const shortId = order.id.slice(0, 8).toUpperCase();
+  const discountedSubtotal = money(
+    order.items.reduce((sum, item) => sum + Number(item.unit_price) * Number(item.quantity), 0),
+  );
+  const penQuantity = order.items
+    .filter((item) => item.product_slug === "pen")
+    .reduce((quantity, item) => quantity + Number(item.quantity), 0);
+  const penDiscount = money(
+    penQuantity >= PEN_DISCOUNT_MIN_QTY
+      ? order.items
+          .filter((item) => item.product_slug === "pen")
+          .reduce(
+            (sum, item) =>
+              sum +
+              Number(item.unit_price) *
+                Number(item.quantity) *
+                (PEN_DISCOUNT_RATE / (1 - PEN_DISCOUNT_RATE)),
+            0,
+          )
+      : 0,
+  );
+  const merchandiseSubtotal = money(discountedSubtotal + penDiscount);
+  const shipping = money(Math.max(0, Number(order.total) - discountedSubtotal));
+  const orderDate = new Date(order.created_at).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const itemRows = order.items
+    .map(
+      (item) => `
+        <tr>
+          <td style="padding:12px 0;border-bottom:1px solid #2a2a2a;color:#e8e8e8;">${escapeHtml(item.product_name)}</td>
+          <td style="padding:12px 0;border-bottom:1px solid #2a2a2a;color:#9a9a9a;text-align:center;">${item.quantity}</td>
+          <td style="padding:12px 0;border-bottom:1px solid #2a2a2a;color:#e8e8e8;text-align:right;">$${Number(item.unit_price).toFixed(2)}</td>
+          <td style="padding:12px 0;border-bottom:1px solid #2a2a2a;color:#c9a84c;text-align:right;">$${(Number(item.unit_price) * Number(item.quantity)).toFixed(2)}</td>
+        </tr>
+      `,
+    )
+    .join("");
+
+  return `
+    <div style="margin:0;padding:32px;background:#0a0a0a;color:#e8e8e8;font-family:Georgia,serif;">
+      <div style="max-width:640px;margin:0 auto;background:#111;border:1px solid #2a2a2a;">
+        <div style="padding:32px;text-align:center;border-bottom:2px solid #c9a84c;">
+          <div style="color:#c9a84c;letter-spacing:6px;font-size:11px;">ZXG WELLNESS</div>
+          <h1 style="font-weight:400;color:#f5f0e8;">Order Confirmed</h1>
+          <p style="color:#9a9a9a;">Payment status: <span style="color:#7ee787;">Paid</span></p>
+        </div>
+        <div style="padding:32px;">
+          <p><strong style="color:#c9a84c;">Order:</strong> #${shortId}</p>
+          <p><strong style="color:#c9a84c;">Date:</strong> ${orderDate}</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">${itemRows}</table>
+          <div style="margin-top:24px;text-align:right;line-height:1.9;">
+            <div>Merchandise Subtotal: $${merchandiseSubtotal.toFixed(2)}</div>
+            ${penDiscount > 0 ? `<div style="color:#7ee787;">Reusable Pen Discount: -$${penDiscount.toFixed(2)}</div>` : ""}
+            <div>Subtotal After Discount: $${discountedSubtotal.toFixed(2)}</div>
+            <div>Shipping: ${shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</div>
+            <div style="font-size:22px;color:#c9a84c;">Total: $${Number(order.total).toFixed(2)}</div>
+          </div>
+          <div style="margin-top:28px;">
+            <p style="color:#c9a84c;letter-spacing:3px;">SHIPPING TO</p>
+            <p>${escapeHtml(order.shipping_name)}<br/>${escapeHtml(order.shipping_address)}<br/>${escapeHtml(order.shipping_city)} ${escapeHtml(order.shipping_zip)}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function sendOrderConfirmationEmail(order: OrderEmail): Promise<OrderEmailResult> {
+  const resend = getResend();
+  const shortId = order.id.slice(0, 8).toUpperCase();
+  const html = buildOrderEmailHtml(order);
+  const adminEmails = getAdminEmails(order.email);
+  const result: OrderEmailResult = {
+    customerSent: false,
+    adminSent: adminEmails.length === 0,
+    errors: [],
+  };
+
+  const customerError = await sendEmail(
+    resend,
+    {
+      from: DEFAULT_FROM_EMAIL,
+      to: order.email,
+      replyTo: "admin@zxgwellness.com",
+      subject: `Order Confirmed & Paid — #${shortId} | ZXG Wellness`,
+      html,
+    },
+    "customer confirmation",
+  );
+
+  if (customerError) {
+    result.errors.push(customerError);
+  } else {
+    result.customerSent = true;
+  }
+
+  if (adminEmails.length > 0) {
+    const adminError = await sendEmail(
+      resend,
+      {
+        from: DEFAULT_FROM_EMAIL,
+        to: adminEmails,
+        replyTo: order.email,
+        subject: `Paid Order Received — #${shortId} | ZXG Wellness`,
+        html,
+      },
+      `admin notification (${adminEmails.join(", ")})`,
+    );
+
+    if (adminError) {
+      result.errors.push(adminError);
+    } else {
+      result.adminSent = true;
+    }
+  }
+
+  if (result.errors.length > 0) {
+    console.error("Resend order email error:", result.errors.join("; "));
+  }
+
+  return result;
 }
 
 function hashCart(
