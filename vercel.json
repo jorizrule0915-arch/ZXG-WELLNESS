@@ -1,6 +1,14 @@
 {
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist/vercel",
+  "functions": {
+    "api/orders.ts": {
+      "maxDuration": 30
+    },
+    "api/send-confirmation.ts": {
+      "maxDuration": 30
+    }
+  },
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "handle": "filesystem" },
