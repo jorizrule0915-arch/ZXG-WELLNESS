@@ -398,9 +398,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ...order,
         items: trustedCart.items,
       });
-      emailSent = emailResult.customerSent && emailResult.adminSent;
-      if (!emailSent) {
+      emailSent = emailResult.customerSent;
+      if (!emailResult.customerSent) {
         emailError = emailResult.errors.join("; ");
+      } else if (!emailResult.adminSent && emailResult.errors.length > 0) {
+        console.warn("[api/orders] admin order email failed", emailResult.errors.join("; "));
       }
     } catch (error) {
       emailError = error instanceof Error ? error.message : "Confirmation email failed";

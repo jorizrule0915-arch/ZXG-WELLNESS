@@ -40,6 +40,8 @@ Order confirmation emails use [server/order-email.ts](server/order-email.ts).
 - **From/Sender:** `orders@zxgwellness.com`
 - **Reply-To:** `admin@zxgwellness.com`
 - **Admin recipients:** addresses in `DEFAULT_ADMIN_EMAILS`
+- **Checkout success:** based on the customer confirmation email; admin notification failures are
+  logged but do not make the customer order look failed
 
 ## Testing
 
@@ -57,6 +59,7 @@ To test email delivery:
 - Check that `RESEND_API_KEY` is set in environment
 - Make sure `RESEND_API_KEY` belongs to the Resend account where `zxgwellness.com` is verified
 - Verify the sender domain is approved in Resend dashboard
+- Keep `DEFAULT_ADMIN_EMAILS` limited to real inboxes you actively use
 - The checkout thank-you page shows the exact Resend API error after a failed send
 - Check server logs for Resend API errors
 
