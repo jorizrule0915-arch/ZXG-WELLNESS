@@ -303,6 +303,36 @@ function getStripeSecretKey() {
   return secretKey;
 }
 
+function getStripeMode() {
+  const secretKey = getStripeSecretKey();
+  if (secretKey.startsWith("sk_test_")) return "test";
+  if (secretKey.startsWith("sk_live_")) return "live";
+  throw Object.assign(new Error("STRIPE_SECRET_KEY must be a valid sk_test or sk_live key."), {
+    statusCode: 500,
+  });
+}
+
+function assertStripeModeMatches(clientMode: unknown) {
+  const serverMode = getStripeMode();
+  if (clientMode !== "test" && clientMode !== "live") {
+    throw Object.assign(
+      new Error("Stripe publishable key mode is missing. Redeploy after setting Vercel env vars."),
+      { statusCode: 400 },
+    );
+  }
+
+  if (clientMode !== serverMode) {
+    throw Object.assign(
+      new Error(
+        `Stripe key mismatch: frontend is ${clientMode} mode but backend is ${serverMode} mode.`,
+      ),
+      { statusCode: 400 },
+    );
+  }
+
+  return serverMode;
+}
+
 async function createPaymentIntent(
   amountCents: number,
   email: string,
@@ -343,8 +373,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     enforceRateLimit(req, "payment", { limit: 20, windowMs: 60_000 });
     const { supabase, user } = await requireUser(req);
-    const { email, items } = req.body || {};
+    const { email, items, stripeMode } = req.body || {};
     if (!email) return res.status(400).json({ error: "Email is required" });
+    const serverStripeMode = assertStripeModeMatches(stripeMode);
 
     const trustedCart = await calculateTrustedCart(supabase, items);
     const paymentIntent = await createPaymentIntent(trustedCart.amountCents, email, {
@@ -354,6 +385,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       discount: trustedCart.discount.toFixed(2),
       shipping: trustedCart.shipping.toFixed(2),
       cartHash: trustedCart.cartHash,
+      stripeMode: serverStripeMode,
     });
     if (!paymentIntent.client_secret)
       return res.status(500).json({ error: "Failed to get payment secret" });

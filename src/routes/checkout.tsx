@@ -7,6 +7,7 @@ import { imageFor } from "@/lib/productImages";
 import { StripeProvider } from "@/components/site/StripeProvider";
 import { PaymentForm } from "@/components/site/PaymentForm";
 import { authFetch, readApiJson } from "@/lib/api";
+import { stripeMode } from "@/integrations/stripe/client";
 
 export const Route = createFileRoute("/checkout")({ component: CheckoutPage });
 
@@ -44,6 +45,9 @@ function CheckoutPage() {
       if (!email) {
         throw new Error("Email is required");
       }
+      if (!stripeMode) {
+        throw new Error("Stripe publishable key is missing or invalid. Check Vercel env vars.");
+      }
 
       const response = await authFetch("/api/payment", {
         method: "POST",
@@ -56,6 +60,7 @@ function CheckoutPage() {
             optionLabel: item.optionLabel,
             name: item.name,
           })),
+          stripeMode,
         }),
       });
 
@@ -243,6 +248,12 @@ function CheckoutPage() {
             </FormSection>
 
             <FormSection title="Payment">
+              {stripeMode === "test" && (
+                <p className="mb-3 text-xs text-gold">
+                  Stripe test mode is active. Use Stripe test cards only; no real card will be
+                  charged.
+                </p>
+              )}
               <p className="text-sm text-muted-foreground">
                 Click the button below to proceed to secure payment processing with Stripe.
               </p>
