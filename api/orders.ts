@@ -375,6 +375,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .maybeSingle();
     if (existing) return res.status(200).json({ success: true, orderId: existing.id });
 
+    const shippingState = String(shipping.state ?? "").trim();
+    const shippingCity = String(shipping.city ?? "").trim();
+    const shippingCityLine = shippingState ? `${shippingCity}, ${shippingState}` : shippingCity;
+
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -384,8 +388,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         email: String(shipping.email),
         shipping_name: String(shipping.name),
         shipping_address: String(shipping.address),
-        shipping_city: String(shipping.city),
-        shipping_state: String(shipping.state),
+        shipping_city: shippingCityLine,
         shipping_zip: String(shipping.zip),
         stripe_payment_intent_id: paymentIntent.id,
       })
