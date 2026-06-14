@@ -13,6 +13,34 @@ export const Route = createFileRoute("/checkout")({ component: CheckoutPage });
 
 type CartSummary = ReturnType<typeof cartSummary>;
 
+function friendlyEmailError(error?: string) {
+  if (!error) return "";
+  const lower = error.toLowerCase();
+
+  if (lower.includes("resend_api_key") || lower.includes("api key")) {
+    return "Email service key is missing or invalid in Vercel.";
+  }
+
+  if (
+    lower.includes("verify") ||
+    lower.includes("verified") ||
+    lower.includes("domain") ||
+    lower.includes("from")
+  ) {
+    return "Email sender domain is not verified in Resend yet.";
+  }
+
+  if (lower.includes("only send testing emails")) {
+    return "Resend test sender can only send to the Resend account email.";
+  }
+
+  if (lower.includes("timed out")) {
+    return "Email provider did not respond before the server timeout.";
+  }
+
+  return error.slice(0, 180);
+}
+
 function CheckoutPage() {
   const { items, clear } = useCart();
   const { user } = useAuth();
@@ -126,8 +154,10 @@ function CheckoutPage() {
         emailError?: string;
       }>(orderResponse);
       if (orderData.emailSent === false) {
+        console.error("Order confirmation email failed:", orderData.emailError);
+        const emailReason = friendlyEmailError(orderData.emailError);
         setNotice(
-          "Your paid order was saved, but the confirmation email could not be sent automatically. Please check the admin orders page.",
+          `Your paid order was saved, but the confirmation email could not be sent automatically.${emailReason ? ` Reason: ${emailReason}` : ""}`,
         );
       } else {
         setNotice(null);

@@ -270,18 +270,20 @@ export async function sendOrderConfirmationEmail(order: OrderEmail) {
       .catch((error) => ({ label: "customer confirmation", error })),
   ];
 
-  if (adminEmails.length > 0) {
+  for (const adminEmail of adminEmails) {
     sendJobs.push(
       resend.emails
         .send({
           from,
-          to: adminEmails,
+          to: adminEmail,
           replyTo: order.email,
           subject: `Paid Order Received — #${shortId} | ZXG Wellness`,
           html,
         })
-        .then(({ error }) => (error ? { label: "admin notification", error } : null))
-        .catch((error) => ({ label: "admin notification", error })),
+        .then(({ error }) =>
+          error ? { label: `admin notification (${adminEmail})`, error } : null,
+        )
+        .catch((error) => ({ label: `admin notification (${adminEmail})`, error })),
     );
   }
 
