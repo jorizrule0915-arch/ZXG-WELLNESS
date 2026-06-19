@@ -1,7 +1,7 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
-import { Check, ChevronRight, Minus } from "lucide-react";
+import { Check, ChevronRight, Minus, X } from "lucide-react";
 import { penColorImages } from "@/lib/productImages";
 
 export const Route = createFileRoute("/reusable-pen-difference")({
@@ -16,6 +16,7 @@ const comparisonProducts = [
     image: penColorImages.gold,
     cta: "Shop Pen",
     slug: "pen",
+    available: false,
   },
   {
     key: "signature",
@@ -24,6 +25,7 @@ const comparisonProducts = [
     image: penColorImages.black,
     cta: "Shop Pen",
     slug: "pen",
+    available: true,
     featured: true,
   },
   {
@@ -33,9 +35,11 @@ const comparisonProducts = [
     image: penColorImages.silver,
     cta: "Shop Disposable",
     slug: "pen",
+    available: false,
   },
 ] as const;
 
+type ComparisonProduct = (typeof comparisonProducts)[number];
 type ProductKey = (typeof comparisonProducts)[number]["key"];
 type ComparisonValue = boolean | string;
 
@@ -183,7 +187,40 @@ function MobileValue({ value }: { value: ComparisonValue }) {
   );
 }
 
+function ProductCta({
+  product,
+  className,
+  onUnavailable,
+}: {
+  product: ComparisonProduct;
+  className: string;
+  onUnavailable: (product: ComparisonProduct) => void;
+}) {
+  const actionClassName = `${className} w-full`;
+
+  if (product.available) {
+    return (
+      <Link to="/products/$slug" params={{ slug: product.slug }} className={actionClassName}>
+        {product.cta}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onUnavailable(product)}
+      className={actionClassName}
+      aria-haspopup="dialog"
+    >
+      {product.cta}
+    </button>
+  );
+}
+
 function ReusablePenDifferencePage() {
+  const [unavailableProduct, setUnavailableProduct] = useState<ComparisonProduct | null>(null);
+
   return (
     <>
       <Helmet>
@@ -318,17 +355,15 @@ function ReusablePenDifferencePage() {
                   </div>
 
                   <div className="p-5 pt-0">
-                    <Link
-                      to="/products/$slug"
-                      params={{ slug: product.slug }}
+                    <ProductCta
+                      product={product}
+                      onUnavailable={setUnavailableProduct}
                       className={`block rounded-xl border px-6 py-3.5 text-center text-sm font-extrabold uppercase tracking-wide transition-colors ${
                         product.featured
                           ? "border-gold bg-gold text-obsidian hover:bg-gold-light"
                           : "border-slate-300 text-gold hover:border-gold hover:bg-gold/10 dark:border-gold/20 dark:hover:bg-gold/10"
                       }`}
-                    >
-                      {product.cta}
-                    </Link>
+                    />
                   </div>
                 </article>
               ))}
@@ -406,17 +441,15 @@ function ReusablePenDifferencePage() {
                           : "bg-white dark:bg-charcoal"
                       }`}
                     >
-                      <Link
-                        to="/products/$slug"
-                        params={{ slug: product.slug }}
+                      <ProductCta
+                        product={product}
+                        onUnavailable={setUnavailableProduct}
                         className={`block rounded-xl border px-6 py-3 text-center text-[15px] font-extrabold transition-colors ${
                           product.featured
                             ? "border-gold bg-gold text-obsidian hover:bg-gold-light"
                             : "border-slate-300 text-gold hover:border-gold hover:bg-gold/10 dark:border-gold/20 dark:text-gold dark:hover:bg-gold/10"
                         }`}
-                      >
-                        {product.cta}
-                      </Link>
+                      />
                     </div>
                   ))}
                 </div>
@@ -449,6 +482,72 @@ function ReusablePenDifferencePage() {
           </div>
         </section>
       </div>
+
+      {unavailableProduct && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-obsidian/70 px-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pen-unavailable-title"
+        >
+          <div className="relative w-full max-w-md rounded-2xl border border-gold/25 bg-background p-6 text-foreground shadow-[0_28px_90px_-35px_rgba(190,140,35,0.85)]">
+            <button
+              type="button"
+              onClick={() => setUnavailableProduct(null)}
+              className="absolute right-4 top-4 rounded-full border border-gold/20 p-2 text-muted-foreground transition-colors hover:border-gold hover:text-gold"
+              aria-label="Close availability message"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-gold/30 bg-gold/10 text-gold">
+              <Minus className="h-6 w-6" />
+            </div>
+
+            <p className="text-[11px] font-bold uppercase tracking-luxury text-gold">
+              Availability Notice
+            </p>
+            <h2
+              id="pen-unavailable-title"
+              className="mt-2 font-display text-3xl font-semibold leading-tight"
+            >
+              {unavailableProduct.name} is not available right now.
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              We currently sell the ZXG Signature Pen, our V2 reusable pen. This option is not in
+              stock yet, but the V2 pen is ready to order now.
+            </p>
+
+            <div className="mt-6 rounded-xl border border-gold/15 bg-gold/5 p-4">
+              <div className="text-[11px] font-bold uppercase tracking-wide text-gold">
+                Recommended available option
+              </div>
+              <div className="mt-1 text-base font-extrabold">ZXG Signature Pen V2</div>
+              <div className="mt-1 text-sm text-muted-foreground">
+                Premium reusable setup with the easiest everyday handling.
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <Link
+                to="/products/$slug"
+                params={{ slug: "pen" }}
+                onClick={() => setUnavailableProduct(null)}
+                className="rounded-xl bg-gold px-5 py-3 text-center text-sm font-extrabold uppercase tracking-wide text-obsidian transition-colors hover:bg-gold-light"
+              >
+                Shop V2 Pen
+              </Link>
+              <button
+                type="button"
+                onClick={() => setUnavailableProduct(null)}
+                className="rounded-xl border border-gold/25 px-5 py-3 text-sm font-extrabold uppercase tracking-wide text-gold transition-colors hover:bg-gold/10"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
