@@ -246,9 +246,9 @@
   line-height: 1.5;
 } /* 13px */
 .text-sm {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   line-height: 1.6;
-} /* 14px */
+} /* 15px */
 
 /* Uppercase tracking labels — the [10px]/[11px] pattern — minimum 11px */
 .tracking-luxury {

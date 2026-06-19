@@ -70,7 +70,7 @@ export function Header() {
           <img src={headerLogo} alt="ZXG Wellness" className="h-10 w-auto" />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-5 lg:gap-8">
+        <nav className="hidden xl:flex items-center gap-8">
           {links.map((link) => {
             const active = pathname === link.to;
             return (
@@ -125,7 +125,7 @@ export function Header() {
           <button
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Open menu"
-            className="md:hidden p-2.5 text-foreground/90 hover:text-gold transition-colors"
+            className="xl:hidden p-2.5 text-foreground/90 hover:text-gold transition-colors"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -134,7 +134,7 @@ export function Header() {
 
       {/* Mobile menu */}
       <div
-        className={`md:hidden overflow-hidden border-t border-border bg-background/95 backdrop-blur-xl transition-[max-height] duration-500 ${
+        className={`xl:hidden overflow-hidden border-t border-border bg-background/95 backdrop-blur-xl transition-[max-height] duration-500 ${
           mobileOpen ? "max-h-96" : "max-h-0"
         }`}
       >

@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { Check, ChevronRight, Minus } from "lucide-react";
-import { penColorImages, productImages } from "@/lib/productImages";
+import { penColorImages } from "@/lib/productImages";
 
 export const Route = createFileRoute("/reusable-pen-difference")({
   component: ReusablePenDifferencePage,
@@ -21,7 +21,7 @@ const comparisonProducts = [
     key: "signature",
     name: "ZXG Signature Pen",
     tagline: "Easiest handling",
-    image: penColorImages.blue,
+    image: penColorImages.black,
     cta: "Shop Pen",
     slug: "pen",
     featured: true,
@@ -30,7 +30,7 @@ const comparisonProducts = [
     key: "singleUse",
     name: "ZXG Disposable Pen",
     tagline: "Single-use",
-    image: penColorImages.blue,
+    image: penColorImages.silver,
     cta: "Shop Disposable",
     slug: "pen",
   },
@@ -138,7 +138,7 @@ const quickLinks = [
 function CheckCell({ value }: { value: ComparisonValue }) {
   if (typeof value !== "boolean") {
     return (
-      <span className="text-[13px] leading-relaxed text-slate-700 dark:text-foreground/80">
+      <span className="text-sm leading-relaxed text-slate-700 dark:text-foreground/80">
         {value}
       </span>
     );
@@ -146,17 +146,39 @@ function CheckCell({ value }: { value: ComparisonValue }) {
 
   return value ? (
     <span
-      className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm"
+      className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm"
       aria-label="Supported"
     >
       <Check className="h-5 w-5" strokeWidth={3} />
     </span>
   ) : (
     <span
-      className="mx-auto flex h-8 w-8 items-center justify-center text-slate-400 dark:text-muted-foreground"
+      className="mx-auto flex h-9 w-9 items-center justify-center text-slate-400 dark:text-muted-foreground"
       aria-label="Not supported"
     >
       <Minus className="h-5 w-5" />
+    </span>
+  );
+}
+
+function MobileValue({ value }: { value: ComparisonValue }) {
+  if (typeof value !== "boolean") {
+    return (
+      <span className="text-right text-sm font-medium text-slate-700 dark:text-foreground/80">
+        {value}
+      </span>
+    );
+  }
+
+  return value ? (
+    <span className="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400">
+      <Check className="h-4 w-4" strokeWidth={3} />
+      Supported
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-2 text-sm font-bold text-slate-400 dark:text-muted-foreground">
+      <Minus className="h-4 w-4" />
+      Not supported
     </span>
   );
 }
@@ -186,12 +208,12 @@ function ReusablePenDifferencePage() {
               className="absolute left-[38%] top-0 h-[380px] rotate-[58deg] object-contain opacity-80"
             />
             <img
-              src={penColorImages.blue}
+              src={penColorImages.gold}
               alt=""
               className="absolute right-[16%] top-8 h-[360px] rotate-[58deg] object-contain opacity-80"
             />
             <img
-              src={penColorImages.pink}
+              src={penColorImages.bronze}
               alt=""
               className="absolute -right-10 top-24 h-[330px] rotate-[58deg] object-contain opacity-70"
             />
@@ -199,7 +221,7 @@ function ReusablePenDifferencePage() {
           <div className="absolute inset-0 -z-10 bg-black/65" />
 
           <div>
-            <h1 className="font-display text-5xl font-semibold leading-tight text-white md:text-7xl">
+            <h1 className="font-display text-4xl font-semibold leading-tight text-white sm:text-5xl md:text-7xl">
               The Reusable Pen Difference
             </h1>
             <div className="mt-5 flex items-center justify-center gap-2 text-sm text-white/75">
@@ -220,7 +242,7 @@ function ReusablePenDifferencePage() {
                   key={link.slug}
                   to="/products/$slug"
                   params={{ slug: link.slug }}
-                  className="rounded-full bg-gold px-8 py-4 text-[12px] font-bold uppercase tracking-wide text-obsidian shadow-sm transition-colors hover:bg-gold-light"
+                  className="rounded-full bg-gold px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-obsidian shadow-sm transition-colors hover:bg-gold-light sm:px-8 sm:py-4"
                 >
                   {link.label}
                 </Link>
@@ -231,7 +253,88 @@ function ReusablePenDifferencePage() {
               ✓ = Supported &nbsp;&nbsp; — = Not supported
             </p>
 
-            <div className="overflow-x-auto pb-2">
+            <div className="grid gap-6 lg:hidden">
+              {comparisonProducts.map((product) => (
+                <article
+                  key={`${product.key}-mobile`}
+                  className={`overflow-hidden rounded-2xl border shadow-[0_20px_55px_-45px_rgba(190,140,35,0.9)] ${
+                    product.featured
+                      ? "border-gold bg-gold/10 dark:bg-gold/15"
+                      : "border-slate-200 bg-white dark:border-gold/15 dark:bg-charcoal"
+                  }`}
+                >
+                  <div
+                    className={`relative flex items-center gap-5 border-b p-5 dark:border-gold/10 ${
+                      product.featured
+                        ? "border-gold/25 bg-gold text-obsidian"
+                        : "border-slate-200 bg-slate-50 dark:bg-surface"
+                    }`}
+                  >
+                    {product.featured && (
+                      <span className="absolute right-4 top-3 rounded-full bg-white px-3 py-0.5 text-[11px] font-bold uppercase tracking-wide text-obsidian">
+                        Popular
+                      </span>
+                    )}
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-24 w-24 shrink-0 object-contain"
+                    />
+                    <div className="pr-10">
+                      <h2 className="text-lg font-extrabold leading-tight">{product.name}</h2>
+                      <p
+                        className={`mt-1 text-sm ${
+                          product.featured
+                            ? "text-obsidian/80"
+                            : "text-muted-foreground dark:text-foreground/70"
+                        }`}
+                      >
+                        {product.tagline}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="divide-y divide-slate-200 dark:divide-gold/10">
+                    {comparisonSections.map((section) => (
+                      <div key={`${product.key}-${section.title}`} className="p-5">
+                        <h3 className="mb-3 text-sm font-extrabold uppercase tracking-wide text-gold">
+                          {section.title}
+                        </h3>
+                        <div className="space-y-3">
+                          {section.rows.map((row) => (
+                            <div
+                              key={`${product.key}-${section.title}-${row.label}`}
+                              className="grid grid-cols-[1fr_auto] items-start gap-4"
+                            >
+                              <span className="text-sm font-bold text-slate-800 dark:text-foreground">
+                                {row.label}
+                              </span>
+                              <MobileValue value={row.values[product.key]} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-5 pt-0">
+                    <Link
+                      to="/products/$slug"
+                      params={{ slug: product.slug }}
+                      className={`block rounded-xl border px-6 py-3.5 text-center text-sm font-extrabold uppercase tracking-wide transition-colors ${
+                        product.featured
+                          ? "border-gold bg-gold text-obsidian hover:bg-gold-light"
+                          : "border-slate-300 text-gold hover:border-gold hover:bg-gold/10 dark:border-gold/20 dark:hover:bg-gold/10"
+                      }`}
+                    >
+                      {product.cta}
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="hidden overflow-x-auto pb-2 lg:block">
               <div className="mx-auto min-w-[940px] overflow-hidden rounded-[22px] border border-slate-200 bg-white text-slate-900 shadow-[0_24px_70px_-55px_rgba(190,140,35,0.85)] dark:border-gold/15 dark:bg-charcoal dark:text-foreground">
                 <div className="grid grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
                   <div className="border-b border-r border-slate-200 bg-slate-50 dark:border-gold/10 dark:bg-surface" />
@@ -252,9 +355,9 @@ function ReusablePenDifferencePage() {
                         alt={product.name}
                         className="mb-4 h-28 w-28 object-contain"
                       />
-                      <h2 className="text-base font-extrabold leading-tight">{product.name}</h2>
+                      <h2 className="text-lg font-extrabold leading-tight">{product.name}</h2>
                       <p
-                        className={`text-xs leading-tight ${
+                        className={`text-sm leading-tight ${
                           product.featured
                             ? "text-obsidian/80"
                             : "text-slate-500 dark:text-foreground/70"
@@ -267,13 +370,13 @@ function ReusablePenDifferencePage() {
 
                   {comparisonSections.map((section) => (
                     <Fragment key={section.title}>
-                      <div className="col-span-4 border-b border-slate-200 bg-slate-100 py-2 text-center text-sm font-extrabold uppercase tracking-wide text-slate-600 dark:border-gold/10 dark:bg-surface-2 dark:text-foreground/75">
+                      <div className="col-span-4 border-b border-slate-200 bg-slate-100 py-2.5 text-center text-base font-extrabold uppercase tracking-wide text-slate-600 dark:border-gold/10 dark:bg-surface-2 dark:text-foreground/75">
                         {section.title}
                       </div>
 
                       {section.rows.map((row) => (
                         <Fragment key={`${section.title}-${row.label}`}>
-                          <div className="flex min-h-16 items-center border-b border-r border-slate-200 bg-white px-5 text-sm font-bold text-slate-800 dark:border-gold/10 dark:bg-charcoal dark:text-foreground">
+                          <div className="flex min-h-16 items-center border-b border-r border-slate-200 bg-white px-5 text-[15px] font-bold text-slate-800 dark:border-gold/10 dark:bg-charcoal dark:text-foreground">
                             {row.label}
                           </div>
                           {comparisonProducts.map((product) => (
@@ -306,7 +409,7 @@ function ReusablePenDifferencePage() {
                       <Link
                         to="/products/$slug"
                         params={{ slug: product.slug }}
-                        className={`block rounded-xl border px-6 py-3 text-center text-sm font-extrabold transition-colors ${
+                        className={`block rounded-xl border px-6 py-3 text-center text-[15px] font-extrabold transition-colors ${
                           product.featured
                             ? "border-gold bg-gold text-obsidian hover:bg-gold-light"
                             : "border-slate-300 text-gold hover:border-gold hover:bg-gold/10 dark:border-gold/20 dark:text-gold dark:hover:bg-gold/10"
@@ -321,10 +424,10 @@ function ReusablePenDifferencePage() {
             </div>
 
             <div className="mx-auto mt-12 max-w-5xl">
-              <h2 className="font-display text-4xl font-semibold leading-tight md:text-5xl">
+              <h2 className="font-display text-3xl font-semibold leading-tight sm:text-4xl md:text-5xl">
                 Which Reusable Setup Is Right for You?
               </h2>
-              <ul className="mt-6 space-y-2 text-base leading-relaxed text-muted-foreground">
+              <ul className="mt-6 space-y-3 text-base leading-relaxed text-muted-foreground md:text-lg">
                 <li>
                   <span className="font-bold text-foreground">Choose ZXG Classic Pen</span> if you
                   prefer a traditional capped pen feel with reusable construction.
