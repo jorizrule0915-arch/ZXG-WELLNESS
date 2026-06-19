@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import { MessageCircle, Star } from "lucide-react";
+import { BadgeCheck, MessageCircle, Star } from "lucide-react";
 import { productImages } from "@/lib/productImages";
 import { localProducts } from "@/lib/products";
 import creatineVideo from "@/assets/Creatine Production Video.mp4";
@@ -20,7 +20,9 @@ const testimonials = [
     role: "Strength training client",
     location: "Austin, TX",
     avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=180&h=180&q=80",
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=240&h=240&q=85",
+    verified: "Verified buyer",
+    product: "Reusable Pen",
     quote:
       "The reusable pen feels much more premium than I expected. The weight, dial, and finish make my whole setup feel cleaner and easier to keep organized.",
     messages: [
@@ -34,7 +36,9 @@ const testimonials = [
     role: "Wellness routine customer",
     location: "San Diego, CA",
     avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=180&h=180&q=80",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=240&h=240&q=85",
+    verified: "Verified buyer",
+    product: "Pen + Cartridges",
     quote:
       "I wanted something that looked professional and did not feel disposable. ZXG’s pen has become the part of my routine that feels the most intentional.",
     messages: [
@@ -48,7 +52,9 @@ const testimonials = [
     role: "Recovery-focused shopper",
     location: "Nashville, TN",
     avatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=180&h=180&q=80",
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=240&h=240&q=85",
+    verified: "Verified buyer",
+    product: "Pen Diff Page",
     quote:
       "The site helped me understand the difference between the reusable pen and the refill pieces. It felt clear, polished, and not overwhelming.",
     messages: [
@@ -76,7 +82,7 @@ function Index() {
         />
       </Helmet>
 
-      <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-obsidian">
+      <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-background">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {Array.from({ length: 14 }).map((_, i) => (
             <motion.span
@@ -151,7 +157,7 @@ function Index() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <div className="font-display text-lg text-foreground leading-tight">
+                  <div className="font-display text-lg text-white leading-tight">
                     {heroSlides[heroIdx].label}
                   </div>
                   <div className="text-[10px] uppercase tracking-luxury text-gold mt-1">
@@ -251,6 +257,9 @@ function Index() {
             <p className="mt-5 text-base text-muted-foreground leading-relaxed">
               A few notes from people using ZXG products in their wellness routines.
             </p>
+            <p className="mt-3 text-sm text-muted-foreground/90">
+              Purchase context is included so each testimonial feels clear and grounded.
+            </p>
           </motion.div>
 
           <div className="mt-16 grid gap-6 lg:grid-cols-3">
@@ -265,17 +274,34 @@ function Index() {
               >
                 <div className="p-6">
                   <div className="flex items-center gap-4">
-                    <img
-                      src={testimonial.avatar}
-                      alt={`${testimonial.name} profile`}
-                      loading="lazy"
-                      className="h-16 w-16 rounded-full border border-gold/30 object-cover"
-                    />
+                    <div
+                      role="img"
+                      aria-label={`${testimonial.name} verified profile`}
+                      className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gold/40 shadow-[0_12px_30px_-18px_rgba(190,140,35,0.9)]"
+                    >
+                      <img
+                        src={testimonial.avatar}
+                        alt={`${testimonial.name} customer profile`}
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        className="h-full w-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-obsidian/35 via-transparent to-white/10" />
+                      <span className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-card bg-gold text-obsidian">
+                        <BadgeCheck className="h-3.5 w-3.5" strokeWidth={2.5} />
+                      </span>
+                    </div>
                     <div>
-                      <h3 className="font-display text-2xl leading-tight">{testimonial.name}</h3>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <h3 className="font-display text-2xl leading-tight">{testimonial.name}</h3>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-gold/25 bg-gold/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-gold">
+                          <BadgeCheck className="h-3 w-3" strokeWidth={2.5} />
+                          {testimonial.verified}
+                        </span>
+                      </div>
                       <p className="text-sm text-muted-foreground">{testimonial.role}</p>
                       <p className="text-xs uppercase tracking-wide text-gold">
-                        {testimonial.location}
+                        {testimonial.product} · {testimonial.location}
                       </p>
                     </div>
                   </div>

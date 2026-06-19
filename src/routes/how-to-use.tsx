@@ -50,43 +50,153 @@ const videoInstructions = [
 ];
 
 const tutorialSteps = [
-  { step: 1,  title: "Gather Supplies",   instruction: "Gather pen, cartridge, needles, alcohol swabs, Compound, and syringe.",                          category: "prep" },
-  { step: 2,  title: "Prepare Area",      instruction: "Wash hands and clean work surface.",                                                              category: "prep" },
-  { step: 3,  title: "Attach Needle",     instruction: "Twist reconstitution needle onto syringe until secure.",                                          category: "prep" },
-  { step: 4,  title: "Prepare Vial",      instruction: "Remove cap and clean rubber top with alcohol swab.",                                              category: "prep" },
-  { step: 5,  title: "Fill Syringe",      instruction: "Pull syringe plunger back to 3 mL.",                                                              category: "fill" },
-  { step: 6,  title: "Inject Air",        instruction: "Insert needle into vial and push 3 mL air inside.",                                               category: "fill" },
-  { step: 7,  title: "Draw Compound",     instruction: "Turn vial upside down and draw 3 mL Compound into syringe.",                                      category: "fill" },
-  { step: 8,  title: "Secure Syringe",    instruction: "Recap syringe and place on clean surface.",                                                       category: "fill" },
-  { step: 9,  title: "Open Pen",          instruction: "Remove pen cap and unscrew chamber from body.",                                                   category: "assembly" },
-  { step: 10, title: "Insert Cartridge",  instruction: "Remove cartridge from packaging and place in chamber.",                                           category: "assembly" },
-  { step: 11, title: "Reassemble",        instruction: "Push plunger in, attach chamber back to pen firmly.",                                             category: "assembly" },
-  { step: 12, title: "Clean Stopper",     instruction: "Clean rubber stopper on cartridge with alcohol swab.",                                            category: "assembly" },
-  { step: 13, title: "Insert Vent",       instruction: "Insert venting needle slightly into stopper (off to side).",                                      category: "fill" },
-  { step: 14, title: "Fill Cartridge",    instruction: "Insert syringe needle next to vent and inject liquid slowly.",                                    category: "fill" },
-  { step: 15, title: "Remove Needles",    instruction: "Remove syringe and venting needle, recap both safely.",                                           category: "fill" },
-  { step: 16, title: "Attach Pen Needle", instruction: "Twist pen needle onto chamber, remove outer and inner caps.",                                     category: "assembly" },
-  { step: 17, title: "Prime Pen",         instruction: "Hold upright, dial and push until bubbles escape and liquid appears.",                            category: "use" },
-  { step: 18, title: "Storage",           instruction: "If not using immediately, recap needle and store in cool, dry place.",                            category: "use" },
-  { step: 19, title: "Set Dose",          instruction: "Dial the number of units you want to inject.",                                                    category: "use" },
-  { step: 20, title: "Prepare Site",      instruction: "Clean injection area with alcohol swab.",                                                         category: "use" },
-  { step: 21, title: "Inject",            instruction: "Hold pen at 90° angle, press down and push button to zero.",                                      category: "use" },
-  { step: 22, title: "Complete",          instruction: "Wait few seconds, remove pen, recap needle, unscrew and store safely.",                           category: "use" },
+  {
+    step: 1,
+    title: "Gather Supplies",
+    instruction: "Gather pen, cartridge, needles, alcohol swabs, Compound, and syringe.",
+    category: "prep",
+  },
+  {
+    step: 2,
+    title: "Prepare Area",
+    instruction: "Wash hands and clean work surface.",
+    category: "prep",
+  },
+  {
+    step: 3,
+    title: "Attach Needle",
+    instruction: "Twist reconstitution needle onto syringe until secure.",
+    category: "prep",
+  },
+  {
+    step: 4,
+    title: "Prepare Vial",
+    instruction: "Remove cap and clean rubber top with alcohol swab.",
+    category: "prep",
+  },
+  {
+    step: 5,
+    title: "Fill Syringe",
+    instruction: "Pull syringe plunger back to 3 mL.",
+    category: "fill",
+  },
+  {
+    step: 6,
+    title: "Inject Air",
+    instruction: "Insert needle into vial and push 3 mL air inside.",
+    category: "fill",
+  },
+  {
+    step: 7,
+    title: "Draw Compound",
+    instruction: "Turn vial upside down and draw 3 mL Compound into syringe.",
+    category: "fill",
+  },
+  {
+    step: 8,
+    title: "Secure Syringe",
+    instruction: "Recap syringe and place on clean surface.",
+    category: "fill",
+  },
+  {
+    step: 9,
+    title: "Open Pen",
+    instruction: "Remove pen cap and unscrew chamber from body.",
+    category: "assembly",
+  },
+  {
+    step: 10,
+    title: "Insert Cartridge",
+    instruction: "Remove cartridge from packaging and place in chamber.",
+    category: "assembly",
+  },
+  {
+    step: 11,
+    title: "Reassemble",
+    instruction: "Push plunger in, attach chamber back to pen firmly.",
+    category: "assembly",
+  },
+  {
+    step: 12,
+    title: "Clean Stopper",
+    instruction: "Clean rubber stopper on cartridge with alcohol swab.",
+    category: "assembly",
+  },
+  {
+    step: 13,
+    title: "Insert Vent",
+    instruction: "Insert venting needle slightly into stopper (off to side).",
+    category: "fill",
+  },
+  {
+    step: 14,
+    title: "Fill Cartridge",
+    instruction: "Insert syringe needle next to vent and inject liquid slowly.",
+    category: "fill",
+  },
+  {
+    step: 15,
+    title: "Remove Needles",
+    instruction: "Remove syringe and venting needle, recap both safely.",
+    category: "fill",
+  },
+  {
+    step: 16,
+    title: "Attach Pen Needle",
+    instruction: "Twist pen needle onto chamber, remove outer and inner caps.",
+    category: "assembly",
+  },
+  {
+    step: 17,
+    title: "Prime Pen",
+    instruction: "Hold upright, dial and push until bubbles escape and liquid appears.",
+    category: "use",
+  },
+  {
+    step: 18,
+    title: "Storage",
+    instruction: "If not using immediately, recap needle and store in cool, dry place.",
+    category: "use",
+  },
+  {
+    step: 19,
+    title: "Set Dose",
+    instruction: "Dial the number of units you want to inject.",
+    category: "use",
+  },
+  {
+    step: 20,
+    title: "Prepare Site",
+    instruction: "Clean injection area with alcohol swab.",
+    category: "use",
+  },
+  {
+    step: 21,
+    title: "Inject",
+    instruction: "Hold pen at 90° angle, press down and push button to zero.",
+    category: "use",
+  },
+  {
+    step: 22,
+    title: "Complete",
+    instruction: "Wait few seconds, remove pen, recap needle, unscrew and store safely.",
+    category: "use",
+  },
 ];
 
 const JPEG_STEPS = new Set([1, 4, 5, 6, 17]);
 
 const categories = {
-  prep:     { label: "Preparation", color: "bg-gold/20 text-gold border-gold/30" },
-  fill:     { label: "Filling",     color: "bg-gold/10 text-gold-light border-gold/20" },
-  assembly: { label: "Assembly",    color: "bg-gold/15 text-gold border-gold/25" },
-  use:      { label: "Usage",       color: "bg-gold/20 text-gold border-gold/30" },
+  prep: { label: "Preparation", color: "bg-gold/20 text-gold border-gold/30" },
+  fill: { label: "Filling", color: "bg-gold/10 text-gold-light border-gold/20" },
+  assembly: { label: "Assembly", color: "bg-gold/15 text-gold border-gold/25" },
+  use: { label: "Usage", color: "bg-gold/20 text-gold border-gold/30" },
 } as const;
 
 const safetyTips = [
-  { icon: Syringe,     text: "Always use single-use needles" },
-  { icon: Droplet,     text: "Keep area sterile" },
-  { icon: Shield,      text: "Follow proper technique" },
+  { icon: Syringe, text: "Always use single-use needles" },
+  { icon: Droplet, text: "Keep area sterile" },
+  { icon: Shield, text: "Follow proper technique" },
   { icon: Thermometer, text: "Store at proper temperature" },
 ];
 
@@ -121,7 +231,7 @@ function HowToUsePage() {
   };
 
   return (
-    <div className="min-h-screen bg-obsidian">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Hero */}
       <section className="pt-28 pb-16 relative overflow-hidden">
         {/* Ambient glow */}
@@ -138,12 +248,10 @@ function HowToUsePage() {
               Step-by-Step Guide
             </p>
             <h1 className="font-display text-4xl md:text-6xl font-light text-foreground leading-tight mb-6">
-              How to Use Your{" "}
-              <span className="text-gradient-gold italic">Refillable Pen</span>
+              How to Use Your <span className="text-gradient-gold italic">Refillable Pen</span>
             </h1>
             <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-              Follow this interactive 22-step guide to safely prepare and use
-              your injection pen.
+              Follow this interactive 22-step guide to safely prepare and use your injection pen.
             </p>
           </motion.div>
         </div>
@@ -179,23 +287,19 @@ function HowToUsePage() {
                           active
                             ? "bg-gold text-obsidian"
                             : done
-                            ? "bg-gold/20 text-gold"
-                            : "bg-surface-2 text-muted-foreground"
+                              ? "bg-gold/20 text-gold"
+                              : "bg-surface-2 text-muted-foreground"
                         }`}
                       >
-                        {done && !active ? (
-                          <Check className="w-3.5 h-3.5" />
-                        ) : (
-                          step.step
-                        )}
+                        {done && !active ? <Check className="w-3.5 h-3.5" /> : step.step}
                       </span>
                       <span
                         className={`text-[12px] truncate transition-colors ${
                           active
                             ? "text-gold font-medium"
                             : done
-                            ? "text-foreground/60"
-                            : "text-muted-foreground"
+                              ? "text-foreground/60"
+                              : "text-muted-foreground"
                         }`}
                       >
                         {step.title}
@@ -236,28 +340,18 @@ function HowToUsePage() {
                     />
                     {/* Fallback */}
                     <div className="absolute inset-0 hidden flex-col items-center justify-center">
-                      <span className="font-display text-6xl text-gold/30">
-                        {selectedStep}
-                      </span>
-                      <p className="text-muted-foreground text-xs mt-2">
-                        Step illustration
-                      </p>
+                      <span className="font-display text-6xl text-gold/30">{selectedStep}</span>
+                      <p className="text-muted-foreground text-xs mt-2">Step illustration</p>
                     </div>
 
                     {/* Category badge */}
                     <div className="absolute top-4 right-4">
                       <span
                         className={`px-3 py-1 text-[10px] uppercase tracking-luxury border rounded-sm ${
-                          categories[
-                            currentStep.category as keyof typeof categories
-                          ].color
+                          categories[currentStep.category as keyof typeof categories].color
                         }`}
                       >
-                        {
-                          categories[
-                            currentStep.category as keyof typeof categories
-                          ].label
-                        }
+                        {categories[currentStep.category as keyof typeof categories].label}
                       </span>
                     </div>
 
@@ -273,11 +367,7 @@ function HowToUsePage() {
                   <div className="p-8">
                     <p className="text-[11px] uppercase tracking-luxury text-muted-foreground mb-3">
                       Step {selectedStep} of 22 &nbsp;·&nbsp;{" "}
-                      {
-                        categories[
-                          currentStep.category as keyof typeof categories
-                        ].label
-                      }
+                      {categories[currentStep.category as keyof typeof categories].label}
                     </p>
 
                     <h2 className="font-display text-2xl md:text-3xl text-foreground mb-4">
@@ -352,9 +442,7 @@ function HowToUsePage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <p className="text-[11px] uppercase tracking-luxury text-gold mb-3">
-              Visual Guides
-            </p>
+            <p className="text-[11px] uppercase tracking-luxury text-gold mb-3">Visual Guides</p>
             <h2 className="font-display text-3xl md:text-5xl font-light text-foreground mb-4">
               Video Instructions
             </h2>
@@ -388,12 +476,8 @@ function HowToUsePage() {
                     </div>
                   </div>
 
-                  <div
-                    className={`${isEven ? "md:order-2" : "md:order-1"} space-y-4`}
-                  >
-                    <p className="text-[11px] uppercase tracking-luxury text-gold">
-                      0{index + 1}
-                    </p>
+                  <div className={`${isEven ? "md:order-2" : "md:order-1"} space-y-4`}>
+                    <p className="text-[11px] uppercase tracking-luxury text-gold">0{index + 1}</p>
                     <h3 className="font-display text-2xl md:text-3xl font-light text-foreground capitalize leading-tight">
                       {video.title}
                     </h3>
@@ -417,9 +501,7 @@ function HowToUsePage() {
               <AlertTriangle className="w-5 h-5 text-gold" strokeWidth={1.25} />
             </div>
             <div>
-              <p className="text-[11px] uppercase tracking-luxury text-gold">
-                Important
-              </p>
+              <p className="text-[11px] uppercase tracking-luxury text-gold">Important</p>
               <h3 className="font-display text-2xl font-light text-foreground">
                 Safety Essentials
               </h3>
@@ -439,9 +521,7 @@ function HowToUsePage() {
                 <div className="w-10 h-10 mx-auto border border-gold/20 rounded-sm flex items-center justify-center mb-4">
                   <tip.icon className="w-5 h-5 text-gold" strokeWidth={1.25} />
                 </div>
-                <p className="text-[12px] text-foreground/80 leading-relaxed">
-                  {tip.text}
-                </p>
+                <p className="text-[12px] text-foreground/80 leading-relaxed">{tip.text}</p>
               </motion.div>
             ))}
           </div>
