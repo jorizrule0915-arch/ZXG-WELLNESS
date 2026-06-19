@@ -3,7 +3,26 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>ZXG Wellness — Luxury Wellness Atelier</title>
+    <script>
+      (() => {
+        try {
+          const storedTheme = localStorage.getItem("zxg-theme");
+          const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+          const theme =
+            storedTheme === "light" || storedTheme === "dark" ? storedTheme : systemTheme;
+
+          document.documentElement.classList.remove("light", "dark");
+          document.documentElement.classList.add(theme);
+          document.documentElement.style.colorScheme = theme;
+        } catch {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

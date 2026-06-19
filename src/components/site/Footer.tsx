@@ -26,6 +26,11 @@ export function Footer() {
               </Link>
             </li>
             <li>
+              <Link to="/reusable-pen-difference" className="hover:text-gold">
+                Pen Diff
+              </Link>
+            </li>
+            <li>
               <Link to="/about" className="hover:text-gold">
                 About
               </Link>

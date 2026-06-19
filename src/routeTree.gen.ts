@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ReusablePenDifferenceRouteImport } from './routes/reusable-pen-difference'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProductsRouteImport } from './routes/products'
@@ -31,6 +32,11 @@ import { Route as AdminAdminOrdersRouteImport } from './routes/_admin.admin.orde
 import { Route as AdminAdminProductsNewRouteImport } from './routes/_admin.admin.products.new'
 import { Route as AdminAdminProductsIdRouteImport } from './routes/_admin.admin.products.$id'
 
+const ReusablePenDifferenceRoute = ReusablePenDifferenceRouteImport.update({
+  id: '/reusable-pen-difference',
+  path: '/reusable-pen-difference',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReturnsRoute = ReturnsRouteImport.update({
   id: '/returns',
   path: '/returns',
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/products': typeof ProductsRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
+  '/reusable-pen-difference': typeof ReusablePenDifferenceRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/products': typeof ProductsRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
+  '/reusable-pen-difference': typeof ReusablePenDifferenceRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/orders': typeof AdminAdminOrdersRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/products': typeof ProductsRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
+  '/reusable-pen-difference': typeof ReusablePenDifferenceRoute
   '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/reset-password'
     | '/returns'
+    | '/reusable-pen-difference'
     | '/admin'
     | '/auth/callback'
     | '/products/$slug'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/reset-password'
     | '/returns'
+    | '/reusable-pen-difference'
     | '/auth/callback'
     | '/products/$slug'
     | '/admin/orders'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/reset-password'
     | '/returns'
+    | '/reusable-pen-difference'
     | '/_admin/admin'
     | '/auth/callback'
     | '/products/$slug'
@@ -285,11 +297,19 @@ export interface RootRouteChildren {
   ProductsRoute: typeof ProductsRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   ReturnsRoute: typeof ReturnsRoute
+  ReusablePenDifferenceRoute: typeof ReusablePenDifferenceRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reusable-pen-difference': {
+      id: '/reusable-pen-difference'
+      path: '/reusable-pen-difference'
+      fullPath: '/reusable-pen-difference'
+      preLoaderRoute: typeof ReusablePenDifferenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/returns': {
       id: '/returns'
       path: '/returns'
@@ -506,6 +526,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsRoute: ProductsRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   ReturnsRoute: ReturnsRoute,
+  ReusablePenDifferenceRoute: ReusablePenDifferenceRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
