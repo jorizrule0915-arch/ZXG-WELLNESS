@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import { MessageCircle, Star } from "lucide-react";
 import { productImages } from "@/lib/productImages";
 import { localProducts } from "@/lib/products";
 import creatineVideo from "@/assets/Creatine Production Video.mp4";
@@ -11,6 +12,51 @@ export const Route = createFileRoute("/")({ component: Index });
 const heroSlides = [
   { slug: "creatine", label: localProducts[0].name, tagline: localProducts[0].tagline },
   { slug: "body-balm", label: localProducts[1].name, tagline: localProducts[1].tagline },
+];
+
+const testimonials = [
+  {
+    name: "Maya L.",
+    role: "Strength training client",
+    location: "Austin, TX",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=180&h=180&q=80",
+    quote:
+      "The reusable pen feels much more premium than I expected. The weight, dial, and finish make my whole setup feel cleaner and easier to keep organized.",
+    messages: [
+      { from: "Maya", text: "Just got my ZXG pen — the metal finish is really nice." },
+      { from: "ZXG", text: "Glad it arrived safely. How does the setup feel?" },
+      { from: "Maya", text: "Super simple. The cartridge system makes everything feel neat." },
+    ],
+  },
+  {
+    name: "Daniel R.",
+    role: "Wellness routine customer",
+    location: "San Diego, CA",
+    avatar:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=180&h=180&q=80",
+    quote:
+      "I wanted something that looked professional and did not feel disposable. ZXG’s pen has become the part of my routine that feels the most intentional.",
+    messages: [
+      { from: "Daniel", text: "Do I need cartridges with the reusable pen?" },
+      { from: "ZXG", text: "Yes — pen body, cartridges, and pen needles work together." },
+      { from: "Daniel", text: "Perfect. That makes restocking way easier." },
+    ],
+  },
+  {
+    name: "Erin C.",
+    role: "Recovery-focused shopper",
+    location: "Nashville, TN",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=180&h=180&q=80",
+    quote:
+      "The site helped me understand the difference between the reusable pen and the refill pieces. It felt clear, polished, and not overwhelming.",
+    messages: [
+      { from: "Erin", text: "The pen diff page helped a lot, thank you." },
+      { from: "ZXG", text: "Happy it made the setup clearer." },
+      { from: "Erin", text: "Yes — now I know what to buy first and what to restock." },
+    ],
+  },
 ];
 
 function Index() {
@@ -181,6 +227,105 @@ function Index() {
                 <h3 className="font-display text-xl mb-3">{b.t}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{b.d}</p>
               </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-28 md:py-32 border-t border-gold/10 bg-background">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="mx-auto max-w-3xl text-center"
+          >
+            <div className="text-[10px] uppercase tracking-luxury text-gold mb-5">
+              <span className="gold-line">Real Feedback</span>
+            </div>
+            <h2 className="font-display text-4xl md:text-6xl leading-tight">
+              Quiet confidence,{" "}
+              <span className="text-gradient-gold italic">shared by customers.</span>
+            </h2>
+            <p className="mt-5 text-base text-muted-foreground leading-relaxed">
+              A few notes from people using ZXG products in their wellness routines.
+            </p>
+          </motion.div>
+
+          <div className="mt-16 grid gap-6 lg:grid-cols-3">
+            {testimonials.map((testimonial, index) => (
+              <motion.article
+                key={testimonial.name}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.65, delay: index * 0.1 }}
+                className="group overflow-hidden border border-gold/15 bg-card shadow-[0_24px_70px_-60px_rgba(190,140,35,0.9)] transition-colors hover:border-gold/35"
+              >
+                <div className="p-6">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={testimonial.avatar}
+                      alt={`${testimonial.name} profile`}
+                      loading="lazy"
+                      className="h-16 w-16 rounded-full border border-gold/30 object-cover"
+                    />
+                    <div>
+                      <h3 className="font-display text-2xl leading-tight">{testimonial.name}</h3>
+                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                      <p className="text-xs uppercase tracking-wide text-gold">
+                        {testimonial.location}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 flex gap-1 text-gold" aria-label="5 star rating">
+                    {Array.from({ length: 5 }).map((_, starIndex) => (
+                      <Star key={starIndex} className="h-4 w-4 fill-current" strokeWidth={1.25} />
+                    ))}
+                  </div>
+
+                  <p className="mt-5 text-base leading-relaxed text-foreground/85">
+                    “{testimonial.quote}”
+                  </p>
+                </div>
+
+                <div className="border-t border-gold/10 bg-surface/70 p-5">
+                  <div className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-luxury text-gold">
+                    <MessageCircle className="h-4 w-4" strokeWidth={1.5} />
+                    Conversation Preview
+                  </div>
+                  <div className="space-y-3 rounded-2xl border border-gold/10 bg-background p-4">
+                    {testimonial.messages.map((message, messageIndex) => {
+                      const isCustomer = message.from === testimonial.name.split(" ")[0];
+                      return (
+                        <div
+                          key={`${testimonial.name}-${messageIndex}`}
+                          className={`flex ${isCustomer ? "justify-start" : "justify-end"}`}
+                        >
+                          <div
+                            className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                              isCustomer
+                                ? "bg-muted text-foreground"
+                                : "bg-gold text-obsidian shadow-sm"
+                            }`}
+                          >
+                            <div
+                              className={`mb-1 text-[10px] font-semibold uppercase tracking-wide ${
+                                isCustomer ? "text-muted-foreground" : "text-obsidian/70"
+                              }`}
+                            >
+                              {message.from}
+                            </div>
+                            {message.text}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.article>
             ))}
           </div>
         </div>
