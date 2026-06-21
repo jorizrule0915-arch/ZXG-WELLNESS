@@ -168,6 +168,58 @@ const defaultProductBaseFields = defaultProducts.map(
 const productImageBucket = "product-images";
 const productVideoBucket = "product-videos";
 const productVideoMaxSize = 50 * 1024 * 1024;
+const trackingStatuses = new Set([
+  "processing",
+  "packed",
+  "shipped",
+  "in_transit",
+  "out_for_delivery",
+  "delivered",
+  "delayed",
+  "returned",
+]);
+
+function cleanOptionalText(value: unknown, maxLength: number) {
+  const text = String(value ?? "").trim();
+  return text ? text.slice(0, maxLength) : null;
+}
+
+function cleanOptionalUrl(value: unknown) {
+  const text = cleanOptionalText(value, 500);
+  if (!text) return null;
+
+  try {
+    const url = new URL(text);
+    if (!["http:", "https:"].includes(url.protocol)) {
+      throw Object.assign(new Error("Tracking URL must start with http:// or https://"), {
+        statusCode: 400,
+      });
+    }
+    return url.toString();
+  } catch (error) {
+    if ((error as { statusCode?: number }).statusCode) throw error;
+    throw Object.assign(new Error("Tracking URL is not valid"), { statusCode: 400 });
+  }
+}
+
+function cleanOptionalDate(value: unknown) {
+  const text = cleanOptionalText(value, 20);
+  if (!text) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    throw Object.assign(new Error("Estimated delivery date must use YYYY-MM-DD"), {
+      statusCode: 400,
+    });
+  }
+  return text;
+}
+
+function cleanTrackingStatus(value: unknown) {
+  const status = String(value ?? "processing");
+  if (!trackingStatuses.has(status)) {
+    throw Object.assign(new Error("Tracking status is not valid"), { statusCode: 400 });
+  }
+  return status;
+}
 
 function cleanFileName(fileName: string) {
   const safeName = fileName
@@ -556,6 +608,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .eq("id", id);
         if (error) return res.status(500).json({ error: error.message });
         return res.status(200).json({ success: true });
+      }
+
+      if (action === "update-order-tracking") {
+        const trackingStatus = cleanTrackingStatus(payload?.tracking_status);
+        const shippedStatuses = new Set(["shipped", "in_transit", "out_for_delivery", "delivered"]);
+
+        const update = {
+          tracking_carrier: cleanOptionalText(payload?.tracking_carrier, 80),
+          tracking_number: cleanOptionalText(payload?.tracking_number, 120),
+          tracking_url: cleanOptionalUrl(payload?.tracking_url),
+          tracking_status: trackingStatus,
+          estimated_delivery_date: cleanOptionalDate(payload?.estimated_delivery_date),
+          shipment_note: cleanOptionalText(payload?.shipment_note, 500),
+          shipped_at: shippedStatuses.has(trackingStatus)
+            ? (cleanOptionalText(payload?.shipped_at, 40) ?? new Date().toISOString())
+            : null,
+        };
+
+        const { data, error } = await supabase
+          .from("orders")
+          .update(update)
+          .eq("id", id)
+          .select("*")
+          .single();
+        if (error) return res.status(500).json({ error: error.message });
+        return res.status(200).json(data);
       }
 
       if (action === "toggle-product-active") {
