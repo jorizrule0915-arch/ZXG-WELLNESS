@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Helmet } from "react-helmet-async";
 import { useState, useEffect, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/reset-password")({ component: ResetPasswordPage });
 
@@ -25,7 +25,10 @@ function ResetPasswordPage() {
     if (code) {
       // PKCE flow — exchange code for session
       supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (error) { setInvalid(true); return; }
+        if (error) {
+          setInvalid(true);
+          return;
+        }
         setReady(true);
         // Clean up the URL
         window.history.replaceState({}, "", "/reset-password");
@@ -39,7 +42,10 @@ function ResetPasswordPage() {
     });
 
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) { setReady(true); return; }
+      if (data.session) {
+        setReady(true);
+        return;
+      }
       setTimeout(() => {
         supabase.auth.getSession().then(({ data: d }) => {
           if (d.session) setReady(true);
@@ -52,19 +58,33 @@ function ResetPasswordPage() {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErr(null);
-    if (password.length < 6) { setErr("Password must be at least 6 characters."); return; }
-    if (password !== confirm) { setErr("Passwords don't match."); return; }
+    if (password.length < 6) {
+      setErr("Password must be at least 6 characters.");
+      return;
+    }
+    if (password !== confirm) {
+      setErr("Passwords don't match.");
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-    if (error) { setErr(error.message); return; }
+    if (error) {
+      setErr(error.message);
+      return;
+    }
     setDone(true);
     setTimeout(() => nav({ to: "/account" }), 2500);
   };
 
   return (
     <>
-      <Helmet><title>Reset Password — ZXG Wellness</title></Helmet>
+      <Seo
+        title="Reset Password"
+        description="Reset your ZXG Wellness account password."
+        path="/reset-password"
+        noIndex
+      />
       <div className="min-h-[80vh] flex items-center justify-center px-6 py-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -81,8 +101,13 @@ function ResetPasswordPage() {
           <div className="bg-charcoal border border-gold/20 p-8 backdrop-blur-sm">
             {invalid ? (
               <div className="text-center space-y-4">
-                <p className="text-sm text-muted-foreground">This reset link is invalid or has expired.</p>
-                <Link to="/login" className="block text-[11px] uppercase tracking-luxury text-gold hover:text-gold-light transition-colors">
+                <p className="text-sm text-muted-foreground">
+                  This reset link is invalid or has expired.
+                </p>
+                <Link
+                  to="/login"
+                  className="block text-[11px] uppercase tracking-luxury text-gold hover:text-gold-light transition-colors"
+                >
                   Request a new one →
                 </Link>
               </div>
@@ -96,7 +121,9 @@ function ResetPasswordPage() {
             ) : (
               <form onSubmit={onSubmit} className="space-y-5">
                 <label className="block">
-                  <span className="block text-[10px] uppercase tracking-luxury text-gold mb-2">New Password</span>
+                  <span className="block text-[10px] uppercase tracking-luxury text-gold mb-2">
+                    New Password
+                  </span>
                   <span className="relative block">
                     <input
                       type={visible ? "text" : "password"}
@@ -106,15 +133,24 @@ function ResetPasswordPage() {
                       placeholder="Min. 6 characters"
                       className="w-full bg-transparent border-b border-gold/30 focus:border-gold outline-none py-2 pr-10 text-sm text-foreground placeholder:text-muted-foreground/50 transition-colors"
                     />
-                    <button type="button" onClick={() => setVisible(v => !v)}
-                      className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-gold transition-colors">
-                      {visible ? <EyeOff className="h-4 w-4" strokeWidth={1.5} /> : <Eye className="h-4 w-4" strokeWidth={1.5} />}
+                    <button
+                      type="button"
+                      onClick={() => setVisible((v) => !v)}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-gold transition-colors"
+                    >
+                      {visible ? (
+                        <EyeOff className="h-4 w-4" strokeWidth={1.5} />
+                      ) : (
+                        <Eye className="h-4 w-4" strokeWidth={1.5} />
+                      )}
                     </button>
                   </span>
                 </label>
 
                 <label className="block">
-                  <span className="block text-[10px] uppercase tracking-luxury text-gold mb-2">Confirm Password</span>
+                  <span className="block text-[10px] uppercase tracking-luxury text-gold mb-2">
+                    Confirm Password
+                  </span>
                   <input
                     type={visible ? "text" : "password"}
                     value={confirm}
@@ -126,7 +162,9 @@ function ResetPasswordPage() {
                 </label>
 
                 {err && (
-                  <div className="text-[11px] text-destructive border border-destructive/30 bg-destructive/10 px-3 py-2">{err}</div>
+                  <div className="text-[11px] text-destructive border border-destructive/30 bg-destructive/10 px-3 py-2">
+                    {err}
+                  </div>
                 )}
 
                 <button
@@ -141,7 +179,10 @@ function ResetPasswordPage() {
           </div>
 
           <div className="mt-8 text-center">
-            <Link to="/" className="text-[11px] uppercase tracking-luxury text-muted-foreground hover:text-gold">
+            <Link
+              to="/"
+              className="text-[11px] uppercase tracking-luxury text-muted-foreground hover:text-gold"
+            >
               ← Return to store
             </Link>
           </div>

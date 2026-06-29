@@ -1,8 +1,9 @@
 import { Fragment, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Helmet } from "react-helmet-async";
 import { Check, ChevronRight, Minus, X } from "lucide-react";
 import { penColorImages } from "@/lib/productImages";
+import { JsonLd, Seo } from "@/lib/seo";
+import { breadcrumbSchema, faqSchema } from "@/lib/seoData";
 
 export const Route = createFileRoute("/reusable-pen-difference")({
   component: ReusablePenDifferencePage,
@@ -223,13 +224,32 @@ function ReusablePenDifferencePage() {
 
   return (
     <>
-      <Helmet>
-        <title>The Reusable Pen Difference — ZXG Wellness</title>
-        <meta
-          name="description"
-          content="Compare reusable pens, refills, and single-use disposable pen options with the ZXG Wellness pen difference page."
-        />
-      </Helmet>
+      <Seo
+        title="Reusable Pen Difference"
+        description="Compare reusable pens, refill cartridges, single-use pen needles, and compatible accessory options from ZXG Wellness."
+        path="/reusable-pen-difference"
+        image={penColorImages.black}
+      />
+      <JsonLd
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Reusable Pen Difference", path: "/reusable-pen-difference" },
+          ]),
+          faqSchema([
+            {
+              question: "What is the ZXG reusable pen difference?",
+              answer:
+                "The ZXG reusable pen system focuses on durable reusable construction, replaceable cartridges, compatible pen needles, and premium everyday handling.",
+            },
+            {
+              question: "What accessories work with the reusable pen?",
+              answer:
+                "The reusable pen is presented alongside ZXG disposable cartridges and single-use pen needles as a complete accessory setup.",
+            },
+          ]),
+        ]}
+      />
 
       <div className="bg-background text-foreground">
         <section className="relative isolate flex min-h-[340px] items-center justify-center overflow-hidden bg-[#11151a] px-6 py-20 text-center text-white md:min-h-[420px]">

@@ -1,15 +1,37 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Moon, ShoppingBag, Menu, Sun, X, User } from "lucide-react";
+import { ChevronDown, Moon, ShoppingBag, Menu, Sun, X, User } from "lucide-react";
 import { useCart, cartCount } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import headerLogo from "@/assets/Logo/Header Nav Logo.png";
 
-const links = [
+type NavTo =
+  | "/"
+  | "/products"
+  | "/blog"
+  | "/reusable-pen-difference"
+  | "/how-to-use"
+  | "/about"
+  | "/returns"
+  | "/contact";
+
+type NavLink = {
+  to: NavTo;
+  label: string;
+};
+
+const links: readonly NavLink[] = [
   { to: "/", label: "Home" },
   { to: "/products", label: "Products" },
+  { to: "/blog", label: "Blog" },
+] as const;
+
+const learnLinks: readonly NavLink[] = [
   { to: "/reusable-pen-difference", label: "Pen Diff" },
   { to: "/how-to-use", label: "How to Use" },
+] as const;
+
+const supportLinks: readonly NavLink[] = [
   { to: "/about", label: "About" },
   { to: "/returns", label: "Returns" },
   { to: "/contact", label: "Contact" },
@@ -72,7 +94,7 @@ export function Header() {
 
         <nav className="hidden xl:flex items-center gap-8">
           {links.map((link) => {
-            const active = pathname === link.to;
+            const active = isRouteActive(pathname, link.to);
             return (
               <Link
                 key={link.to}
@@ -88,6 +110,18 @@ export function Header() {
               </Link>
             );
           })}
+          <DesktopSubNav
+            label="Learn"
+            links={learnLinks}
+            pathname={pathname}
+            active={learnLinks.some((link) => isRouteActive(pathname, link.to))}
+          />
+          <DesktopSubNav
+            label="Support"
+            links={supportLinks}
+            pathname={pathname}
+            active={supportLinks.some((link) => isRouteActive(pathname, link.to))}
+          />
         </nav>
 
         <div className="flex items-center gap-1">
@@ -148,6 +182,8 @@ export function Header() {
               {link.label}
             </Link>
           ))}
+          <MobileNavGroup label="Learn" links={learnLinks} />
+          <MobileNavGroup label="Support" links={supportLinks} />
           <button
             onClick={() => setTheme(nextTheme)}
             className="flex items-center justify-between py-4 text-[15px] uppercase tracking-widest text-foreground font-medium hover:text-gold transition-colors"
@@ -163,4 +199,77 @@ export function Header() {
       </div>
     </header>
   );
+}
+
+function DesktopSubNav({
+  label,
+  links,
+  pathname,
+  active,
+}: {
+  label: string;
+  links: readonly NavLink[];
+  pathname: string;
+  active: boolean;
+}) {
+  return (
+    <div className="group relative">
+      <button
+        type="button"
+        className="relative flex items-center gap-1.5 text-[13px] font-medium uppercase tracking-widest text-foreground transition-colors hover:text-gold"
+      >
+        {label}
+        <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
+        <span
+          className={`absolute -bottom-1.5 left-0 h-px bg-gold transition-all duration-300 ${
+            active ? "w-full" : "w-0 group-hover:w-full"
+          }`}
+        />
+      </button>
+
+      <div className="invisible absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+        <div className="border border-gold/15 bg-background/95 p-2 shadow-2xl backdrop-blur-xl">
+          {links.map((link) => {
+            const linkActive = isRouteActive(pathname, link.to);
+
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`block px-4 py-3 text-sm transition-colors hover:bg-gold hover:text-obsidian ${
+                  linkActive ? "text-gold" : "text-foreground/80"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobileNavGroup({ label, links }: { label: string; links: readonly NavLink[] }) {
+  return (
+    <div className="border-b border-gold/10 py-3">
+      <div className="pb-2 text-[11px] uppercase tracking-widest text-gold">{label}</div>
+      <div className="grid gap-1">
+        {links.map((link) => (
+          <Link
+            key={link.to}
+            to={link.to}
+            className="py-2 text-sm uppercase tracking-widest text-foreground/80 transition-colors hover:text-gold"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function isRouteActive(pathname: string, to: NavTo) {
+  if (to === "/") return pathname === "/";
+  return pathname === to || pathname.startsWith(`${to}/`);
 }

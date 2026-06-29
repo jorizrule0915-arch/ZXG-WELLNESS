@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
+import { JsonLd, Seo } from "@/lib/seo";
+import { breadcrumbSchema } from "@/lib/seoData";
 
 export const Route = createFileRoute("/returns")({ component: ReturnsPage });
 
@@ -30,9 +31,17 @@ function Section({
 function ReturnsPage() {
   return (
     <>
-      <Helmet>
-        <title>Refund &amp; Return Policy — ZXG Wellness</title>
-      </Helmet>
+      <Seo
+        title="Refund & Return Policy"
+        description="Read the ZXG Wellness return, refund, damaged item, cancellation, and customer care policy before ordering."
+        path="/returns"
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Returns", path: "/returns" },
+        ])}
+      />
       <div className="mx-auto max-w-3xl px-6 lg:px-10 py-20 md:py-28">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

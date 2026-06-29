@@ -1,5 +1,4 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Helmet } from "react-helmet-async";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -16,16 +15,21 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth";
+import { imageForOrderItem } from "@/lib/orderImages";
+import { Seo } from "@/lib/seo";
 import { supabase } from "@/integrations/supabase/client";
 
 type OrderItem = {
   product_name: string;
+  product_slug?: string | null;
   quantity: number;
   unit_price?: number | null;
+  product_image?: string | null;
 };
 
 type Order = {
   id: string;
+  user_id?: string;
   created_at: string;
   status: "pending" | "paid" | "fulfilled" | "cancelled" | string;
   total: number;
@@ -48,10 +52,10 @@ type OrderFilter = "all" | "active" | "delivered";
 type PillTone = "gold" | "muted" | "green" | "red" | "amber";
 
 const orderSelect =
-  "id, created_at, status, total, shipping_name, shipping_address, shipping_city, shipping_state, shipping_zip, tracking_carrier, tracking_number, tracking_url, tracking_status, shipped_at, estimated_delivery_date, shipment_note, order_items(product_name, quantity, unit_price)";
+  "id, created_at, status, total, shipping_name, shipping_address, shipping_city, shipping_zip, tracking_carrier, tracking_number, tracking_url, tracking_status, shipped_at, estimated_delivery_date, shipment_note, order_items(product_name, product_slug, quantity, unit_price)";
 
 const legacyOrderSelect =
-  "id, created_at, status, total, shipping_name, shipping_address, shipping_city, shipping_state, shipping_zip, order_items(product_name, quantity, unit_price)";
+  "id, created_at, status, total, shipping_name, shipping_address, shipping_city, shipping_zip, order_items(product_name, product_slug, quantity, unit_price)";
 
 const trackingStatusLabels: Record<string, string> = {
   processing: "Preparing",
@@ -121,22 +125,24 @@ function AccountPage() {
       const result = await supabase
         .from("orders")
         .select(orderSelect)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (result.error) {
         const fallback = await supabase
           .from("orders")
           .select(legacyOrderSelect)
+          .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 
         if (fallback.error) {
           setError("We could not load your orders right now.");
           setOrders([]);
         } else {
-          setOrders((fallback.data ?? []) as unknown as Order[]);
+          setOrders(await hydrateOrderProductImages((fallback.data ?? []) as unknown as Order[]));
         }
       } else {
-        setOrders((result.data ?? []) as unknown as Order[]);
+        setOrders(await hydrateOrderProductImages((result.data ?? []) as unknown as Order[]));
       }
 
       setFetching(false);
@@ -173,44 +179,45 @@ function AccountPage() {
 
   return (
     <>
-      <Helmet>
-        <title>My Account — ZXG Wellness</title>
-      </Helmet>
+      <Seo
+        title="My Account"
+        description="View your ZXG Wellness orders."
+        path="/account"
+        noIndex
+      />
 
-      <main className="mx-auto max-w-7xl px-5 py-16 md:py-24 lg:px-10">
+      <main className="mx-auto max-w-7xl overflow-x-hidden px-4 py-8 sm:px-5 md:py-16 lg:px-10">
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55 }}
           className="overflow-hidden border border-gold/15 bg-charcoal"
         >
-          <div className="grid gap-8 bg-[radial-gradient(circle_at_top_right,rgba(201,168,76,0.16),transparent_34rem)] p-6 md:grid-cols-[1fr_320px] md:p-8 lg:p-10">
+          <div className="grid gap-6 bg-[radial-gradient(circle_at_top_right,rgba(201,168,76,0.16),transparent_34rem)] p-5 sm:gap-8 sm:p-6 md:grid-cols-[1fr_320px] md:p-8 lg:p-10">
             <div>
-              <div className="mb-4 text-[11px] uppercase tracking-luxury text-gold">
-                Account Dashboard
-              </div>
-              <h1 className="font-display text-4xl leading-tight md:text-6xl">
+              <div className="mb-3 text-sm font-medium text-gold">Account dashboard</div>
+              <h1 className="text-2xl font-medium leading-tight text-foreground sm:text-3xl md:text-4xl">
                 Hi, <span className="text-gradient-gold italic">{displayName}</span>
               </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground md:text-base">
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">
                 Track every ZXG order from purchase to delivery. Open any order to see what you
                 bought, where it is shipping, and the courier details once the package leaves us.
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
                 <Link
                   to="/products"
-                  className="inline-flex items-center gap-2 bg-gold px-5 py-3 text-[11px] uppercase tracking-luxury text-obsidian transition-colors hover:bg-gold-light"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 bg-gold px-5 py-3 text-sm font-medium text-obsidian transition-colors hover:bg-gold-light"
                 >
                   <ShoppingBag className="h-4 w-4" />
-                  Continue Shopping
+                  Continue shopping
                 </Link>
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className="inline-flex items-center gap-2 border border-gold/40 px-5 py-3 text-[11px] uppercase tracking-luxury text-gold transition-colors hover:bg-gold hover:text-obsidian"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 border border-gold/40 px-5 py-3 text-sm text-gold transition-colors hover:bg-gold hover:text-obsidian"
                   >
-                    Admin Dashboard
+                    Admin dashboard
                   </Link>
                 )}
                 <button
@@ -218,9 +225,9 @@ function AccountPage() {
                     await signOut();
                     nav({ to: "/" });
                   }}
-                  className="inline-flex items-center border border-gold/20 px-5 py-3 text-[11px] uppercase tracking-luxury text-muted-foreground transition-colors hover:border-gold/60 hover:text-gold"
+                  className="inline-flex min-h-11 items-center justify-center border border-gold/20 px-5 py-3 text-sm text-muted-foreground transition-colors hover:border-gold/60 hover:text-gold"
                 >
-                  Sign Out
+                  Sign out
                 </button>
               </div>
             </div>
@@ -255,30 +262,33 @@ function AccountPage() {
           />
         </section>
 
-        <section className="mt-8 grid gap-8 lg:grid-cols-[1fr_340px]">
+        <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_340px] lg:gap-8">
           <div>
-            <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+            <div className="mb-5 grid gap-3 sm:flex sm:flex-wrap sm:items-end sm:justify-between">
               <div>
-                <div className="text-[11px] uppercase tracking-luxury text-gold">
+                <div className="text-sm font-medium text-gold">
                   <span className="gold-line">Your Orders</span>
                 </div>
-                <h2 className="mt-3 font-display text-3xl md:text-4xl">Order history</h2>
+                <h2 className="mt-3 text-xl font-medium text-foreground sm:text-2xl">
+                  Order history
+                </h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
                   Each order shows payment status, delivery destination, and tracking details when
-                  the shipping company provides them.
+                  the shipping company provides them. Only orders placed from this signed-in account
+                  are shown here.
                 </p>
               </div>
-              <div className="text-[10px] uppercase tracking-luxury text-muted-foreground">
+              <div className="text-sm text-muted-foreground sm:text-xs">
                 {filteredOrders.length} shown
               </div>
             </div>
 
-            <div className="mb-5 flex flex-wrap gap-2">
+            <div className="mb-5 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
               {(Object.keys(filterLabels) as OrderFilter[]).map((nextFilter) => (
                 <button
                   key={nextFilter}
                   onClick={() => setFilter(nextFilter)}
-                  className={`border px-4 py-2 text-[10px] uppercase tracking-luxury transition-colors ${
+                  className={`min-h-11 border px-4 py-2.5 text-sm transition-colors ${
                     filter === nextFilter
                       ? "border-gold bg-gold text-obsidian"
                       : "border-gold/25 text-muted-foreground hover:border-gold hover:text-gold"
@@ -341,7 +351,7 @@ function AccountSummaryCard({
 }) {
   return (
     <div className="border border-gold/15 bg-obsidian/70 p-5">
-      <div className="text-[10px] uppercase tracking-luxury text-gold">Signed in as</div>
+      <div className="text-sm font-medium text-gold">Signed in as</div>
       <div className="mt-2 break-all text-sm text-foreground/85">{email}</div>
 
       <div className="mt-6 grid grid-cols-2 gap-3">
@@ -350,12 +360,12 @@ function AccountSummaryCard({
       </div>
 
       <div className="mt-6 border-t border-gold/10 pt-5">
-        <div className="text-[10px] uppercase tracking-luxury text-muted-foreground">
-          Latest Order
-        </div>
+        <div className="text-sm text-muted-foreground">Latest order</div>
         {latestOrder ? (
           <>
-            <div className="mt-2 font-display text-xl">#{latestOrder.id.slice(0, 8)}</div>
+            <div className="mt-2 text-lg font-medium text-foreground">
+              #{latestOrder.id.slice(0, 8)}
+            </div>
             <div className="mt-1 text-sm text-muted-foreground">
               {formatDate(latestOrder.created_at)} · {getTrackingLabel(latestOrder)}
             </div>
@@ -371,8 +381,8 @@ function AccountSummaryCard({
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="border border-gold/10 bg-charcoal/80 p-4">
-      <div className="font-display text-2xl text-gold">{value}</div>
-      <div className="mt-1 text-[9px] uppercase tracking-luxury text-muted-foreground">{label}</div>
+      <div className="text-2xl font-medium text-gold">{value}</div>
+      <div className="mt-1 text-xs text-muted-foreground">{label}</div>
     </div>
   );
 }
@@ -392,8 +402,8 @@ function DashboardStat({
     <div className="border border-gold/15 bg-charcoal p-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="text-[10px] uppercase tracking-luxury text-muted-foreground">{label}</div>
-          <div className="mt-2 font-display text-4xl text-gold">{value}</div>
+          <div className="text-xs text-muted-foreground">{label}</div>
+          <div className="mt-2 text-2xl font-medium text-gold">{value}</div>
         </div>
         <div className="border border-gold/20 bg-obsidian p-3 text-gold">{icon}</div>
       </div>
@@ -418,45 +428,54 @@ function OrderCard({
     <li className="overflow-hidden border border-gold/15 bg-charcoal">
       <button
         onClick={onToggle}
-        className="w-full p-5 text-left transition-colors hover:bg-surface/40 md:p-6"
+        className="w-full p-4 text-left transition-colors hover:bg-surface/40 sm:p-5 md:p-6"
       >
-        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
-          <div className="flex gap-4">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-5">
+          <div className="min-w-0 sm:flex sm:gap-4">
             <div className="mt-1 hidden border border-gold/20 bg-obsidian p-3 text-gold sm:block">
               <Package className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-display text-2xl">Order #{order.id.slice(0, 8)}</h3>
-                <StatusPill label={getOrderStatusLabel(order.status)} tone={getOrderTone(order)} />
-                <StatusPill label={getTrackingLabel(order)} tone={trackingTone} />
+              <div className="space-y-2">
+                <h3 className="break-words text-base font-medium leading-6 text-foreground">
+                  Order #{order.id.slice(0, 8)}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <StatusPill
+                    label={getOrderStatusLabel(order.status)}
+                    tone={getOrderTone(order)}
+                  />
+                  <StatusPill label={getTrackingLabel(order)} tone={trackingTone} />
+                </div>
               </div>
-              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-                <span className="inline-flex items-center gap-1.5">
-                  <CalendarDays className="h-4 w-4 text-gold/80" />
-                  Ordered {formatDate(order.created_at)}
+              <div className="mt-3 grid gap-2 text-sm leading-6 text-muted-foreground sm:flex sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
+                <span className="inline-flex min-w-0 items-center gap-1.5">
+                  <CalendarDays className="h-4 w-4 shrink-0 text-gold/80" />
+                  <span>Ordered {formatDate(order.created_at)}</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <ShoppingBag className="h-4 w-4 text-gold/80" />
-                  {itemCount} {itemCount === 1 ? "item" : "items"}
+                <span className="inline-flex min-w-0 items-center gap-1.5">
+                  <ShoppingBag className="h-4 w-4 shrink-0 text-gold/80" />
+                  <span>
+                    {itemCount} {itemCount === 1 ? "item" : "items"}
+                  </span>
                 </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4 text-gold/80" />
-                  Ships to {order.shipping_city}
-                  {order.shipping_state ? `, ${order.shipping_state}` : ""}
+                <span className="inline-flex min-w-0 items-start gap-1.5">
+                  <MapPin className="h-4 w-4 shrink-0 text-gold/80" />
+                  <span className="min-w-0 break-words">
+                    Ships to {order.shipping_city}
+                    {order.shipping_state ? `, ${order.shipping_state}` : ""}
+                  </span>
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-5 lg:flex-col lg:items-end">
+          <div className="flex min-w-0 items-center justify-between gap-4 border-t border-gold/10 pt-4 lg:flex-col lg:items-end lg:border-t-0 lg:pt-0">
             <div className="text-left lg:text-right">
-              <div className="text-[9px] uppercase tracking-luxury text-muted-foreground">
-                Order Total
-              </div>
-              <div className="mt-1 font-display text-3xl text-gold">{formatMoney(order.total)}</div>
+              <div className="text-xs text-muted-foreground">Order Total</div>
+              <div className="mt-1 text-xl font-medium text-gold">{formatMoney(order.total)}</div>
             </div>
-            <div className="flex items-center gap-2 text-[10px] uppercase tracking-luxury text-gold">
+            <div className="inline-flex min-h-10 shrink-0 items-center gap-2 text-sm text-gold">
               {isOpen ? "Hide details" : "View details"}
               {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
             </div>
@@ -471,37 +490,40 @@ function OrderCard({
 
 function OrderDetails({ order }: { order: Order }) {
   return (
-    <div className="grid gap-6 border-t border-gold/10 bg-obsidian/40 p-5 md:p-6 xl:grid-cols-[1fr_1fr]">
-      <section className="border border-gold/10 bg-charcoal/70 p-5">
+    <div className="grid gap-4 border-t border-gold/10 bg-obsidian/40 p-4 sm:gap-5 sm:p-5 md:gap-6 md:p-7 xl:grid-cols-[minmax(300px,0.75fr)_minmax(0,1.25fr)]">
+      <section className="min-w-0 border border-gold/10 bg-charcoal/70 p-4 sm:p-5 md:p-6">
         <SectionHeader icon={<PackageCheck className="h-4 w-4" />} label="Items in this order" />
-        <ul className="mt-4 divide-y divide-gold/10 text-sm">
+        <ul className="mt-5 divide-y divide-gold/10">
           {order.order_items?.map((item, index) => (
             <li
               key={`${item.product_name}-${index}`}
-              className="flex items-start justify-between gap-4 py-3 first:pt-0"
+              className="grid min-w-0 grid-cols-[64px_minmax(0,1fr)] gap-3 py-4 first:pt-0 sm:grid-cols-[72px_1fr_auto] sm:items-start sm:gap-5"
             >
-              <div>
-                <div className="text-foreground/90">{item.product_name}</div>
-                <div className="mt-1 text-xs text-muted-foreground">Qty {item.quantity}</div>
+              <ProductThumb item={item} />
+              <div className="min-w-0">
+                <div className="break-words text-sm leading-6 text-foreground/90 sm:text-base">
+                  {item.product_name}
+                </div>
+                <div className="mt-1 text-sm text-muted-foreground">Quantity: {item.quantity}</div>
               </div>
               {typeof item.unit_price === "number" && (
-                <span className="shrink-0 text-gold">
+                <span className="col-start-2 text-sm font-medium text-gold sm:col-start-auto sm:text-right sm:text-base">
                   {formatMoney(item.unit_price * item.quantity)}
                 </span>
               )}
             </li>
           ))}
-          <li className="flex justify-between pt-4 font-display text-xl">
+          <li className="flex justify-between gap-4 pt-5 text-base font-medium sm:gap-6 sm:text-lg">
             <span>Total paid</span>
             <span className="text-gold">{formatMoney(order.total)}</span>
           </li>
         </ul>
       </section>
 
-      <section className="space-y-6">
-        <div className="border border-gold/10 bg-charcoal/70 p-5">
+      <section className="min-w-0 space-y-5 md:space-y-6">
+        <div className="min-w-0 border border-gold/10 bg-charcoal/70 p-4 sm:p-5 md:p-6">
           <SectionHeader icon={<MapPin className="h-4 w-4" />} label="Delivery destination" />
-          <address className="mt-4 not-italic text-sm leading-7 text-foreground/80">
+          <address className="mt-5 break-words not-italic text-sm leading-7 text-foreground/85 sm:text-base sm:leading-8">
             <div className="font-medium text-foreground">{order.shipping_name}</div>
             <div>{order.shipping_address}</div>
             <div>
@@ -511,7 +533,7 @@ function OrderDetails({ order }: { order: Order }) {
           </address>
         </div>
 
-        <div className="border border-gold/10 bg-charcoal/70 p-5">
+        <div className="min-w-0 border border-gold/10 bg-charcoal/70 p-4 sm:p-5 md:p-6">
           <SectionHeader icon={<Truck className="h-4 w-4" />} label="Package tracking" />
           <TrackingTimeline order={order} />
           <TrackingDetails order={order} />
@@ -523,7 +545,7 @@ function OrderDetails({ order }: { order: Order }) {
 
 function SectionHeader({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <div className="flex items-center gap-2 text-[10px] uppercase tracking-luxury text-gold">
+    <div className="flex items-center gap-2 text-sm font-medium text-gold">
       {icon}
       {label}
     </div>
@@ -534,30 +556,38 @@ function TrackingTimeline({ order }: { order: Order }) {
   const progress = getProgressIndex(order);
 
   return (
-    <div className="mt-5 grid gap-4 sm:grid-cols-4">
+    <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
       {progressSteps.map((step, index) => {
         const complete = progress >= index;
         const current = progress === index;
         return (
-          <div key={step.title} className="relative">
-            <div
-              className={`mb-3 h-1 rounded-full ${complete ? "bg-gold" : "bg-gold/15"} sm:mb-4`}
-            />
-            <div
-              className={`flex h-8 w-8 items-center justify-center border text-xs ${
-                complete
-                  ? "border-gold bg-gold text-obsidian"
-                  : current
-                    ? "border-gold text-gold"
-                    : "border-gold/20 text-muted-foreground"
-              }`}
-            >
-              {index + 1}
+          <div
+            key={step.title}
+            className={`min-w-0 border p-3.5 sm:p-4 ${
+              complete
+                ? "border-gold/45 bg-gold/5"
+                : current
+                  ? "border-gold/35 bg-obsidian/60"
+                  : "border-gold/10 bg-obsidian/40"
+            }`}
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <div
+                className={`flex h-8 w-8 shrink-0 items-center justify-center border text-sm ${
+                  complete
+                    ? "border-gold bg-gold text-obsidian"
+                    : current
+                      ? "border-gold text-gold"
+                      : "border-gold/20 text-muted-foreground"
+                }`}
+              >
+                {index + 1}
+              </div>
+              <div className="min-w-0 break-words text-sm font-medium leading-6 text-foreground sm:text-base">
+                {step.title}
+              </div>
             </div>
-            <div className="mt-3 text-xs font-medium uppercase tracking-wide text-foreground/90">
-              {step.title}
-            </div>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">{step.description}</p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">{step.description}</p>
           </div>
         );
       })}
@@ -567,8 +597,8 @@ function TrackingTimeline({ order }: { order: Order }) {
 
 function TrackingDetails({ order }: { order: Order }) {
   return (
-    <div className="mt-5 space-y-4 border border-gold/10 bg-obsidian/70 p-4 text-sm">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <div className="mt-5 min-w-0 space-y-5 border border-gold/10 bg-obsidian/70 p-4 text-sm sm:p-5 md:p-6">
+      <div className="grid gap-5 md:grid-cols-2">
         <TrackingField label="Courier" value={order.tracking_carrier || "Not assigned yet"} />
         <TrackingField
           label="Tracking Number"
@@ -590,12 +620,12 @@ function TrackingDetails({ order }: { order: Order }) {
           href={order.tracking_url}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-2 bg-gold px-4 py-2 text-[11px] uppercase tracking-luxury text-obsidian transition-colors hover:bg-gold-light"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 bg-gold px-4 py-2 text-sm font-medium text-obsidian transition-colors hover:bg-gold-light sm:w-auto"
         >
           Track with shipping company <ExternalLink className="h-3.5 w-3.5" />
         </a>
       ) : (
-        <div className="rounded-sm border border-gold/10 bg-gold/5 p-4 text-xs leading-6 text-muted-foreground">
+        <div className="border border-gold/10 bg-gold/5 p-4 text-sm leading-6 text-muted-foreground">
           Tracking is added after ZXG hands the package to the shipping company. Until then, this
           page shows your order status and delivery destination.
         </div>
@@ -606,9 +636,34 @@ function TrackingDetails({ order }: { order: Order }) {
 
 function TrackingField({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <div className="text-[9px] uppercase tracking-luxury text-muted-foreground">{label}</div>
-      <div className="mt-1 break-words text-foreground/85">{value}</div>
+    <div className="min-w-0">
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="mt-1.5 break-words text-sm leading-6 text-foreground/90 sm:text-base">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function ProductThumb({ item }: { item: OrderItem }) {
+  const imageSrc = imageForOrderItem(item);
+
+  if (imageSrc) {
+    return (
+      <div className="flex h-16 w-16 items-center justify-center border border-gold/10 bg-obsidian p-2 sm:h-[72px] sm:w-[72px]">
+        <img
+          src={imageSrc}
+          alt={item.product_name}
+          loading="lazy"
+          className="h-full w-full object-contain"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-16 w-16 items-center justify-center border border-gold/10 bg-obsidian text-gold/70 sm:h-[72px] sm:w-[72px]">
+      <Package className="h-6 w-6" />
     </div>
   );
 }
@@ -616,7 +671,7 @@ function TrackingField({ label, value }: { label: string; value: string }) {
 function TrackingExplainer() {
   return (
     <div className="border border-gold/15 bg-charcoal p-5">
-      <div className="flex items-center gap-2 text-[10px] uppercase tracking-luxury text-gold">
+      <div className="flex items-center gap-2 text-sm font-medium text-gold">
         <Truck className="h-4 w-4" />
         How Tracking Works
       </div>
@@ -658,7 +713,7 @@ function ExplainerStep({ number, title, text }: { number: string; title: string;
 function HelpCard() {
   return (
     <div className="border border-gold/15 bg-charcoal p-5">
-      <div className="flex items-center gap-2 text-[10px] uppercase tracking-luxury text-gold">
+      <div className="flex items-center gap-2 text-sm font-medium text-gold">
         <HelpCircle className="h-4 w-4" />
         Need Help?
       </div>
@@ -668,7 +723,7 @@ function HelpCard() {
       </p>
       <Link
         to="/contact"
-        className="mt-5 inline-flex border border-gold/40 px-4 py-2 text-[11px] uppercase tracking-luxury text-gold transition-colors hover:bg-gold hover:text-obsidian"
+        className="mt-5 inline-flex border border-gold/40 px-4 py-2 text-sm font-medium text-gold transition-colors hover:bg-gold hover:text-obsidian"
       >
         Contact Support
       </Link>
@@ -696,13 +751,13 @@ function EmptyOrders() {
       <div className="mx-auto flex h-14 w-14 items-center justify-center border border-gold/20 bg-obsidian text-gold">
         <ShoppingBag className="h-7 w-7" />
       </div>
-      <div className="mt-5 font-display text-3xl text-gold/90">No orders yet</div>
+      <div className="mt-5 text-2xl font-medium text-gold/90">No orders yet</div>
       <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">
         Once you complete a purchase, your order details and tracking updates will appear here.
       </p>
       <Link
         to="/products"
-        className="mt-6 inline-flex bg-gold px-5 py-3 text-[11px] uppercase tracking-luxury text-obsidian transition-colors hover:bg-gold-light"
+        className="mt-6 inline-flex bg-gold px-5 py-3 text-sm font-medium text-obsidian transition-colors hover:bg-gold-light"
       >
         Browse Products
       </Link>
@@ -721,7 +776,7 @@ function StatusPill({ label, tone = "gold" }: { label: string; tone?: PillTone }
 
   return (
     <span
-      className={`inline-flex border px-2.5 py-1 text-[9px] uppercase tracking-luxury ${classes[tone]}`}
+      className={`inline-flex max-w-full items-center border px-2.5 py-1 text-xs font-medium leading-5 ${classes[tone]}`}
     >
       {label}
     </span>
@@ -788,4 +843,30 @@ function formatMoney(value: number) {
     currency: "USD",
     maximumFractionDigits: Number(value) % 1 === 0 ? 0 : 2,
   }).format(Number(value));
+}
+
+async function hydrateOrderProductImages(rows: Order[]) {
+  const slugs = [
+    ...new Set(
+      rows
+        .flatMap((order) => order.order_items ?? [])
+        .map((item) => item.product_slug)
+        .filter((slug): slug is string => Boolean(slug)),
+    ),
+  ];
+
+  if (slugs.length === 0) return rows;
+
+  const { data, error } = await supabase.from("products").select("slug, image").in("slug", slugs);
+  if (error) return rows;
+
+  const imageBySlug = new Map((data ?? []).map((product) => [product.slug, product.image]));
+
+  return rows.map((order) => ({
+    ...order,
+    order_items: (order.order_items ?? []).map((item) => ({
+      ...item,
+      product_image: item.product_slug ? (imageBySlug.get(item.product_slug) ?? null) : null,
+    })),
+  }));
 }

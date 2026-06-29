@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BadgeCheck, MessageCircle, Star } from "lucide-react";
 import { productImages } from "@/lib/productImages";
 import { localProducts } from "@/lib/products";
 import creatineVideo from "@/assets/Creatine Production Video.mp4";
+import { JsonLd, Seo } from "@/lib/seo";
+import { organizationSchema, websiteSchema } from "@/lib/seoData";
 
 export const Route = createFileRoute("/")({ component: Index });
 
@@ -74,13 +75,12 @@ function Index() {
 
   return (
     <>
-      <Helmet>
-        <title>ZXG Wellness — Luxury Wellness</title>
-        <meta
-          name="description"
-          content="Premium Creatine and Body Balm crafted for performance and recovery. A black & gold wellness brand."
-        />
-      </Helmet>
+      <Seo
+        title="ZXG Wellness — Luxury Wellness Atelier"
+        description="Premium creatine, recovery care, reusable pens, cartridges, and accessories from ZXG Wellness."
+        path="/"
+      />
+      <JsonLd data={[organizationSchema(), websiteSchema()]} />
 
       <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-background">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

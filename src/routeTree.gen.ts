@@ -18,11 +18,13 @@ import { Route as HowToUseRouteImport } from './routes/how-to-use'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
 import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index'
@@ -77,6 +79,11 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -100,6 +107,11 @@ const ProductsSlugRoute = ProductsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ProductsRoute,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
@@ -146,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
@@ -157,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/reusable-pen-difference': typeof ReusablePenDifferenceRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/orders': typeof AdminAdminOrdersRoute
   '/admin/products': typeof AdminAdminProductsRouteWithChildren
@@ -169,6 +183,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
@@ -179,6 +194,7 @@ export interface FileRoutesByTo {
   '/returns': typeof ReturnsRoute
   '/reusable-pen-difference': typeof ReusablePenDifferenceRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/admin/orders': typeof AdminAdminOrdersRoute
   '/admin/products': typeof AdminAdminProductsRouteWithChildren
@@ -193,6 +209,7 @@ export interface FileRoutesById {
   '/_admin': typeof AdminRouteWithChildren
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/blog': typeof BlogRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
@@ -204,6 +221,7 @@ export interface FileRoutesById {
   '/reusable-pen-difference': typeof ReusablePenDifferenceRoute
   '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/_admin/admin/orders': typeof AdminAdminOrdersRoute
   '/_admin/admin/products': typeof AdminAdminProductsRouteWithChildren
@@ -218,6 +236,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/blog'
     | '/cart'
     | '/checkout'
     | '/contact'
@@ -229,6 +248,7 @@ export interface FileRouteTypes {
     | '/reusable-pen-difference'
     | '/admin'
     | '/auth/callback'
+    | '/blog/$slug'
     | '/products/$slug'
     | '/admin/orders'
     | '/admin/products'
@@ -241,6 +261,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/blog'
     | '/cart'
     | '/checkout'
     | '/contact'
@@ -251,6 +272,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/reusable-pen-difference'
     | '/auth/callback'
+    | '/blog/$slug'
     | '/products/$slug'
     | '/admin/orders'
     | '/admin/products'
@@ -264,6 +286,7 @@ export interface FileRouteTypes {
     | '/_admin'
     | '/about'
     | '/account'
+    | '/blog'
     | '/cart'
     | '/checkout'
     | '/contact'
@@ -275,6 +298,7 @@ export interface FileRouteTypes {
     | '/reusable-pen-difference'
     | '/_admin/admin'
     | '/auth/callback'
+    | '/blog/$slug'
     | '/products/$slug'
     | '/_admin/admin/orders'
     | '/_admin/admin/products'
@@ -289,6 +313,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
+  BlogRoute: typeof BlogRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
@@ -366,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account': {
       id: '/account'
       path: '/account'
@@ -400,6 +432,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/products/$slug'
       preLoaderRoute: typeof ProductsSlugRouteImport
       parentRoute: typeof ProductsRoute
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/auth/callback': {
       id: '/auth/callback'
@@ -501,6 +540,16 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 interface ProductsRouteChildren {
   ProductsSlugRoute: typeof ProductsSlugRoute
 }
@@ -518,6 +567,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
+  BlogRoute: BlogRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,

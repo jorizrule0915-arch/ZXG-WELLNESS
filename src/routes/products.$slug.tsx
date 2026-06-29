@@ -1,5 +1,4 @@
 import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
-import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
@@ -13,6 +12,9 @@ import { useCart } from "@/lib/cart";
 import { ProductCard } from "@/components/site/ProductCard";
 import { galleryFor, penColorImages } from "@/lib/productImages";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { getProductSeoContent } from "@/lib/productSeo";
+import { JsonLd, Seo } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, faqSchema } from "@/lib/seoData";
 
 export const Route = createFileRoute("/products/$slug")({ component: ProductDetail });
 
@@ -84,6 +86,7 @@ function ProductDetail() {
     : undefined;
   const selectedColorInStock = selectedColor?.inStock !== false;
   const prefersContainedImage = product.slug === "pen";
+  const seoContent = getProductSeoContent(product);
 
   const displayPrice = selectedColor
     ? selectedColor.price
@@ -96,13 +99,52 @@ function ProductDetail() {
     : selectedVariant
       ? `${product.name} - ${selectedVariant.label}`
       : product.name;
+  const productPath = `/products/${product.slug}`;
+  const primaryImage = selectedColorImage ?? gallery[activeImg] ?? gallery[0] ?? product.image;
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: [absoluteUrl(primaryImage)],
+    description: seoContent.metaDescription,
+    sku: product.slug,
+    brand: {
+      "@type": "Brand",
+      name: "ZXG Wellness",
+    },
+    category: product.category,
+    offers: {
+      "@type": "Offer",
+      url: absoluteUrl(productPath),
+      priceCurrency: "USD",
+      price: displayPrice.toFixed(2),
+      availability: selectedColorInStock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
+    },
+  };
 
   return (
     <>
-      <Helmet>
-        <title>{product.name} — ZXG Wellness</title>
-        <meta name="description" content={product.description} />
-      </Helmet>
+      <Seo
+        title={product.name}
+        description={seoContent.metaDescription}
+        path={productPath}
+        image={primaryImage}
+        type="product"
+      />
+      <JsonLd
+        data={[
+          productSchema,
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Products", path: "/products" },
+            { name: product.name, path: productPath },
+          ]),
+          faqSchema(seoContent.faqs),
+        ]}
+      />
 
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 md:py-24">
         <Link
@@ -183,6 +225,12 @@ function ProductDetail() {
             <div className="mt-6 font-display text-4xl text-gold">${displayPrice.toFixed(2)}</div>
             <div className="mt-8 hairline" />
             <p className="mt-8 text-base leading-relaxed">{product.description}</p>
+
+            <div className="mt-6 space-y-4 text-sm leading-7 text-foreground/75">
+              {seoContent.overview.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
 
             {/* Color picker — pen */}
             {colorVariants.length > 0 && (
@@ -325,6 +373,43 @@ function ProductDetail() {
             </div>
           </section>
         )}
+
+        <section className="mt-20 grid gap-10 border-t border-gold/10 pt-16 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <div className="mb-4 text-xs uppercase tracking-luxury text-gold">
+              Product Questions
+            </div>
+            <h2 className="font-display text-3xl md:text-4xl">
+              Frequently asked <span className="text-gradient-gold italic">questions</span>
+            </h2>
+            <div className="mt-8 space-y-4">
+              {seoContent.faqs.map((faq) => (
+                <article key={faq.question} className="border border-gold/15 bg-charcoal p-5">
+                  <h3 className="text-base font-medium text-foreground">{faq.question}</h3>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{faq.answer}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <aside className="border border-gold/15 bg-obsidian/60 p-5 md:p-6">
+            <div className="text-xs uppercase tracking-luxury text-gold">Helpful next steps</div>
+            <div className="mt-5 space-y-4">
+              {seoContent.internalLinks.map((link) => (
+                <a
+                  key={link.path}
+                  href={link.path}
+                  className="block border border-gold/10 bg-charcoal p-4 transition-colors hover:border-gold/50"
+                >
+                  <span className="block text-sm font-medium text-gold">{link.label}</span>
+                  <span className="mt-2 block text-sm leading-6 text-muted-foreground">
+                    {link.description}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </aside>
+        </section>
 
         {related.length > 0 && (
           <div className="mt-32 border-t border-gold/10 pt-16">

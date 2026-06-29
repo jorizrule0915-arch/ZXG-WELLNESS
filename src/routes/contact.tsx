@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Helmet } from "react-helmet-async";
 import { useState, type FormEvent } from "react";
+import { JsonLd, Seo } from "@/lib/seo";
+import { breadcrumbSchema, organizationSchema } from "@/lib/seoData";
 
 export const Route = createFileRoute("/contact")({ component: ContactPage });
 
@@ -14,9 +15,20 @@ function ContactPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Contact Us - ZXG Wellness</title>
-      </Helmet>
+      <Seo
+        title="Contact ZXG Wellness"
+        description="Contact ZXG Wellness customer care for order, shipping, product, and return questions."
+        path="/contact"
+      />
+      <JsonLd
+        data={[
+          organizationSchema(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Contact", path: "/contact" },
+          ]),
+        ]}
+      />
       <div className="mx-auto max-w-3xl px-6 py-20 md:py-28">
         <div className="mb-10">
           <div className="mb-4 text-[10px] uppercase tracking-luxury text-gold">Contact</div>
@@ -33,7 +45,10 @@ function ContactPage() {
           </a>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-5 border border-gold/15 bg-charcoal p-6 md:p-8">
+        <form
+          onSubmit={onSubmit}
+          className="space-y-5 border border-gold/15 bg-charcoal p-6 md:p-8"
+        >
           {sent ? (
             <div className="py-10 text-center">
               <div className="font-display text-3xl text-gradient-gold">Message received</div>

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { LayoutDashboard, Package, ShoppingCart, Users, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
+import { Helmet } from "react-helmet-async";
 
 export const Route = createFileRoute("/_admin")({ component: AdminLayout });
 
@@ -50,6 +51,9 @@ function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-obsidian flex">
+      <Helmet>
+        <meta name="robots" content="noindex,nofollow" />
+      </Helmet>
       <aside className="w-64 shrink-0 border-r border-gold/15 bg-charcoal min-h-screen sticky top-0 hidden md:flex flex-col">
         <div className="px-6 py-8 border-b border-gold/15">
           <div className="font-display text-3xl text-gold tracking-luxury">ZXG</div>
@@ -59,7 +63,9 @@ function AdminLayout() {
         </div>
         <nav className="flex-1 py-6 px-4 space-y-1">
           {navItems.map((item) => {
-            const active = item.exact ? (pathname === "/admin" || pathname === "/admin/") : pathname.startsWith(item.to);
+            const active = item.exact
+              ? pathname === "/admin" || pathname === "/admin/"
+              : pathname.startsWith(item.to);
             const Icon = item.icon;
             return (
               <Link
@@ -96,7 +102,9 @@ function AdminLayout() {
       >
         <div className="md:hidden flex border-b border-gold/15 bg-charcoal">
           {navItems.map((item) => {
-            const active = item.exact ? (pathname === "/admin" || pathname === "/admin/") : pathname.startsWith(item.to);
+            const active = item.exact
+              ? pathname === "/admin" || pathname === "/admin/"
+              : pathname.startsWith(item.to);
             return (
               <Link
                 key={item.to}

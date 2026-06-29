@@ -1,8 +1,9 @@
 import { createFileRoute, Outlet, useMatchRoute } from "@tanstack/react-router";
-import { Helmet } from "react-helmet-async";
 import { useEffect, useMemo, useState } from "react";
 import { fetchProducts, type Product } from "@/lib/products";
 import { ProductCard } from "@/components/site/ProductCard";
+import { JsonLd, Seo } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema } from "@/lib/seoData";
 
 const categories = ["All", "Supplements", "Skincare", "Accessories"] as const;
 
@@ -31,13 +32,30 @@ function ProductsPage() {
 
   return (
     <>
-      <Helmet>
-        <title>The Collection — ZXG Wellness</title>
-        <meta
-          name="description"
-          content="Explore the ZXG Wellness collection — Creatine Performance Matrix Powder and restorative Body Balm."
-        />
-      </Helmet>
+      <Seo
+        title="Wellness Products, Creatine, Recovery Care & Accessories"
+        description="Explore the ZXG Wellness collection of creatine, recovery skincare, reusable pens, cartridges, needles, and accessories."
+        path="/products"
+      />
+      <JsonLd
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Products", path: "/products" },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            name: "ZXG Wellness Product Collection",
+            itemListElement: products.map((product, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: absoluteUrl(`/products/${product.slug}`),
+              name: product.name,
+            })),
+          },
+        ]}
+      />
 
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-20 md:py-28">
         <div className="text-center mb-16">

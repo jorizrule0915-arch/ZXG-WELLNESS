@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Helmet } from "react-helmet-async";
 import { Plus, Minus, X } from "lucide-react";
 import { useCart, cartSummary, cartItemKey } from "@/lib/cart";
+import { Seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/cart")({ component: CartPage });
 
@@ -11,9 +11,7 @@ function CartPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Your Cart — ZXG Wellness</title>
-      </Helmet>
+      <Seo title="Your Cart" description="Review your ZXG Wellness cart." path="/cart" noIndex />
       <div className="mx-auto max-w-5xl px-6 lg:px-10 py-20 md:py-28">
         <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Your Selection</div>
         <h1 className="font-display text-5xl md:text-6xl">

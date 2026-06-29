@@ -431,10 +431,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (resource === "orders") {
         const { data, error } = await supabase
           .from("orders")
-          .select("*, order_items(product_name, quantity, unit_price)")
+          .select("*, order_items(product_name, product_slug, quantity, unit_price)")
           .order("created_at", { ascending: false });
         if (error) return res.status(500).json({ error: error.message });
-        return res.status(200).json(data);
+
+        const productSlugs = [
+          ...new Set(
+            (data ?? [])
+              .flatMap((order: any) => order.order_items ?? [])
+              .map((item: any) => item.product_slug)
+              .filter(Boolean),
+          ),
+        ];
+        const { data: products } =
+          productSlugs.length > 0
+            ? await supabase.from("products").select("slug, image").in("slug", productSlugs)
+            : { data: [] };
+        const imageBySlug = new Map(
+          (products ?? []).map((product: any) => [product.slug, product.image]),
+        );
+
+        return res.status(200).json(
+          (data ?? []).map((order: any) => ({
+            ...order,
+            order_items: (order.order_items ?? []).map((item: any) => ({
+              ...item,
+              product_image: item.product_slug
+                ? (imageBySlug.get(item.product_slug) ?? null)
+                : null,
+            })),
+          })),
+        );
       }
 
       if (resource === "products") {
@@ -547,18 +574,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (resource === "dashboard") {
+        const dashboardOrderSelect =
+          "id, created_at, total, status, email, shipping_name, shipping_city, shipping_zip, tracking_carrier, tracking_number, tracking_url, tracking_status, shipped_at, estimated_delivery_date, shipment_note";
+        const legacyDashboardOrderSelect =
+          "id, created_at, total, status, email, shipping_name, shipping_city, shipping_zip";
+
         const [ordersRes, productsRes, itemsRes, authData] = await Promise.all([
-          supabase
-            .from("orders")
-            .select("id, created_at, total, status, email")
-            .order("created_at", { ascending: false }),
+          supabase.from("orders").select(dashboardOrderSelect).order("created_at", {
+            ascending: false,
+          }),
           supabase.from("products").select("id", { count: "exact", head: true }),
           supabase.from("order_items").select("product_name, quantity"),
           supabase.auth.admin.listUsers({ perPage: 1000 }),
         ]);
 
-        const orders = ordersRes.data ?? [];
+        let orders = ordersRes.data ?? [];
+        if (ordersRes.error?.code === "42703") {
+          const fallback = await supabase
+            .from("orders")
+            .select(legacyDashboardOrderSelect)
+            .order("created_at", { ascending: false });
+          orders = fallback.data ?? [];
+        }
+
         const revenue = orders.reduce((sum: number, o: any) => sum + Number(o.total), 0);
+        const pendingOrderCount = orders.filter((o: any) => o.status === "pending").length;
+        const fulfillmentOrders = orders.filter((o: any) => {
+          if (o.status === "cancelled" || o.status === "fulfilled") return false;
+          if (o.tracking_status === "delivered" || o.tracking_status === "returned") return false;
+          return true;
+        });
 
         const days: { day: string; revenue: number }[] = [];
         for (let i = 13; i >= 0; i--) {
@@ -586,9 +631,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(200).json({
           revenue,
           orderCount: orders.length,
+          pendingOrderCount,
+          needsFulfillmentCount: fulfillmentOrders.length,
           productCount: productsRes.count ?? 0,
           customerCount: authData.data?.users?.length ?? 0,
           recentOrders: orders.slice(0, 5),
+          fulfillmentOrders: fulfillmentOrders.slice(0, 8),
           revenueByDay: days,
           topProducts,
         });
@@ -634,6 +682,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .single();
         if (error) return res.status(500).json({ error: error.message });
         return res.status(200).json(data);
+      }
+
+      if (action === "delete-order") {
+        const { error } = await supabase.from("orders").delete().eq("id", id);
+        if (error) return res.status(500).json({ error: error.message });
+        return res.status(200).json({ success: true });
       }
 
       if (action === "toggle-product-active") {

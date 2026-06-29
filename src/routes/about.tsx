@@ -1,19 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
+import { JsonLd, Seo } from "@/lib/seo";
+import { breadcrumbSchema, organizationSchema } from "@/lib/seoData";
 
 export const Route = createFileRoute("/about")({ component: AboutPage });
 
 function AboutPage() {
   return (
     <>
-      <Helmet>
-        <title>Our Story — ZXG Wellness</title>
-        <meta
-          name="description"
-          content="ZXG Wellness was built on a simple belief: that caring for yourself should feel as meaningful as anything else you do with intention."
-        />
-      </Helmet>
+      <Seo
+        title="Our Story"
+        description="Learn the ZXG Wellness story, our approach to premium wellness products, and our commitment to considered daily care."
+        path="/about"
+      />
+      <JsonLd
+        data={[
+          organizationSchema(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "About", path: "/about" },
+          ]),
+        ]}
+      />
       <div className="mx-auto max-w-4xl px-6 lg:px-10 py-20 md:py-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -11,6 +11,8 @@ import {
   Shield,
   Thermometer,
 } from "lucide-react";
+import { JsonLd, Seo } from "@/lib/seo";
+import { breadcrumbSchema } from "@/lib/seoData";
 
 export const Route = createFileRoute("/how-to-use")({
   component: HowToUsePage,
@@ -231,325 +233,340 @@ function HowToUsePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Hero */}
-      <section className="pt-28 pb-16 relative overflow-hidden">
-        {/* Ambient glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-gold/5 blur-[100px]" />
-        </div>
-        <div className="relative mx-auto max-w-4xl px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-          >
-            <p className="text-[11px] uppercase tracking-luxury text-gold mb-4">
-              Step-by-Step Guide
-            </p>
-            <h1 className="font-display text-4xl md:text-6xl font-light text-foreground leading-tight mb-6">
-              How to Use Your <span className="text-gradient-gold italic">Refillable Pen</span>
-            </h1>
-            <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-              Follow this interactive 22-step guide to safely prepare and use your injection pen.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Tutorial */}
-      <section className="pb-20 px-6">
-        <div className="mx-auto max-w-6xl">
-          <div className="grid lg:grid-cols-[280px_1fr] gap-8">
-            {/* Sidebar */}
-            <div className="bg-charcoal border border-gold/15 rounded-sm h-fit lg:sticky lg:top-24">
-              <div className="px-4 py-4 border-b border-gold/10">
-                <h3 className="font-display text-sm uppercase tracking-luxury text-gold">
-                  All Steps
-                </h3>
-              </div>
-              <div className="max-h-[520px] overflow-y-auto p-2 space-y-0.5 custom-scrollbar">
-                {tutorialSteps.map((step) => {
-                  const active = selectedStep === step.step;
-                  const done = step.step < selectedStep;
-                  return (
-                    <button
-                      key={step.step}
-                      onClick={() => setSelectedStep(step.step)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all duration-200 rounded-sm ${
-                        active
-                          ? "bg-gold/10 border border-gold/30"
-                          : "hover:bg-gold/5 border border-transparent"
-                      }`}
-                    >
-                      <span
-                        className={`w-7 h-7 shrink-0 rounded-sm flex items-center justify-center text-[11px] font-semibold transition-colors ${
-                          active
-                            ? "bg-gold text-obsidian"
-                            : done
-                              ? "bg-gold/20 text-gold"
-                              : "bg-surface-2 text-muted-foreground"
-                        }`}
-                      >
-                        {done && !active ? <Check className="w-3.5 h-3.5" /> : step.step}
-                      </span>
-                      <span
-                        className={`text-[12px] truncate transition-colors ${
-                          active
-                            ? "text-gold font-medium"
-                            : done
-                              ? "text-foreground/60"
-                              : "text-muted-foreground"
-                        }`}
-                      >
-                        {step.title}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Main content */}
-            <div
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
+    <>
+      <Seo
+        title="How to Use ZXG Wellness Accessories"
+        description="Review ZXG Wellness setup videos, pen guidance, cartridge steps, needle attachment tips, and accessory handling resources."
+        path="/how-to-use"
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "How to Use", path: "/how-to-use" },
+        ])}
+      />
+      <div className="min-h-screen bg-background text-foreground">
+        {/* Hero */}
+        <section className="pt-28 pb-16 relative overflow-hidden">
+          {/* Ambient glow */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-gold/5 blur-[100px]" />
+          </div>
+          <div className="relative mx-auto max-w-4xl px-6 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
             >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={selectedStep}
-                  initial={{ opacity: 0, x: 16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -16 }}
-                  transition={{ duration: 0.25 }}
-                  className="bg-charcoal border border-gold/15 rounded-sm overflow-hidden"
-                >
-                  {/* Image */}
-                  <div className="h-64 md:h-96 relative bg-surface flex items-center justify-center overflow-hidden">
-                    <img
-                      src={`/step-images/Step ${selectedStep}.${ext}`}
-                      alt={`Step ${selectedStep}: ${currentStep.title}`}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        const t = e.target as HTMLImageElement;
-                        t.style.display = "none";
-                        const fb = t.nextElementSibling as HTMLElement | null;
-                        if (fb) fb.classList.remove("hidden");
-                      }}
-                    />
-                    {/* Fallback */}
-                    <div className="absolute inset-0 hidden flex-col items-center justify-center">
-                      <span className="font-display text-6xl text-gold/30">{selectedStep}</span>
-                      <p className="text-muted-foreground text-xs mt-2">Step illustration</p>
-                    </div>
+              <p className="text-[11px] uppercase tracking-luxury text-gold mb-4">
+                Step-by-Step Guide
+              </p>
+              <h1 className="font-display text-4xl md:text-6xl font-light text-foreground leading-tight mb-6">
+                How to Use Your <span className="text-gradient-gold italic">Refillable Pen</span>
+              </h1>
+              <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                Follow this interactive 22-step guide to safely prepare and use your injection pen.
+              </p>
+            </motion.div>
+          </div>
+        </section>
 
-                    {/* Category badge */}
-                    <div className="absolute top-4 right-4">
-                      <span
-                        className={`px-3 py-1 text-[10px] uppercase tracking-luxury border rounded-sm ${
-                          categories[currentStep.category as keyof typeof categories].color
+        {/* Tutorial */}
+        <section className="pb-20 px-6">
+          <div className="mx-auto max-w-6xl">
+            <div className="grid lg:grid-cols-[280px_1fr] gap-8">
+              {/* Sidebar */}
+              <div className="bg-charcoal border border-gold/15 rounded-sm h-fit lg:sticky lg:top-24">
+                <div className="px-4 py-4 border-b border-gold/10">
+                  <h3 className="font-display text-sm uppercase tracking-luxury text-gold">
+                    All Steps
+                  </h3>
+                </div>
+                <div className="max-h-[520px] overflow-y-auto p-2 space-y-0.5 custom-scrollbar">
+                  {tutorialSteps.map((step) => {
+                    const active = selectedStep === step.step;
+                    const done = step.step < selectedStep;
+                    return (
+                      <button
+                        key={step.step}
+                        onClick={() => setSelectedStep(step.step)}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all duration-200 rounded-sm ${
+                          active
+                            ? "bg-gold/10 border border-gold/30"
+                            : "hover:bg-gold/5 border border-transparent"
                         }`}
                       >
+                        <span
+                          className={`w-7 h-7 shrink-0 rounded-sm flex items-center justify-center text-[11px] font-semibold transition-colors ${
+                            active
+                              ? "bg-gold text-obsidian"
+                              : done
+                                ? "bg-gold/20 text-gold"
+                                : "bg-surface-2 text-muted-foreground"
+                          }`}
+                        >
+                          {done && !active ? <Check className="w-3.5 h-3.5" /> : step.step}
+                        </span>
+                        <span
+                          className={`text-[12px] truncate transition-colors ${
+                            active
+                              ? "text-gold font-medium"
+                              : done
+                                ? "text-foreground/60"
+                                : "text-muted-foreground"
+                          }`}
+                        >
+                          {step.title}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Main content */}
+              <div
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={selectedStep}
+                    initial={{ opacity: 0, x: 16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -16 }}
+                    transition={{ duration: 0.25 }}
+                    className="bg-charcoal border border-gold/15 rounded-sm overflow-hidden"
+                  >
+                    {/* Image */}
+                    <div className="h-64 md:h-96 relative bg-surface flex items-center justify-center overflow-hidden">
+                      <img
+                        src={`/step-images/Step ${selectedStep}.${ext}`}
+                        alt={`Step ${selectedStep}: ${currentStep.title}`}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          const t = e.target as HTMLImageElement;
+                          t.style.display = "none";
+                          const fb = t.nextElementSibling as HTMLElement | null;
+                          if (fb) fb.classList.remove("hidden");
+                        }}
+                      />
+                      {/* Fallback */}
+                      <div className="absolute inset-0 hidden flex-col items-center justify-center">
+                        <span className="font-display text-6xl text-gold/30">{selectedStep}</span>
+                        <p className="text-muted-foreground text-xs mt-2">Step illustration</p>
+                      </div>
+
+                      {/* Category badge */}
+                      <div className="absolute top-4 right-4">
+                        <span
+                          className={`px-3 py-1 text-[10px] uppercase tracking-luxury border rounded-sm ${
+                            categories[currentStep.category as keyof typeof categories].color
+                          }`}
+                        >
+                          {categories[currentStep.category as keyof typeof categories].label}
+                        </span>
+                      </div>
+
+                      {/* Step number overlay */}
+                      <div className="absolute top-4 left-4">
+                        <span className="font-display text-4xl text-gold/20 select-none leading-none">
+                          {String(selectedStep).padStart(2, "0")}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div className="p-8">
+                      <p className="text-[11px] uppercase tracking-luxury text-muted-foreground mb-3">
+                        Step {selectedStep} of 22 &nbsp;·&nbsp;{" "}
                         {categories[currentStep.category as keyof typeof categories].label}
-                      </span>
-                    </div>
+                      </p>
 
-                    {/* Step number overlay */}
-                    <div className="absolute top-4 left-4">
-                      <span className="font-display text-4xl text-gold/20 select-none leading-none">
-                        {String(selectedStep).padStart(2, "0")}
-                      </span>
-                    </div>
-                  </div>
+                      <h2 className="font-display text-2xl md:text-3xl text-foreground mb-4">
+                        {currentStep.title}
+                      </h2>
 
-                  {/* Details */}
-                  <div className="p-8">
-                    <p className="text-[11px] uppercase tracking-luxury text-muted-foreground mb-3">
-                      Step {selectedStep} of 22 &nbsp;·&nbsp;{" "}
-                      {categories[currentStep.category as keyof typeof categories].label}
-                    </p>
+                      <p className="text-muted-foreground text-base leading-relaxed mb-8">
+                        {currentStep.instruction}
+                      </p>
 
-                    <h2 className="font-display text-2xl md:text-3xl text-foreground mb-4">
-                      {currentStep.title}
-                    </h2>
-
-                    <p className="text-muted-foreground text-base leading-relaxed mb-8">
-                      {currentStep.instruction}
-                    </p>
-
-                    {/* Progress */}
-                    <div className="mb-8">
-                      <div className="flex justify-between text-[11px] text-muted-foreground mb-2 uppercase tracking-luxury">
-                        <span>Progress</span>
-                        <span>{Math.round((selectedStep / 22) * 100)}%</span>
+                      {/* Progress */}
+                      <div className="mb-8">
+                        <div className="flex justify-between text-[11px] text-muted-foreground mb-2 uppercase tracking-luxury">
+                          <span>Progress</span>
+                          <span>{Math.round((selectedStep / 22) * 100)}%</span>
+                        </div>
+                        <div className="h-px bg-gold/10 relative overflow-visible">
+                          <motion.div
+                            className="h-px bg-gradient-to-r from-gold-dark to-gold absolute top-0 left-0"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(selectedStep / 22) * 100}%` }}
+                            transition={{ duration: 0.3 }}
+                          />
+                          {/* Glow dot */}
+                          <motion.div
+                            className="absolute -top-1 w-2 h-2 rounded-full bg-gold shadow-glow-sm"
+                            animate={{ left: `${(selectedStep / 22) * 100}%` }}
+                            transition={{ duration: 0.3 }}
+                            style={{ translateX: "-50%" }}
+                          />
+                        </div>
                       </div>
-                      <div className="h-px bg-gold/10 relative overflow-visible">
-                        <motion.div
-                          className="h-px bg-gradient-to-r from-gold-dark to-gold absolute top-0 left-0"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${(selectedStep / 22) * 100}%` }}
-                          transition={{ duration: 0.3 }}
-                        />
-                        {/* Glow dot */}
-                        <motion.div
-                          className="absolute -top-1 w-2 h-2 rounded-full bg-gold shadow-glow-sm"
-                          animate={{ left: `${(selectedStep / 22) * 100}%` }}
-                          transition={{ duration: 0.3 }}
-                          style={{ translateX: "-50%" }}
-                        />
+
+                      {/* Navigation */}
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={() => setSelectedStep((s) => Math.max(1, s - 1))}
+                          disabled={selectedStep === 1}
+                          className="flex items-center gap-2 px-5 py-2.5 border border-gold/20 text-gold text-[11px] uppercase tracking-luxury hover:bg-gold/5 transition-colors disabled:opacity-30 disabled:pointer-events-none rounded-sm"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                          Previous
+                        </button>
+
+                        <span className="text-[10px] uppercase tracking-luxury text-muted-foreground hidden md:block">
+                          Arrow keys or swipe to navigate
+                        </span>
+
+                        <button
+                          onClick={() => setSelectedStep((s) => Math.min(22, s + 1))}
+                          disabled={selectedStep === 22}
+                          className="flex items-center gap-2 px-5 py-2.5 bg-gold text-obsidian text-[11px] uppercase tracking-luxury hover:bg-gold-light transition-colors disabled:opacity-30 disabled:pointer-events-none rounded-sm"
+                        >
+                          Next
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-
-                    {/* Navigation */}
-                    <div className="flex items-center justify-between">
-                      <button
-                        onClick={() => setSelectedStep((s) => Math.max(1, s - 1))}
-                        disabled={selectedStep === 1}
-                        className="flex items-center gap-2 px-5 py-2.5 border border-gold/20 text-gold text-[11px] uppercase tracking-luxury hover:bg-gold/5 transition-colors disabled:opacity-30 disabled:pointer-events-none rounded-sm"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                        Previous
-                      </button>
-
-                      <span className="text-[10px] uppercase tracking-luxury text-muted-foreground hidden md:block">
-                        Arrow keys or swipe to navigate
-                      </span>
-
-                      <button
-                        onClick={() => setSelectedStep((s) => Math.min(22, s + 1))}
-                        disabled={selectedStep === 22}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-gold text-obsidian text-[11px] uppercase tracking-luxury hover:bg-gold-light transition-colors disabled:opacity-30 disabled:pointer-events-none rounded-sm"
-                      >
-                        Next
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Video Instructions */}
-      <section className="py-20 border-t border-gold/10 px-6">
-        <div className="mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <p className="text-[11px] uppercase tracking-luxury text-gold mb-3">Visual Guides</p>
-            <h2 className="font-display text-3xl md:text-5xl font-light text-foreground mb-4">
-              Video Instructions
-            </h2>
-            <p className="text-muted-foreground text-base max-w-2xl mx-auto">
-              Watch these detailed guides for step-by-step visual instructions.
-            </p>
-          </motion.div>
+        {/* Video Instructions */}
+        <section className="py-20 border-t border-gold/10 px-6">
+          <div className="mx-auto max-w-6xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <p className="text-[11px] uppercase tracking-luxury text-gold mb-3">Visual Guides</p>
+              <h2 className="font-display text-3xl md:text-5xl font-light text-foreground mb-4">
+                Video Instructions
+              </h2>
+              <p className="text-muted-foreground text-base max-w-2xl mx-auto">
+                Watch these detailed guides for step-by-step visual instructions.
+              </p>
+            </motion.div>
 
-          <div className="space-y-20">
-            {videoInstructions.map((video, index) => {
-              const isEven = index % 2 === 0;
-              return (
+            <div className="space-y-20">
+              {videoInstructions.map((video, index) => {
+                const isEven = index % 2 === 0;
+                return (
+                  <motion.div
+                    key={video.videoId}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.08 }}
+                    className={`grid md:grid-cols-2 gap-10 items-center`}
+                  >
+                    <div className={isEven ? "md:order-1" : "md:order-2"}>
+                      <div className="relative w-full overflow-hidden rounded-sm border border-gold/15 pt-[56.25%] shadow-[0_0_40px_-10px_rgba(0,0,0,0.8)]">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${video.videoId}?rel=0`}
+                          title={video.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          className="absolute top-0 left-0 w-full h-full"
+                        />
+                      </div>
+                    </div>
+
+                    <div className={`${isEven ? "md:order-2" : "md:order-1"} space-y-4`}>
+                      <p className="text-[11px] uppercase tracking-luxury text-gold">
+                        0{index + 1}
+                      </p>
+                      <h3 className="font-display text-2xl md:text-3xl font-light text-foreground capitalize leading-tight">
+                        {video.title}
+                      </h3>
+                      <div className="w-8 h-px bg-gold/40" />
+                      <p className="text-muted-foreground text-sm leading-relaxed">
+                        {video.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Safety */}
+        <section className="py-20 border-t border-gold/10 bg-charcoal px-6">
+          <div className="mx-auto max-w-5xl">
+            <div className="flex items-center gap-4 mb-12">
+              <div className="w-10 h-10 border border-gold/30 flex items-center justify-center rounded-sm">
+                <AlertTriangle className="w-5 h-5 text-gold" strokeWidth={1.25} />
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-luxury text-gold">Important</p>
+                <h3 className="font-display text-2xl font-light text-foreground">
+                  Safety Essentials
+                </h3>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {safetyTips.map((tip, index) => (
                 <motion.div
-                  key={video.videoId}
-                  initial={{ opacity: 0, y: 24 }}
+                  key={index}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.08 }}
-                  className={`grid md:grid-cols-2 gap-10 items-center`}
+                  className="bg-surface border border-gold/10 rounded-sm p-6 text-center hover:border-gold/25 transition-colors"
                 >
-                  <div className={isEven ? "md:order-1" : "md:order-2"}>
-                    <div className="relative w-full overflow-hidden rounded-sm border border-gold/15 pt-[56.25%] shadow-[0_0_40px_-10px_rgba(0,0,0,0.8)]">
-                      <iframe
-                        src={`https://www.youtube.com/embed/${video.videoId}?rel=0`}
-                        title={video.title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        className="absolute top-0 left-0 w-full h-full"
-                      />
-                    </div>
+                  <div className="w-10 h-10 mx-auto border border-gold/20 rounded-sm flex items-center justify-center mb-4">
+                    <tip.icon className="w-5 h-5 text-gold" strokeWidth={1.25} />
                   </div>
-
-                  <div className={`${isEven ? "md:order-2" : "md:order-1"} space-y-4`}>
-                    <p className="text-[11px] uppercase tracking-luxury text-gold">0{index + 1}</p>
-                    <h3 className="font-display text-2xl md:text-3xl font-light text-foreground capitalize leading-tight">
-                      {video.title}
-                    </h3>
-                    <div className="w-8 h-px bg-gold/40" />
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {video.description}
-                    </p>
-                  </div>
+                  <p className="text-[12px] text-foreground/80 leading-relaxed">{tip.text}</p>
                 </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Safety */}
-      <section className="py-20 border-t border-gold/10 bg-charcoal px-6">
-        <div className="mx-auto max-w-5xl">
-          <div className="flex items-center gap-4 mb-12">
-            <div className="w-10 h-10 border border-gold/30 flex items-center justify-center rounded-sm">
-              <AlertTriangle className="w-5 h-5 text-gold" strokeWidth={1.25} />
-            </div>
-            <div>
-              <p className="text-[11px] uppercase tracking-luxury text-gold">Important</p>
-              <h3 className="font-display text-2xl font-light text-foreground">
-                Safety Essentials
-              </h3>
+              ))}
             </div>
           </div>
+        </section>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {safetyTips.map((tip, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.08 }}
-                className="bg-surface border border-gold/10 rounded-sm p-6 text-center hover:border-gold/25 transition-colors"
-              >
-                <div className="w-10 h-10 mx-auto border border-gold/20 rounded-sm flex items-center justify-center mb-4">
-                  <tip.icon className="w-5 h-5 text-gold" strokeWidth={1.25} />
-                </div>
-                <p className="text-[12px] text-foreground/80 leading-relaxed">{tip.text}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 border-t border-gold/10 px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mx-auto max-w-lg"
-        >
-          <p className="font-display text-2xl md:text-3xl font-light text-foreground mb-2">
-            Ready to begin?
-          </p>
-          <p className="text-muted-foreground text-sm mb-8">
-            Shop our full range of performance and wellness products.
-          </p>
-          <Link
-            to="/products"
-            className="inline-block px-10 py-3 bg-gold text-obsidian text-[11px] uppercase tracking-luxury hover:bg-gold-light transition-colors rounded-sm"
+        {/* CTA */}
+        <section className="py-20 border-t border-gold/10 px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mx-auto max-w-lg"
           >
-            View Our Products
-          </Link>
-        </motion.div>
-      </section>
-    </div>
+            <p className="font-display text-2xl md:text-3xl font-light text-foreground mb-2">
+              Ready to begin?
+            </p>
+            <p className="text-muted-foreground text-sm mb-8">
+              Shop our full range of performance and wellness products.
+            </p>
+            <Link
+              to="/products"
+              className="inline-block px-10 py-3 bg-gold text-obsidian text-[11px] uppercase tracking-luxury hover:bg-gold-light transition-colors rounded-sm"
+            >
+              View Our Products
+            </Link>
+          </motion.div>
+        </section>
+      </div>
+    </>
   );
 }
