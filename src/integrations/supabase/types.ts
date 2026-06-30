@@ -184,22 +184,34 @@ export type Database = {
       };
       profiles: {
         Row: {
+          admin_notes: string | null;
           created_at: string;
+          email: string | null;
           full_name: string | null;
           id: string;
+          status: string;
           updated_at: string;
+          welcome_email_sent_at: string | null;
         };
         Insert: {
+          admin_notes?: string | null;
           created_at?: string;
+          email?: string | null;
           full_name?: string | null;
           id: string;
+          status?: string;
           updated_at?: string;
+          welcome_email_sent_at?: string | null;
         };
         Update: {
+          admin_notes?: string | null;
           created_at?: string;
+          email?: string | null;
           full_name?: string | null;
           id?: string;
+          status?: string;
           updated_at?: string;
+          welcome_email_sent_at?: string | null;
         };
         Relationships: [];
       };

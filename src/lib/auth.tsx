@@ -8,7 +8,16 @@ type AuthCtx = {
   loading: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: string | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string,
+  ) => Promise<{
+    error: string | null;
+    needsEmailConfirmation?: boolean;
+    welcomeEmailSent?: boolean;
+    welcomeEmailError?: string | null;
+  }>;
   signOut: () => Promise<void>;
 };
 
@@ -64,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp: AuthCtx["signUp"] = async (email, password, fullName) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -72,7 +81,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: { full_name: fullName },
       },
     });
-    return { error: error?.message ?? null };
+
+    if (error) return { error: error.message };
+
+    const welcomeEmail = await sendWelcomeEmail(email, fullName, data.user?.id ?? null);
+
+    return {
+      error: null,
+      needsEmailConfirmation: !data.session,
+      welcomeEmailSent: welcomeEmail.sent,
+      welcomeEmailError: welcomeEmail.error,
+    };
   };
 
   const signOut = async () => {
@@ -100,4 +119,29 @@ export function useAuth() {
   const c = useContext(Ctx);
   if (!c) throw new Error("useAuth must be used within AuthProvider");
   return c;
+}
+
+async function sendWelcomeEmail(email: string, fullName: string, userId: string | null) {
+  try {
+    const res = await fetch("/api/welcome-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, fullName, userId }),
+    });
+
+    if (!res.ok) {
+      const data = (await res.json().catch(() => null)) as { error?: string } | null;
+      return {
+        sent: false,
+        error: data?.error || "Welcome email could not be sent.",
+      };
+    }
+
+    return { sent: true, error: null };
+  } catch (error) {
+    return {
+      sent: false,
+      error: error instanceof Error ? error.message : "Welcome email could not be sent.",
+    };
+  }
 }

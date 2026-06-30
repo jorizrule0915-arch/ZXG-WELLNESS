@@ -72,13 +72,41 @@ function LoginPage() {
       return;
     }
 
-    const { error } =
-      mode === "signin" ? await signIn(email, password) : await signUp(email, password, name);
-    setLoading(false);
-    if (error) {
-      setErr(error);
-      return;
+    if (mode === "signin") {
+      const { error } = await signIn(email, password);
+      setLoading(false);
+      if (error) {
+        setErr(error);
+        return;
+      }
+      await redirectAfterAuth();
+    } else {
+      const result = await signUp(email, password, name);
+      setLoading(false);
+      if (result.error) {
+        setErr(result.error);
+        return;
+      }
+
+      if (result.needsEmailConfirmation) {
+        setSuccess(
+          result.welcomeEmailSent
+            ? "✓ Account created! We sent your welcome email. Please check your inbox to confirm your account before signing in."
+            : `✓ Account created! Please check your inbox to confirm your account before signing in.${result.welcomeEmailError ? ` Welcome email note: ${result.welcomeEmailError}` : ""}`,
+        );
+        setPassword("");
+        setMode("signin");
+        return;
+      }
+
+      if (result.welcomeEmailError) {
+        setSuccess(`✓ Account created. Welcome email note: ${result.welcomeEmailError}`);
+      }
+      await redirectAfterAuth();
     }
+  };
+
+  const redirectAfterAuth = async () => {
     const redirectTo = getSafeRedirectPath(new URLSearchParams(window.location.search));
     if (redirectTo) {
       window.location.assign(redirectTo);

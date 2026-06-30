@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient, type User } from "@supabase/supabase
 import { Resend } from "resend";
 
 const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
-const DEFAULT_ADMIN_EMAILS = ["jorizrule0@gmail.com"];
+const ORDER_TEAM_EMAILS = ["jorizrule0@gmail.com", "g@zxgwellness.com"];
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
 type OrderEmailItem = {
@@ -106,13 +106,8 @@ function getResend() {
 }
 
 function getAdminEmails(customerEmail: string) {
-  const configured = (process.env.ORDER_NOTIFICATION_EMAILS || "")
-    .split(",")
-    .map((email) => email.trim())
-    .filter(Boolean);
-  const emails = configured.length > 0 ? configured : DEFAULT_ADMIN_EMAILS;
   const customer = customerEmail.toLowerCase();
-  return [...new Set(emails)].filter((email) => email.toLowerCase() !== customer);
+  return ORDER_TEAM_EMAILS.filter((email) => email.toLowerCase() !== customer);
 }
 
 function escapeHtml(value: unknown) {
