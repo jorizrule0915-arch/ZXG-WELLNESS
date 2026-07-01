@@ -105,6 +105,9 @@ const emptyFulfillmentDraft: FulfillmentDraft = {
   shipment_note: "",
 };
 
+const noEstimatedDeliveryNote =
+  "Shipping label has been created. USPS will show an estimated delivery date once they receive and scan the package.";
+
 const fieldClassName =
   "h-9 w-full border border-gold/15 bg-obsidian px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-gold/60";
 
@@ -159,10 +162,23 @@ function AdminDashboard() {
 
   const saveFulfillment = async (order: FulfillmentOrder) => {
     const draft = fulfillmentDrafts[order.id] ?? fulfillmentDraftFromOrder(order);
-    const estimatedDeliveryDate =
-      dateFromDeliveryDays(draft.delivery_days) ??
-      order.estimated_delivery_date?.slice(0, 10) ??
-      "";
+    const estimatedDeliveryDate = dateFromDeliveryDays(draft.delivery_days);
+    const trackingPayload: Record<string, string | null> = {
+      tracking_carrier: draft.tracking_carrier,
+      tracking_number: draft.tracking_number,
+      tracking_url: draft.tracking_url,
+      tracking_status: draft.tracking_status,
+      shipment_note: draft.shipment_note.trim()
+        ? draft.shipment_note
+        : estimatedDeliveryDate
+          ? draft.shipment_note
+          : noEstimatedDeliveryNote,
+      shipped_at: order.shipped_at ?? null,
+    };
+
+    if (estimatedDeliveryDate) {
+      trackingPayload.estimated_delivery_date = estimatedDeliveryDate;
+    }
 
     setSavingOrderId(order.id);
     try {
@@ -185,15 +201,7 @@ function AdminDashboard() {
         body: JSON.stringify({
           action: "update-order-tracking",
           id: order.id,
-          payload: {
-            tracking_carrier: draft.tracking_carrier,
-            tracking_number: draft.tracking_number,
-            tracking_url: draft.tracking_url,
-            tracking_status: draft.tracking_status,
-            estimated_delivery_date: estimatedDeliveryDate,
-            shipment_note: draft.shipment_note,
-            shipped_at: order.shipped_at,
-          },
+          payload: trackingPayload,
         }),
       });
       await readApiJson(trackingResponse);
@@ -528,19 +536,40 @@ function FulfillmentQueue({
                     />
                   </label>
 
-                  <label>
-                    <FieldLabel>Delivery days</FieldLabel>
-                    <input
-                      type="number"
-                      min="1"
-                      value={draft.delivery_days}
-                      onChange={(event) =>
-                        updateDraft(order.id, { delivery_days: event.target.value })
-                      }
-                      placeholder="3"
-                      className={fieldClassName}
-                    />
-                  </label>
+                  <div>
+                    <FieldLabel>Delivery estimate</FieldLabel>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateDraft(order.id, {
+                            delivery_days: "",
+                            shipment_note: draft.shipment_note.trim()
+                              ? draft.shipment_note
+                              : noEstimatedDeliveryNote,
+                          })
+                        }
+                        className={`h-9 border px-3 text-left text-sm transition-colors ${
+                          !draft.delivery_days
+                            ? "border-gold bg-gold/10 text-gold"
+                            : "border-gold/15 text-muted-foreground hover:border-gold/40"
+                        }`}
+                      >
+                        No date yet
+                      </button>
+                      <input
+                        type="number"
+                        min="1"
+                        value={draft.delivery_days}
+                        onChange={(event) =>
+                          updateDraft(order.id, { delivery_days: event.target.value })
+                        }
+                        placeholder="Days"
+                        className={fieldClassName}
+                        aria-label="Estimated delivery days"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
@@ -577,6 +606,19 @@ function FulfillmentQueue({
                     {saving ? "Saving..." : "Save update"}
                   </button>
                 </div>
+
+                <label className="mt-3 block">
+                  <FieldLabel>Customer note</FieldLabel>
+                  <textarea
+                    value={draft.shipment_note}
+                    onChange={(event) =>
+                      updateDraft(order.id, { shipment_note: event.target.value })
+                    }
+                    rows={2}
+                    placeholder="Example: Shipping label has been created. USPS will update once they receive the package."
+                    className={`${fieldClassName} h-auto resize-none py-2`}
+                  />
+                </label>
               </article>
             );
           })}

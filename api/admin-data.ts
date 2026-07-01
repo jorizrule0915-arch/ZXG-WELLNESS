@@ -279,7 +279,7 @@ function missingColumnFrom(error: { message?: string } | null) {
   const message = error?.message ?? "";
   return (
     message.match(/'([^']+)' column/)?.[1] ??
-    message.match(/column products\.([a-zA-Z0-9_]+) does not exist/)?.[1] ??
+    message.match(/column [a-zA-Z0-9_]+\.([a-zA-Z0-9_]+) does not exist/)?.[1] ??
     null
   );
 }
@@ -301,7 +301,32 @@ async function retryWithAvailableColumns(
     nextPayload = rest;
   }
 
-  return new Error("Product save failed after matching the live schema.");
+  return new Error("Save failed after matching the live schema.");
+}
+
+async function updateOrderTracking(
+  supabase: SupabaseClient,
+  id: string,
+  payload: Record<string, unknown>,
+) {
+  let nextPayload = { ...payload };
+
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const { error } = await supabase.from("orders").update(nextPayload).eq("id", id);
+
+    if (!error) return { data: { id, ...nextPayload }, error: null };
+
+    const missingColumn = missingColumnFrom(error);
+    if (!missingColumn || !(missingColumn in nextPayload)) return { data: null, error };
+
+    const { [missingColumn]: _removed, ...rest } = nextPayload;
+    nextPayload = rest;
+  }
+
+  return {
+    data: null,
+    error: new Error("Tracking save failed after matching the live order schema."),
+  };
 }
 
 async function insertProduct(supabase: SupabaseClient, payload: Record<string, unknown>) {
@@ -589,7 +614,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ]);
 
         let orders = ordersRes.data ?? [];
-        if (ordersRes.error?.code === "42703") {
+        if (ordersRes.error?.code === "42703" || missingColumnFrom(ordersRes.error)) {
           const fallback = await supabase
             .from("orders")
             .select(legacyDashboardOrderSelect)
@@ -661,25 +686,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (action === "update-order-tracking") {
         const trackingStatus = cleanTrackingStatus(payload?.tracking_status);
         const shippedStatuses = new Set(["shipped", "in_transit", "out_for_delivery", "delivered"]);
+        const estimatedDeliveryDate = cleanOptionalDate(payload?.estimated_delivery_date);
 
-        const update = {
+        const update: Record<string, unknown> = {
           tracking_carrier: cleanOptionalText(payload?.tracking_carrier, 80),
           tracking_number: cleanOptionalText(payload?.tracking_number, 120),
           tracking_url: cleanOptionalUrl(payload?.tracking_url),
           tracking_status: trackingStatus,
-          estimated_delivery_date: cleanOptionalDate(payload?.estimated_delivery_date),
           shipment_note: cleanOptionalText(payload?.shipment_note, 500),
           shipped_at: shippedStatuses.has(trackingStatus)
             ? (cleanOptionalText(payload?.shipped_at, 40) ?? new Date().toISOString())
             : null,
         };
+        if (estimatedDeliveryDate) update.estimated_delivery_date = estimatedDeliveryDate;
 
-        const { data, error } = await supabase
-          .from("orders")
-          .update(update)
-          .eq("id", id)
-          .select("*")
-          .single();
+        const { data, error } = await updateOrderTracking(supabase, id, update);
         if (error) return res.status(500).json({ error: error.message });
         return res.status(200).json(data);
       }

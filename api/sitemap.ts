@@ -10,6 +10,8 @@ const blogRoutes = [
   "/blog/creatine-strength-recovery-daily-routine",
   "/blog/post-workout-recovery-routine-skin-hydration-rest",
   "/blog/reusable-pen-cartridge-needle-setup-guide",
+  "/blog/hydration-products-water-electrolytes-guide",
+  "/blog/authors/zxg-wellness-editorial-team",
 ];
 
 const staticRoutes = [

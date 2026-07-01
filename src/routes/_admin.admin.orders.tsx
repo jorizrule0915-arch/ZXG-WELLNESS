@@ -78,6 +78,9 @@ const emptyTrackingDraft: TrackingDraft = {
   shipment_note: "",
 };
 
+const noEstimatedDeliveryNote =
+  "Shipping label has been created. USPS will show an estimated delivery date once they receive and scan the package.";
+
 function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,6 +137,7 @@ function AdminOrders() {
 
   const saveTracking = async (order: Order) => {
     const draft = trackingDrafts[order.id] ?? trackingDraftFromOrder(order);
+    const payload = trackingPayloadFromDraft(draft, order.shipped_at);
 
     try {
       const res = await authFetch("/api/admin-data", {
@@ -142,10 +146,7 @@ function AdminOrders() {
         body: JSON.stringify({
           action: "update-order-tracking",
           id: order.id,
-          payload: {
-            ...draft,
-            shipped_at: order.shipped_at,
-          },
+          payload,
         }),
       });
       const updated = await readApiJson<Order>(res);
@@ -581,15 +582,36 @@ function TrackingEditor({
           </select>
         </label>
 
-        <label className="block">
-          <FieldLabel>Estimated delivery</FieldLabel>
-          <input
-            type="date"
-            value={draft.estimated_delivery_date}
-            onChange={(event) => updateDraft({ estimated_delivery_date: event.target.value })}
-            className={fieldClassName}
-          />
-        </label>
+        <div className="block">
+          <FieldLabel>Delivery estimate</FieldLabel>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() =>
+                updateDraft({
+                  estimated_delivery_date: "",
+                  shipment_note: draft.shipment_note.trim()
+                    ? draft.shipment_note
+                    : noEstimatedDeliveryNote,
+                })
+              }
+              className={`min-h-11 border px-3 py-2 text-left text-sm transition-colors ${
+                !draft.estimated_delivery_date
+                  ? "border-gold bg-gold/10 text-gold"
+                  : "border-gold/15 text-muted-foreground hover:border-gold/40"
+              }`}
+            >
+              No date yet
+            </button>
+            <input
+              type="date"
+              value={draft.estimated_delivery_date}
+              onChange={(event) => updateDraft({ estimated_delivery_date: event.target.value })}
+              className={fieldClassName}
+              aria-label="Estimated delivery date"
+            />
+          </div>
+        </div>
       </div>
 
       <label className="block">
@@ -693,6 +715,23 @@ function trackingDraftFromOrder(order: Order): TrackingDraft {
     estimated_delivery_date: order.estimated_delivery_date?.slice(0, 10) ?? "",
     shipment_note: order.shipment_note ?? "",
   };
+}
+
+function trackingPayloadFromDraft(draft: TrackingDraft, shippedAt?: string | null) {
+  const payload: Record<string, string | null> = {
+    tracking_carrier: draft.tracking_carrier,
+    tracking_number: draft.tracking_number,
+    tracking_url: draft.tracking_url,
+    tracking_status: draft.tracking_status,
+    shipment_note: draft.shipment_note,
+    shipped_at: shippedAt ?? null,
+  };
+
+  if (draft.estimated_delivery_date) {
+    payload.estimated_delivery_date = draft.estimated_delivery_date;
+  }
+
+  return payload;
 }
 
 function isTrackingStatus(status: unknown): status is TrackingStatus {
