@@ -51,6 +51,18 @@ const videoInstructions = [
   },
 ];
 
+const doseCheckVideo = {
+  title: "How to Verify Your Dosing Pen Is Accurate — Step-by-Step Dose Check",
+  src: "/Video/How%20to%20Verify%20Your%20Dosing%20Pen%20Is%20Accurate%20%E2%80%94%20Step-by-Step%20Dose%20Check.mov",
+  description:
+    "Quick walkthrough showing how to confirm your reusable pen is dispensing the exact dose every time. In this video, we check the syringe markings against the pen's dial settings step by step, so you can dose with confidence and know your pen is calibrated correctly before use.",
+  highlights: [
+    "Simple visual check anyone can do at home",
+    "Confirms accurate, consistent dosing",
+    "Peace of mind before every injection",
+  ],
+};
+
 const tutorialSteps = [
   {
     step: 1,
@@ -463,6 +475,62 @@ function HowToUsePage() {
               <p className="text-muted-foreground text-base max-w-2xl mx-auto">
                 Watch these detailed guides for step-by-step visual instructions.
               </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-20 overflow-hidden rounded-sm border border-gold/20 bg-charcoal shadow-[0_30px_80px_-45px_rgba(190,157,99,0.55)]"
+            >
+              <div className="grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
+                <div className="relative border-b border-gold/10 bg-black lg:border-b-0 lg:border-r">
+                  <video
+                    className="aspect-video h-full min-h-[220px] w-full bg-black object-contain"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    title={doseCheckVideo.title}
+                  >
+                    <source src={doseCheckVideo.src} />
+                    Your browser does not support this video. Please use a modern browser to view
+                    the dose check guide.
+                  </video>
+                </div>
+
+                <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+                  <div className="mb-5 flex flex-wrap items-center gap-3">
+                    <span className="border border-gold/30 bg-gold/10 px-3 py-1 text-[10px] uppercase tracking-luxury text-gold">
+                      Featured Guide
+                    </span>
+                    <span className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+                      Dose Accuracy Check
+                    </span>
+                  </div>
+
+                  <h3 className="font-display text-2xl font-light leading-tight text-foreground sm:text-3xl">
+                    {doseCheckVideo.title}
+                  </h3>
+                  <div className="my-5 h-px w-12 bg-gold/45" />
+                  <p className="text-sm leading-7 text-muted-foreground sm:text-[15px]">
+                    {doseCheckVideo.description}
+                  </p>
+
+                  <div className="mt-7 grid gap-3">
+                    {doseCheckVideo.highlights.map((highlight) => (
+                      <div
+                        key={highlight}
+                        className="flex items-start gap-3 border border-gold/10 bg-surface/60 px-4 py-3 text-sm text-foreground/85"
+                      >
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold text-obsidian">
+                          <Check className="h-3.5 w-3.5" />
+                        </span>
+                        <span>{highlight}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </motion.div>
 
             <div className="space-y-20">
