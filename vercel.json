@@ -1,6 +1,5 @@
 {
   "buildCommand": "npm run build:vercel",
-  "devCommand": "vite dev --config vite.vercel.config.ts",
   "outputDirectory": "dist/vercel",
   "functions": {
     "api/orders.ts": {
