@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
+import { loadLocalEnv } from "./local-env";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
@@ -104,6 +105,7 @@ function setJsonHeaders(res: VercelResponse) {
 }
 
 function getSupabaseAdmin(): SupabaseClient {
+  loadLocalEnv();
   const url = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").replace(
     ".supabase.com",
     ".supabase.co",
@@ -298,6 +300,7 @@ async function calculateTrustedCart(supabase: SupabaseClient, rawItems: Checkout
 }
 
 function getStripeSecretKey() {
+  loadLocalEnv();
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error("STRIPE_SECRET_KEY is not configured.");
   return secretKey;

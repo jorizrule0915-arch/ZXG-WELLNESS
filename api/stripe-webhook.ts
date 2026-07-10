@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 import Stripe from "stripe";
+import { loadLocalEnv } from "./local-env";
 
 type PaidPaymentIntent = {
   id: string;
@@ -19,12 +20,14 @@ const defaultAdminEmails = [
 ];
 
 function getStripe() {
+  loadLocalEnv();
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error("STRIPE_SECRET_KEY is not configured.");
   return new Stripe(secretKey, { apiVersion: "2026-04-22.dahlia" });
 }
 
 function getResend() {
+  loadLocalEnv();
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY is not configured.");
   return new Resend(key);

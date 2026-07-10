@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown, ChevronRight, ExternalLink, Package, Save, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink, Mail, Package, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { authFetch, readApiJson } from "@/lib/api";
 import { imageForOrderItem } from "@/lib/orderImages";
@@ -88,6 +88,7 @@ function AdminOrders() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [trackingDrafts, setTrackingDrafts] = useState<Record<string, TrackingDraft>>({});
   const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
+  const [resendingOrderId, setResendingOrderId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -193,6 +194,28 @@ function AdminOrders() {
       toast.error(error instanceof Error ? error.message : "Failed to remove order");
     } finally {
       setDeletingOrderId(null);
+    }
+  };
+
+  const resendOrderEmail = async (order: Order) => {
+    const confirmed = window.confirm(
+      `Resend order details for #${order.id.slice(0, 8)} to ${order.email}?`,
+    );
+    if (!confirmed) return;
+
+    setResendingOrderId(order.id);
+    try {
+      const res = await authFetch("/api/send-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: order.id }),
+      });
+      await readApiJson(res);
+      toast.success(`Order details sent to ${order.email}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to resend order details");
+    } finally {
+      setResendingOrderId(null);
     }
   };
 
@@ -338,8 +361,10 @@ function AdminOrders() {
                         updateStatus={updateStatus}
                         updateDraft={(patch) => updateTrackingDraft(order.id, patch)}
                         saveTracking={() => saveTracking(order)}
+                        resendOrderEmail={() => resendOrderEmail(order)}
                         removeOrder={() => removeOrder(order)}
                         deleting={deletingOrderId === order.id}
+                        resending={resendingOrderId === order.id}
                       />
                     )}
                   </li>
@@ -359,16 +384,20 @@ function OrderDetails({
   updateStatus,
   updateDraft,
   saveTracking,
+  resendOrderEmail,
   removeOrder,
   deleting,
+  resending,
 }: {
   order: Order;
   draft: TrackingDraft;
   updateStatus: (id: string, status: Order["status"]) => void;
   updateDraft: (patch: Partial<TrackingDraft>) => void;
   saveTracking: () => void;
+  resendOrderEmail: () => void;
   removeOrder: () => void;
   deleting: boolean;
+  resending: boolean;
 }) {
   return (
     <div className="border-t border-gold/10 bg-obsidian/35 p-4 sm:p-5">
@@ -392,6 +421,13 @@ function OrderDetails({
               draft={draft}
               updateDraft={updateDraft}
               save={saveTracking}
+            />
+          </Panel>
+          <Panel title="Customer email">
+            <ResendOrderEmailAction
+              email={order.email}
+              resendOrderEmail={resendOrderEmail}
+              resending={resending}
             />
           </Panel>
           <Panel title="Admin actions">
@@ -643,6 +679,35 @@ function TrackingEditor({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function ResendOrderEmailAction({
+  email,
+  resendOrderEmail,
+  resending,
+}: {
+  email: string;
+  resendOrderEmail: () => void;
+  resending: boolean;
+}) {
+  return (
+    <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <p className="text-sm leading-6 text-muted-foreground">
+          Resend the Outlook-safe order confirmation and receipt to this customer.
+        </p>
+        <p className="mt-1 break-all text-xs text-foreground/70">{email}</p>
+      </div>
+      <button
+        onClick={resendOrderEmail}
+        disabled={resending}
+        className="inline-flex min-h-11 items-center justify-center gap-2 border border-gold/40 px-3 py-2 text-sm text-gold transition-colors hover:bg-gold hover:text-obsidian disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <Mail className="h-3.5 w-3.5" />
+        {resending ? "Sending..." : "Resend order details"}
+      </button>
     </div>
   );
 }

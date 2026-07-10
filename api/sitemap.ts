@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
+import { loadLocalEnv } from "./local-env";
 
 const siteUrl = String(
   process.env.SITE_URL || process.env.VITE_SITE_URL || "https://www.zxgwellness.com",
@@ -44,6 +45,7 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
 }
 
 async function getProductRoutes() {
+  loadLocalEnv();
   const fallback = fallbackProductSlugs.map((slug) => ({
     path: `/products/${slug}`,
     priority: "0.8",

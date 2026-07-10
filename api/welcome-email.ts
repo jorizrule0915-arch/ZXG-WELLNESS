@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+import { loadLocalEnv } from "./local-env";
 
 const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
@@ -41,6 +42,7 @@ function enforceRateLimit(key: string, options: { limit: number; windowMs: numbe
 }
 
 function getSupabaseAdmin(): SupabaseClient {
+  loadLocalEnv();
   const url = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").replace(
     ".supabase.com",
     ".supabase.co",
@@ -56,6 +58,7 @@ function getSupabaseAdmin(): SupabaseClient {
 }
 
 function getResend() {
+  loadLocalEnv();
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY is not configured.");
   return new Resend(key);
@@ -99,7 +102,7 @@ async function findRecentUserByEmail(supabase: SupabaseClient, email: string) {
     const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 200 });
     if (error) throw error;
 
-    const user = data.users.find((item) => item.email?.toLowerCase() === email);
+    const user = data.users.find((item: any) => item.email?.toLowerCase() === email);
     if (user) return user;
 
     if (data.users.length < 200) break;

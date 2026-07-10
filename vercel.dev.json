@@ -1,0 +1,11 @@
+{
+  "devCommand": "vite dev --config vite.vercel.config.ts",
+  "functions": {
+    "api/orders.ts": {
+      "maxDuration": 30
+    },
+    "api/send-confirmation.ts": {
+      "maxDuration": 30
+    }
+  }
+}

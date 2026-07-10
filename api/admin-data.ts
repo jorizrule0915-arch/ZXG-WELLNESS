@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { randomUUID } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
+import { loadLocalEnv } from "./local-env";
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -230,6 +231,7 @@ function cleanFileName(fileName: string) {
 }
 
 function storageUploadEndpoint() {
+  loadLocalEnv();
   const rawUrl = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").replace(
     ".supabase.com",
     ".supabase.co",
@@ -355,6 +357,7 @@ function setJsonHeaders(res: VercelResponse) {
 }
 
 function getSupabaseAdmin(): SupabaseClient {
+  loadLocalEnv();
   const url = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").replace(
     ".supabase.com",
     ".supabase.co",
@@ -613,7 +616,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           supabase.auth.admin.listUsers({ perPage: 1000 }),
         ]);
 
-        let orders = ordersRes.data ?? [];
+        let orders: any[] = ordersRes.data ?? [];
         if (ordersRes.error?.code === "42703" || missingColumnFrom(ordersRes.error)) {
           const fallback = await supabase
             .from("orders")

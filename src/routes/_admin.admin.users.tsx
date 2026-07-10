@@ -53,7 +53,9 @@ function AdminUsers() {
       const nextUsers = Array.isArray(rows) ? rows : [];
       setUsers(nextUsers);
       const initialNotes: Record<string, string> = {};
-      nextUsers.forEach((r) => { initialNotes[r.id] = r.admin_notes ?? ""; });
+      nextUsers.forEach((r) => {
+        initialNotes[r.id] = r.admin_notes ?? "";
+      });
       setNotes(initialNotes);
     } catch {
       toast.error("Failed to load users");
@@ -62,7 +64,9 @@ function AdminUsers() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const updateStatus = async (id: string, status: UserRow["status"]) => {
     try {
@@ -118,11 +122,11 @@ function AdminUsers() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: user.email, name: user.full_name, message }),
       });
-      if (!res.ok) throw new Error("Failed to send");
+      await readApiJson(res);
       toast.success("Warning sent to " + user.email);
       setWarning((prev) => ({ ...prev, [user.id]: "" }));
-    } catch {
-      toast.error("Failed to send warning email");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to send warning email");
     } finally {
       setSending(null);
     }
@@ -168,7 +172,9 @@ function AdminUsers() {
           <div className="border-b border-gold/15 pb-6">
             <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">Management</div>
             <h1 className="font-display text-3xl md:text-4xl">Accounts</h1>
-            <p className="text-sm text-muted-foreground mt-2">Manage customer access, notes, warning emails, and admin roles.</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Manage customer access, notes, warning emails, and admin roles.
+            </p>
           </div>
         </motion.div>
 
@@ -250,7 +256,6 @@ function AdminUsers() {
                     {/* Expanded */}
                     {isOpen && (
                       <div className="px-6 pb-8 border-t border-gold/10 bg-obsidian/40 grid md:grid-cols-2 gap-8">
-
                         {/* Account Actions */}
                         <div>
                           <div className="text-[10px] uppercase tracking-luxury text-gold mb-4 mt-6">
