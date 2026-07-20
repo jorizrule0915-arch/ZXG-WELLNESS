@@ -7,6 +7,7 @@ import { localProducts } from "@/lib/products";
 import creatineVideo from "@/assets/Creatine Production Video.mp4";
 import { JsonLd, Seo } from "@/lib/seo";
 import { organizationSchema, websiteSchema } from "@/lib/seoData";
+import { PromoMarquee } from "@/components/site/PromoMarquee";
 
 export const Route = createFileRoute("/")({ component: Index });
 
@@ -81,6 +82,8 @@ function Index() {
         path="/"
       />
       <JsonLd data={[organizationSchema(), websiteSchema()]} />
+
+      <PromoMarquee />
 
       <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-background">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
