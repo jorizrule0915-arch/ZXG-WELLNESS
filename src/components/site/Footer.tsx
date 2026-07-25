@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import footerLogo from "@/assets/Logo/FOoter logo.png";
+import footerLogo from "@/assets/Logo/footer-logo-400.png";
 import { NewsletterSignup } from "@/components/site/NewsletterSignup";
 import { Instagram } from "lucide-react";
 
@@ -10,7 +10,14 @@ export function Footer() {
     <footer className="border-t border-gold/15 bg-charcoal mt-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid gap-12 md:grid-cols-4">
         <div className="md:col-span-2">
-          <img src={footerLogo} alt="ZXG Wellness" className="h-24 w-auto" />
+          <img
+            src={footerLogo}
+            alt="ZXG Wellness"
+            width="96"
+            height="96"
+            loading="lazy"
+            className="h-24 w-24"
+          />
           <p className="mt-4 text-sm text-muted-foreground max-w-sm leading-relaxed">
             A luxury wellness brand — premium, editorial, considered. Crafted in small batches for
             those who pursue equilibrium.

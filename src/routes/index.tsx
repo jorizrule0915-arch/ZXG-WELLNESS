@@ -22,7 +22,7 @@ const testimonials = [
     role: "Strength training client",
     location: "Austin, TX",
     avatar:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=240&h=240&q=85",
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=128&h=128&q=75",
     verified: "Verified buyer",
     product: "Reusable Pen",
     quote:
@@ -38,7 +38,7 @@ const testimonials = [
     role: "Wellness routine customer",
     location: "San Diego, CA",
     avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=240&h=240&q=85",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&h=128&q=75",
     verified: "Verified buyer",
     product: "Pen + Cartridges",
     quote:
@@ -54,7 +54,7 @@ const testimonials = [
     role: "Recovery-focused shopper",
     location: "Nashville, TN",
     avatar:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=240&h=240&q=85",
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&h=128&q=75",
     verified: "Verified buyer",
     product: "Pen Diff Page",
     quote:
@@ -119,11 +119,7 @@ function Index() {
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 lg:px-10 w-full grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          >
+          <div>
             <div className="inline-block text-[10px] uppercase tracking-luxury text-gold border border-gold/40 px-3 py-1.5 mb-8">
               ZXG Wellness
             </div>
@@ -149,7 +145,7 @@ function Index() {
                 Our Philosophy
               </Link>
             </div>
-          </motion.div>
+          </div>
 
           <motion.div
             initial={{ opacity: 0, x: 40 }}
@@ -163,6 +159,9 @@ function Index() {
                   key={heroSlides[heroIdx].slug}
                   src={productImages[heroSlides[heroIdx].slug]}
                   alt={heroSlides[heroIdx].label}
+                  width="600"
+                  height="800"
+                  fetchPriority={heroIdx === 0 ? "high" : "auto"}
                   className="absolute inset-0 h-full w-full object-cover"
                   initial={{ opacity: 0, scale: 1.04 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -194,6 +193,8 @@ function Index() {
                 <button
                   key={i}
                   onClick={() => setHeroIdx(i)}
+                  aria-label={`Show ${heroSlides[i].label}`}
+                  aria-pressed={i === heroIdx}
                   className={`h-px w-8 transition-all duration-300 ${i === heroIdx ? "bg-gold" : "bg-gold/30"}`}
                 />
               ))}
@@ -297,14 +298,12 @@ function Index() {
               >
                 <div className="p-6">
                   <div className="flex items-center gap-4">
-                    <div
-                      role="img"
-                      aria-label={`${testimonial.name} verified profile`}
-                      className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gold/40 shadow-[0_12px_30px_-18px_rgba(190,140,35,0.9)]"
-                    >
+                    <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gold/40 shadow-[0_12px_30px_-18px_rgba(190,140,35,0.9)]">
                       <img
                         src={testimonial.avatar}
                         alt={`${testimonial.name} customer profile`}
+                        width="64"
+                        height="64"
                         loading="lazy"
                         referrerPolicy="no-referrer"
                         className="h-full w-full object-cover"
@@ -329,7 +328,11 @@ function Index() {
                     </div>
                   </div>
 
-                  <div className="mt-5 flex gap-1 text-gold" aria-label="5 star rating">
+                  <div
+                    className="mt-5 flex gap-1 text-gold"
+                    role="img"
+                    aria-label="5 out of 5 stars"
+                  >
                     {Array.from({ length: 5 }).map((_, starIndex) => (
                       <Star key={starIndex} className="h-4 w-4 fill-current" strokeWidth={1.25} />
                     ))}
@@ -407,7 +410,7 @@ function Index() {
         >
           <video
             src={loadVideo ? creatineVideo : undefined}
-            poster={productImages.creatine}
+            poster={loadVideo ? productImages.creatine : undefined}
             autoPlay
             loop
             muted

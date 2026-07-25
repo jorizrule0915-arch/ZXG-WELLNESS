@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ChevronDown, Moon, ShoppingBag, Menu, Sun, X, User } from "lucide-react";
 import { useCart, cartCount } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
-import headerLogo from "@/assets/Logo/Header Nav Logo.png";
+import headerLogo from "@/assets/Logo/header-logo-200.png";
 
 type NavTo =
   | "/"
@@ -89,7 +89,14 @@ export function Header() {
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-10 h-[68px] flex items-center justify-between">
         <Link to="/" className="flex items-center">
-          <img src={headerLogo} alt="ZXG Wellness" className="h-10 w-auto" />
+          <img
+            src={headerLogo}
+            alt="ZXG Wellness"
+            width="100"
+            height="40"
+            fetchPriority="high"
+            className="h-10 w-auto"
+          />
         </Link>
 
         <nav className="hidden xl:flex items-center gap-8">
@@ -158,7 +165,8 @@ export function Header() {
           </button>
           <button
             onClick={() => setMobileOpen((o) => !o)}
-            aria-label="Open menu"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
             className="xl:hidden p-2.5 text-foreground/90 hover:text-gold transition-colors"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
