@@ -243,7 +243,7 @@ function render(baseHtml, route) {
       ? `<meta name="google-site-verification" content="${escapeHtml(googleVerification)}" />`
       : "",
     schema
-      ? `<script data-rh="true" type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`
+      ? `<script data-rh="true" data-prerendered-jsonld="true" type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`
       : "",
   ]
     .filter(Boolean)
