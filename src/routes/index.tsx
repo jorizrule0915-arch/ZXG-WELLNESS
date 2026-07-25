@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BadgeCheck, MessageCircle, Star } from "lucide-react";
 import { productImages } from "@/lib/productImages";
 import { localProducts } from "@/lib/products";
@@ -69,16 +69,36 @@ const testimonials = [
 
 function Index() {
   const [heroIdx, setHeroIdx] = useState(0);
+  const [loadVideo, setLoadVideo] = useState(false);
+  const videoSectionRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const t = setInterval(() => setHeroIdx((i) => (i + 1) % heroSlides.length), 3000);
     return () => clearInterval(t);
   }, []);
 
+  useEffect(() => {
+    const element = videoSectionRef.current;
+    if (!element || loadVideo) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setLoadVideo(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "400px" },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [loadVideo]);
+
   return (
     <>
       <Seo
-        title="ZXG Wellness — Luxury Wellness Atelier"
-        description="Premium creatine, recovery care, reusable pens, cartridges, and accessories from ZXG Wellness."
+        title="Reusable Peptide Pens & Wellness Products"
+        description="Shop ZXG Wellness reusable peptide injection pens, 3mL cartridges, pen needles, creatine, hydration, and premium recovery products."
         path="/"
       />
       <JsonLd data={[organizationSchema(), websiteSchema()]} />
@@ -378,6 +398,7 @@ function Index() {
           </div>
         </div>
         <motion.div
+          ref={videoSectionRef}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.2 }}
@@ -385,11 +406,14 @@ function Index() {
           className="w-full"
         >
           <video
-            src={creatineVideo}
+            src={loadVideo ? creatineVideo : undefined}
+            poster={productImages.creatine}
             autoPlay
             loop
             muted
             playsInline
+            preload="none"
+            aria-label="ZXG Wellness creatine product presentation"
             className="w-full object-cover max-h-[80vh]"
           />
         </motion.div>

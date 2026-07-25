@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { loadLocalEnv } from "./local-env";
+import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
 
 const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
@@ -11,13 +12,6 @@ type WelcomeRequest = {
   fullName?: unknown;
   userId?: unknown;
 };
-
-function setJsonHeaders(res: VercelResponse) {
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-}
 
 function getClientIp(req: VercelRequest) {
   const forwardedFor = req.headers["x-forwarded-for"];
@@ -229,13 +223,17 @@ async function sendWelcomeEmail(values: { email: string; fullName: string }) {
 function sendApiError(res: VercelResponse, error: unknown) {
   const err = error as Error & { statusCode?: number };
   const status = err.statusCode ?? 500;
-  return res.status(status).json({ error: err.message || "Server error" });
+  return res.status(status).json({ error: publicErrorMessage(error, "Welcome email failed") });
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  setJsonHeaders(res);
+  setApiHeaders(req, res);
 
-  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method === "OPTIONS") {
+    if (rejectDisallowedOrigin(req, res)) return;
+    return res.status(204).end();
+  }
+  if (rejectDisallowedOrigin(req, res)) return;
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {

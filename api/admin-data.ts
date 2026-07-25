@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { randomUUID } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { loadLocalEnv } from "./local-env";
+import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -349,13 +350,6 @@ async function updateProduct(
   });
 }
 
-function setJsonHeaders(res: VercelResponse) {
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-}
-
 function getSupabaseAdmin(): SupabaseClient {
   loadLocalEnv();
   const url = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").replace(
@@ -438,12 +432,16 @@ async function requireAdmin(req: VercelRequest): Promise<{
 function sendApiError(res: VercelResponse, error: unknown) {
   const err = error as Error & { statusCode?: number };
   const status = err.statusCode ?? 500;
-  return res.status(status).json({ error: err.message || "Server error" });
+  return res.status(status).json({ error: publicErrorMessage(error, "Admin request failed") });
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  setJsonHeaders(res);
-  if (req.method === "OPTIONS") return res.status(200).end();
+  setApiHeaders(req, res, "GET, POST, OPTIONS");
+  if (req.method === "OPTIONS") {
+    if (rejectDisallowedOrigin(req, res)) return;
+    return res.status(204).end();
+  }
+  if (rejectDisallowedOrigin(req, res)) return;
 
   const resource = req.query.resource as string;
 

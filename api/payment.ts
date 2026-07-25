@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { loadLocalEnv } from "./local-env";
+import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
@@ -97,13 +98,6 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
   },
 ];
 
-function setJsonHeaders(res: VercelResponse) {
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-}
-
 function getSupabaseAdmin(): SupabaseClient {
   loadLocalEnv();
   const url = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").replace(
@@ -170,7 +164,7 @@ async function requireUser(req: VercelRequest): Promise<{
 function sendApiError(res: VercelResponse, error: unknown) {
   const err = error as Error & { statusCode?: number };
   const status = err.statusCode ?? 500;
-  return res.status(status).json({ error: err.message || "Server error" });
+  return res.status(status).json({ error: publicErrorMessage(error, "Payment request failed") });
 }
 
 function normalizeOption(item: CheckoutItemInput) {
@@ -400,9 +394,13 @@ async function createCheckoutSession(
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  setJsonHeaders(res);
+  setApiHeaders(req, res);
 
-  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method === "OPTIONS") {
+    if (rejectDisallowedOrigin(req, res)) return;
+    return res.status(204).end();
+  }
+  if (rejectDisallowedOrigin(req, res)) return;
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {

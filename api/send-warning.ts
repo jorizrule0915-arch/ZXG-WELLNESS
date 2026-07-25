@@ -2,17 +2,11 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { loadLocalEnv } from "./local-env";
+import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
 
 const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
 const REPLY_TO_EMAIL = "admin@zxgwellness.com";
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
-
-function setJsonHeaders(res: VercelResponse) {
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-}
 
 function getSupabaseAdmin(): SupabaseClient {
   loadLocalEnv();
@@ -96,7 +90,7 @@ async function requireAdmin(req: VercelRequest): Promise<{
 function sendApiError(res: VercelResponse, error: unknown) {
   const err = error as Error & { statusCode?: number };
   const status = err.statusCode ?? 500;
-  return res.status(status).json({ error: err.message || "Server error" });
+  return res.status(status).json({ error: publicErrorMessage(error, "Warning email failed") });
 }
 
 function getResend() {
@@ -204,8 +198,12 @@ function buildWarningEmailHtml({ name, message }: { name?: string; message: stri
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  setJsonHeaders(res);
-  if (req.method === "OPTIONS") return res.status(200).end();
+  setApiHeaders(req, res);
+  if (req.method === "OPTIONS") {
+    if (rejectDisallowedOrigin(req, res)) return;
+    return res.status(204).end();
+  }
+  if (rejectDisallowedOrigin(req, res)) return;
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {

@@ -1,8 +1,8 @@
 export const siteName = "ZXG Wellness";
 export const siteUrl = "https://www.zxgwellness.com";
 export const defaultSeoDescription =
-  "Premium wellness essentials from ZXG Wellness, including creatine, recovery care, reusable pens, cartridges, and accessories.";
-export const defaultOgImage = "/Creatine Products/front Creatine.png";
+  "Shop ZXG Wellness reusable peptide injection pens, 3mL cartridges, pen needles, creatine, hydration, and premium recovery products.";
+export const defaultOgImage = "/og/zxg-wellness-products.webp";
 
 export function absoluteUrl(path: string) {
   if (!path) return siteUrl;
@@ -11,12 +11,20 @@ export function absoluteUrl(path: string) {
 }
 
 export function organizationSchema() {
+  const sameAs = [
+    import.meta.env.VITE_INSTAGRAM_URL,
+    import.meta.env.VITE_FACEBOOK_URL,
+    import.meta.env.VITE_TIKTOK_URL,
+  ].filter((url): url is string => Boolean(url));
+
   return {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "OnlineStore",
     name: siteName,
     url: siteUrl,
+    logo: absoluteUrl("/android-chrome-512x512.png"),
     email: "g@zxgwellness.com",
+    ...(sameAs.length > 0 ? { sameAs } : {}),
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",

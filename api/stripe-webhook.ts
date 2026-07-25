@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 import Stripe from "stripe";
 import { loadLocalEnv } from "./local-env";
+import { getOrderNotificationEmails, zxgFromEmail, zxgReplyToEmail } from "../server/email-config";
 
 type PaidPaymentIntent = {
   id: string;
@@ -11,13 +12,6 @@ type PaidPaymentIntent = {
   metadata: Record<string, string>;
   status: string;
 };
-
-const defaultAdminEmails = [
-  "jorizrule0@gmail.com",
-  "g@gxzpeptides.com",
-  "g@gxzhealth.com",
-  "g@zxgwellness.com",
-];
 
 function getStripe() {
   loadLocalEnv();
@@ -31,13 +25,6 @@ function getResend() {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY is not configured.");
   return new Resend(key);
-}
-
-function getAdminEmails() {
-  return (process.env.ORDER_NOTIFICATION_EMAILS || "")
-    .split(",")
-    .map((email) => email.trim())
-    .filter(Boolean);
 }
 
 async function getRawBody(req: VercelRequest) {
@@ -56,12 +43,12 @@ async function sendPaidPaymentEmail(paymentIntent: PaidPaymentIntent) {
   const discount = Number(paymentIntent.metadata.discount || 0);
   const shipping = Number(paymentIntent.metadata.shipping || 0);
   const cartTotal = paymentIntent.metadata.cartTotal || amount;
-  const recipients = getAdminEmails();
-  const to = recipients.length > 0 ? recipients : defaultAdminEmails;
+  const to = getOrderNotificationEmails();
 
   await getResend().emails.send({
-    from: "ZXG Wellness <admin@zxgwellness.com>",
+    from: zxgFromEmail,
     to,
+    replyTo: zxgReplyToEmail,
     subject: `Stripe Payment Approved - $${amount}`,
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111;">
@@ -80,6 +67,12 @@ async function sendPaidPaymentEmail(paymentIntent: PaidPaymentIntent) {
     `,
   });
 }
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });

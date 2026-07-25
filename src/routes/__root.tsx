@@ -4,6 +4,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/CartDrawer";
+import { ConsentAnalytics } from "@/components/site/ConsentAnalytics";
 import { AuthProvider } from "@/lib/auth";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -56,6 +57,7 @@ function RootComponent() {
         </main>
         {!isAdmin && <Footer />}
         {!isAdmin && <CartDrawer />}
+        {!isAdmin && <ConsentAnalytics />}
         <Analytics />
       </AuthProvider>
     </HelmetProvider>

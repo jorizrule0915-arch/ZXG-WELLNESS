@@ -1,6 +1,6 @@
-import creatineImage from "@/assets/creatine-products/front-creatine.png";
-import bodyBalmImage from "@/assets/body-balm/body-balm.png";
-import penImage from "@/assets/reusable-pen-black.png";
+import creatineImage from "@/assets/creatine-products/front-creatine.webp";
+import bodyBalmImage from "@/assets/body-balm/body-balm.webp";
+import penImage from "@/assets/reusable-pen-black.webp";
 
 const hydrationProductImage =
   "https://uppjyjifjffdqiyqvdgh.supabase.co/storage/v1/object/public/product-images/products/1780636260936-fc3d9bae-471e-4488-9f29-49c21d7dfb5b.png";
@@ -321,12 +321,12 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     slug: "reusable-pen-cartridge-needle-setup-guide",
-    title: "Reusable Pen Setup Guide: Pen, Cartridge, and Needle Accessories Explained",
+    title: "Reusable Peptide Pen Setup Guide: Cartridges and Pen Needles Explained",
     description:
-      "Understand how reusable pens, disposable cartridges, and single-use pen needles fit together so customers can shop ZXG accessories with confidence.",
+      "Compare a reusable peptide injection pen, disposable 3mL cartridges, and single-use pen needles so you can shop ZXG accessories with confidence.",
     category: "Accessories",
     publishedAt: "2026-06-29",
-    updatedAt: "2026-06-29",
+    updatedAt: "2026-07-25",
     readingTime: "8 min read",
     author: "ZXG Wellness Editorial Team",
     authorSlug: "zxg-wellness-editorial-team",
@@ -337,10 +337,13 @@ export const blogArticles: BlogArticle[] = [
     image: penImage,
     imageAlt: "ZXG Wellness reusable injection pen accessory",
     keywords: [
+      "reusable peptide pen",
+      "peptide injection pen",
+      "insulin-style peptide pen",
       "reusable injection pen",
       "pen cartridges",
       "single use pen needles",
-      "wellness accessories",
+      "peptide pen supplies",
     ],
     takeaways: [
       "Think in systems: pen body, cartridge, and single-use needle accessory.",
@@ -396,6 +399,11 @@ export const blogArticles: BlogArticle[] = [
       {
         question: "Are pen needles reusable?",
         answer: "No. Pen needles are presented as single-use accessories and should not be reused.",
+      },
+      {
+        question: "Is a reusable peptide pen the same as a syringe?",
+        answer:
+          "No. A reusable pen is a multi-part accessory system built around a pen body, compatible cartridge, and single-use pen needle. A syringe is a separate device. Ask a qualified healthcare professional which delivery device is appropriate for a prescribed medication.",
       },
       {
         question: "Where should I start if I am confused?",
@@ -454,7 +462,7 @@ export const blogArticles: BlogArticle[] = [
     summaryAnswer:
       "Most people can support daily hydration with water and regular meals, while electrolyte or sports-drink products may be useful during heavy sweating, prolonged exercise, heat exposure, or fluid loss from illness.",
     image: hydrationProductImage,
-    imageAlt: "GXZ Health Hydration electrolyte and amino formula packets",
+    imageAlt: "ZXG Wellness hydration electrolyte and amino formula packets",
     keywords: [
       "hydration products",
       "electrolyte drinks",

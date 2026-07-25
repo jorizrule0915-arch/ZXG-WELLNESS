@@ -1,22 +1,22 @@
-import creatineFront from "@/assets/creatine-products/front-creatine.png";
-import creatineBack from "@/assets/creatine-products/back-creatine.png";
-import bodyBalm from "@/assets/body-balm/body-balm.png";
-import bodyBalmBack from "@/assets/body-balm/backbalm.png";
-import bodyBalmLifestyle from "@/assets/body-balm/lifestylebalm.png";
+import creatineFront from "@/assets/creatine-products/front-creatine.webp";
+import creatineBack from "@/assets/creatine-products/back-creatine.webp";
+import bodyBalm from "@/assets/body-balm/body-balm.webp";
+import bodyBalmBack from "@/assets/body-balm/backbalm.webp";
+import bodyBalmLifestyle from "@/assets/body-balm/lifestylebalm.webp";
 
-import penBlue from "@/assets/reusable-pen.png";
-import penBlack from "@/assets/reusable-pen-black.png";
-import penGold from "@/assets/reusable-pen-gold.png";
-import penGray from "@/assets/reusable-pen-gray.png";
-import penPink from "@/assets/reusable-pen-pink.png";
-import penPurple from "@/assets/reusable-pen-purple.png";
-import penRed from "@/assets/reusable-pen-red.png";
-import penGreen from "@/assets/reusable-pen-green.png";
-import penBronze from "@/assets/reusable-pen-bronze.png";
-import penSilver from "@/assets/reusable-pen-silver.png";
-import syringe from "@/assets/syringe.png";
-import cartridge from "@/assets/cartridge.png";
-import needles from "@/assets/needles.png";
+import penBlue from "@/assets/reusable-pen.webp";
+import penBlack from "@/assets/reusable-pen-black.webp";
+import penGold from "@/assets/reusable-pen-gold.webp";
+import penGray from "@/assets/reusable-pen-gray.webp";
+import penPink from "@/assets/reusable-pen-pink.webp";
+import penPurple from "@/assets/reusable-pen-purple.webp";
+import penRed from "@/assets/reusable-pen-red.webp";
+import penGreen from "@/assets/reusable-pen-green.webp";
+import penBronze from "@/assets/reusable-pen-bronze.webp";
+import penSilver from "@/assets/reusable-pen-silver.webp";
+import syringe from "@/assets/syringe.webp";
+import cartridge from "@/assets/cartridge.webp";
+import needles from "@/assets/needles.webp";
 
 export const productImages: Record<string, string> = {
   creatine: creatineFront,

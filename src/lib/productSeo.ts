@@ -84,10 +84,10 @@ const productSeoContent: Record<string, ProductSeoContent> = {
   },
   pen: {
     metaDescription:
-      "Shop the ZXG Wellness Reusable Injection Pen with a durable metal body, color options, refillable cartridge compatibility, and premium everyday handling.",
+      "Shop the ZXG Wellness reusable peptide injection pen with a durable metal body, color options, 3mL cartridge compatibility, and adjustable dial.",
     overview: [
-      "The ZXG Wellness Reusable Injection Pen is designed for customers who want a durable, premium-feeling refillable pen setup.",
-      "Pair it with compatible ZXG cartridges and single-use pen needles to build a cleaner, easier-to-understand accessory system.",
+      "The ZXG Wellness Reusable Injection Pen is an insulin-style peptide pen accessory for customers who want a durable, premium-feeling refillable setup.",
+      "Pair the reusable pen with compatible ZXG 3mL cartridges and single-use pen needles to build a complete, easier-to-understand accessory system.",
     ],
     faqs: [
       {
@@ -104,6 +104,11 @@ const productSeoContent: Record<string, ProductSeoContent> = {
         question: "Where can I compare reusable pen options?",
         answer:
           "Use the reusable pen difference guide to compare reusable construction, handling, refill options, and accessory compatibility.",
+      },
+      {
+        question: "Can this pen be used for GLP-1 medication?",
+        answer:
+          "Compatibility depends on the prescribed product, cartridge, and instructions from your healthcare professional or pharmacist. ZXG provides the accessory only and does not offer medication, dosing, or treatment advice.",
       },
     ],
     internalLinks: [

@@ -3,13 +3,13 @@ import { createHash } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { loadLocalEnv } from "./local-env";
+import { getOrderNotificationEmails, zxgFromEmail, zxgReplyToEmail } from "../server/email-config";
+import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
 const PEN_DISCOUNT_MIN_QTY = 5;
 const PEN_DISCOUNT_RATE = 0.1;
-const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
-const ORDER_TEAM_EMAILS = ["jorizrule0@gmail.com", "g@zxgwellness.com"];
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -128,13 +128,6 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
   },
 ];
 
-function setJsonHeaders(res: VercelResponse) {
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-}
-
 function getSupabaseAdmin(): SupabaseClient {
   loadLocalEnv();
   const url = String(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "").replace(
@@ -201,7 +194,7 @@ async function requireUser(req: VercelRequest): Promise<{
 function sendApiError(res: VercelResponse, error: unknown) {
   const err = error as Error & { statusCode?: number };
   const status = err.statusCode ?? 500;
-  return res.status(status).json({ error: err.message || "Server error" });
+  return res.status(status).json({ error: publicErrorMessage(error, "Order request failed") });
 }
 
 function normalizeOption(item: CheckoutItemInput) {
@@ -231,7 +224,7 @@ function getResend() {
 
 function getAdminEmails(customerEmail: string) {
   const customer = customerEmail.toLowerCase();
-  return ORDER_TEAM_EMAILS.filter((email) => email.toLowerCase() !== customer);
+  return getOrderNotificationEmails().filter((email) => email.toLowerCase() !== customer);
 }
 
 function resendErrorMessage(error: unknown) {
@@ -621,9 +614,9 @@ async function sendOrderConfirmationEmail(order: OrderEmail): Promise<OrderEmail
   const customerError = await sendEmail(
     resend,
     {
-      from: DEFAULT_FROM_EMAIL,
+      from: zxgFromEmail,
       to: order.email,
-      replyTo: "admin@zxgwellness.com",
+      replyTo: zxgReplyToEmail,
       subject: `Order Confirmed & Paid — #${shortId} | ZXG Wellness`,
       html,
       text,
@@ -641,7 +634,7 @@ async function sendOrderConfirmationEmail(order: OrderEmail): Promise<OrderEmail
     const adminError = await sendEmail(
       resend,
       {
-        from: DEFAULT_FROM_EMAIL,
+        from: zxgFromEmail,
         to: adminEmails,
         replyTo: order.email,
         subject: `Paid Order Received — #${shortId} | ZXG Wellness`,
@@ -799,9 +792,13 @@ async function retrieveCheckoutSession(checkoutSessionId: string) {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  setJsonHeaders(res);
+  setApiHeaders(req, res);
 
-  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method === "OPTIONS") {
+    if (rejectDisallowedOrigin(req, res)) return;
+    return res.status(204).end();
+  }
+  if (rejectDisallowedOrigin(req, res)) return;
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {

@@ -8,10 +8,11 @@
     "dev:local": "vite dev --config vite.vercel.config.ts",
     "dev:vercel": "npx vercel dev --local-config vercel.dev.json",
     "build": "vite build",
-    "build:vercel": "vite build --config vite.vercel.config.ts",
+    "build:vercel": "vite build --config vite.vercel.config.ts && node scripts/prerender-seo.mjs",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
+    "test:smoke": "node scripts/smoke-api.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {

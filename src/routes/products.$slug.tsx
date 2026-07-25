@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   fetchProduct,
   fetchProducts,
+  localProducts,
   type Product,
   type ProductVariant,
   type ProductColorVariant,
@@ -35,15 +36,18 @@ function ProductDetail() {
   const { slug } = useParams({ from: "/products/$slug" });
   const nav = useNavigate();
   const add = useCart((s) => s.add);
-  const [product, setProduct] = useState<Product | null>(null);
+  const fallbackProduct = localProducts.find((item) => item.slug === slug) ?? null;
+  const [product, setProduct] = useState<Product | null>(fallbackProduct);
   const [related, setRelated] = useState<Product[]>([]);
   const [activeImg, setActiveImg] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedColor, setSelectedColor] = useState<ProductColorVariant | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!fallbackProduct);
 
   useEffect(() => {
-    setLoading(true);
+    const nextFallback = localProducts.find((item) => item.slug === slug) ?? null;
+    setProduct(nextFallback);
+    setLoading(!nextFallback);
     fetchProduct(slug).then((p) => {
       if (!p) {
         nav({ to: "/products" });
