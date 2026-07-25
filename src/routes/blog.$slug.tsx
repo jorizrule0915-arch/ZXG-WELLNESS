@@ -14,6 +14,7 @@ import {
   getBlogArticle,
   getBlogAuthor,
   getRelatedBlogArticles,
+  toSchemaDateTime,
   type BlogArticle,
 } from "@/lib/blog";
 import { JsonLd, Seo } from "@/lib/seo";
@@ -49,8 +50,8 @@ function BlogArticlePage() {
             headline: article.title,
             description: article.description,
             image: [absoluteUrl(article.image)],
-            datePublished: article.publishedAt,
-            dateModified: article.updatedAt,
+            datePublished: toSchemaDateTime(article.publishedAt),
+            dateModified: toSchemaDateTime(article.updatedAt),
             author: {
               "@type": "Organization",
               name: article.author,

@@ -6,6 +6,7 @@ import {
   blogCategories,
   formatBlogDate,
   getFeaturedBlogArticle,
+  toSchemaDateTime,
   type BlogArticle,
   type BlogCategory,
 } from "@/lib/blog";
@@ -77,8 +78,8 @@ function BlogPage() {
               headline: article.title,
               description: article.description,
               url: absoluteUrl(`/blog/${article.slug}`),
-              datePublished: article.publishedAt,
-              dateModified: article.updatedAt,
+              datePublished: toSchemaDateTime(article.publishedAt),
+              dateModified: toSchemaDateTime(article.updatedAt),
               author: {
                 "@type": "Organization",
                 name: article.author,

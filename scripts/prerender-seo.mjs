@@ -186,13 +186,16 @@ function schemaFor(route) {
   }
 
   if ("datePublished" in route) {
+    const datePublished = `${route.datePublished}T00:00:00Z`;
+    const dateModified = `${route.dateModified}T00:00:00Z`;
+
     return {
       "@context": "https://schema.org",
       "@type": "Article",
       headline: route.title,
       description: route.description,
-      datePublished: route.datePublished,
-      dateModified: route.dateModified,
+      datePublished,
+      dateModified,
       mainEntityOfPage: url,
       image: defaultImage,
       author: { "@type": "Organization", name: "ZXG Wellness Editorial Team" },
