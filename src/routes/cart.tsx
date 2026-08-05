@@ -11,7 +11,12 @@ function CartPage() {
 
   return (
     <>
-      <Seo title="Your Cart" description="Review your ZXG Wellness cart." path="/cart" noIndex />
+      <Seo
+        title="Your Cart"
+        description="Review your GXZ Health and Wellness cart."
+        path="/cart"
+        noIndex
+      />
       <div className="mx-auto max-w-5xl px-6 lg:px-10 py-20 md:py-28">
         <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Your Selection</div>
         <h1 className="font-display text-5xl md:text-6xl">

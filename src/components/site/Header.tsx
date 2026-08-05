@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ChevronDown, Moon, ShoppingBag, Menu, Sun, X, User } from "lucide-react";
 import { useCart, cartCount } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
-import headerLogo from "@/assets/Logo/header-logo-200.png";
+import headerLogo from "@/assets/Logo/gxz-header-logo.svg";
 
 type NavTo =
   | "/"
@@ -91,11 +91,11 @@ export function Header() {
         <Link to="/" className="flex items-center">
           <img
             src={headerLogo}
-            alt="ZXG Wellness"
-            width="100"
-            height="40"
+            alt="GXZ Health and Wellness"
+            width="137"
+            height="50"
             fetchPriority="high"
-            className="h-10 w-auto"
+            className="h-[50px] w-auto"
           />
         </Link>
 

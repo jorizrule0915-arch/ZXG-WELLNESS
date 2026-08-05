@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="glow" cx="72%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#c4a15b" stop-opacity=".16" />
+      <stop offset="1" stop-color="#050505" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#050505" />
+  <rect width="1200" height="630" fill="url(#glow)" />
+  <rect x="42" y="42" width="1116" height="546" fill="none" stroke="#c4a15b" stroke-opacity=".28" />
+  <g transform="translate(94 118)" fill="none" stroke="#c4a15b" stroke-width="16" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M176 0H74C30 0 0 34 0 89s30 89 74 89h92V102H96" />
+    <path d="M207 0l145 178M352 0L207 178" />
+    <path d="M398 0h172L398 178h172" />
+  </g>
+  <text x="95" y="390" fill="#f4f0e8" font-family="Georgia, serif" font-size="66" letter-spacing="4">Health &amp; Wellness</text>
+  <text x="98" y="455" fill="#c4a15b" font-family="Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="7">PREMIUM WELLNESS, CONSIDERED</text>
+  <line x1="98" y1="505" x2="1102" y2="505" stroke="#c4a15b" stroke-opacity=".3" />
+  <text x="98" y="550" fill="#d8d1c4" font-family="Arial, sans-serif" font-size="20" letter-spacing="3">ZXGWELLNESS.COM</text>
+</svg>

@@ -81,7 +81,7 @@ function ResetPasswordPage() {
     <>
       <Seo
         title="Reset Password"
-        description="Reset your ZXG Wellness account password."
+        description="Reset your GXZ Health and Wellness account password."
         path="/reset-password"
         noIndex
       />

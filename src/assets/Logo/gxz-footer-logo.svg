@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420" role="img" aria-labelledby="title desc">
+  <title id="title">GXZ Health and Wellness</title>
+  <desc id="desc">Gold GXZ monogram with Health and Wellness wordmark</desc>
+  <rect width="420" height="420" rx="18" fill="#111111" />
+  <rect x="18" y="18" width="384" height="384" rx="10" fill="none" stroke="#c4a15b" stroke-opacity=".35" />
+  <g transform="translate(45 83)" fill="none" stroke="#c4a15b" stroke-width="10" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M105 0H43C18 0 0 20 0 50s18 50 43 50h52V57H57" />
+    <path d="M125 0l82 100M207 0l-82 100" />
+    <path d="M235 0h95l-95 100h95" />
+  </g>
+  <text x="210" y="250" fill="#f4f0e8" text-anchor="middle" font-family="Georgia, serif" font-size="31" letter-spacing="7">HEALTH</text>
+  <text x="210" y="294" fill="#c4a15b" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="16" font-weight="600" letter-spacing="6">&amp; WELLNESS</text>
+  <line x1="105" y1="327" x2="315" y2="327" stroke="#c4a15b" stroke-opacity=".6" />
+</svg>

@@ -8,7 +8,7 @@ const marqueeItems = Array.from({ length: 4 }, () => promoMessages).flat();
 export function PromoMarquee() {
   return (
     <section
-      aria-label="Current ZXG Wellness promotions"
+      aria-label="Current GXZ Health and Wellness promotions"
       className="relative z-10 mt-1 overflow-hidden border-y border-[#d4af64]/25 bg-[#050505] text-[#f2ead9] shadow-[0_10px_30px_-28px_rgba(212,175,100,0.9)]"
     >
       <div className="sr-only">

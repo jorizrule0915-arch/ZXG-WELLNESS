@@ -9,7 +9,7 @@ function NewProduct() {
   return (
     <>
       <Helmet>
-        <title>New Product — ZXG Admin</title>
+        <title>New Product — GXZ Admin</title>
       </Helmet>
       <div className="px-6 lg:px-10 py-10">
         <Link

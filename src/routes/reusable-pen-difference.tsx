@@ -12,7 +12,7 @@ export const Route = createFileRoute("/reusable-pen-difference")({
 const comparisonProducts = [
   {
     key: "classic",
-    name: "ZXG Classic Pen",
+    name: "GXZ Classic Pen",
     tagline: "Classic feel",
     image: penColorImages.gold,
     cta: "Shop Pen",
@@ -21,7 +21,7 @@ const comparisonProducts = [
   },
   {
     key: "signature",
-    name: "ZXG Signature Pen",
+    name: "GXZ Signature Pen",
     tagline: "Easiest handling",
     image: penColorImages.black,
     cta: "Shop Pen",
@@ -31,7 +31,7 @@ const comparisonProducts = [
   },
   {
     key: "singleUse",
-    name: "ZXG Disposable Pen",
+    name: "GXZ Disposable Pen",
     tagline: "Single-use",
     image: penColorImages.silver,
     cta: "Shop Disposable",
@@ -226,7 +226,7 @@ function ReusablePenDifferencePage() {
     <>
       <Seo
         title="Reusable Pen Difference"
-        description="Compare reusable pens, refill cartridges, single-use pen needles, and compatible accessory options from ZXG Wellness."
+        description="Compare reusable pens, refill cartridges, single-use pen needles, and compatible accessory options from GXZ Health and Wellness."
         path="/reusable-pen-difference"
         image={penColorImages.black}
       />
@@ -238,14 +238,14 @@ function ReusablePenDifferencePage() {
           ]),
           faqSchema([
             {
-              question: "What is the ZXG reusable pen difference?",
+              question: "What is the GXZ reusable pen difference?",
               answer:
-                "The ZXG reusable pen system focuses on durable reusable construction, replaceable cartridges, compatible pen needles, and premium everyday handling.",
+                "The GXZ reusable pen system focuses on durable reusable construction, replaceable cartridges, compatible pen needles, and premium everyday handling.",
             },
             {
               question: "What accessories work with the reusable pen?",
               answer:
-                "The reusable pen is presented alongside ZXG disposable cartridges and single-use pen needles as a complete accessory setup.",
+                "The reusable pen is presented alongside GXZ disposable cartridges and single-use pen needles as a complete accessory setup.",
             },
           ]),
         ]}
@@ -482,11 +482,11 @@ function ReusablePenDifferencePage() {
               </h2>
               <ul className="mt-6 space-y-3 text-base leading-relaxed text-muted-foreground md:text-lg">
                 <li>
-                  <span className="font-bold text-foreground">Choose ZXG Classic Pen</span> if you
+                  <span className="font-bold text-foreground">Choose GXZ Classic Pen</span> if you
                   prefer a traditional capped pen feel with reusable construction.
                 </li>
                 <li>
-                  <span className="font-bold text-foreground">Choose ZXG Signature Pen</span> if you
+                  <span className="font-bold text-foreground">Choose GXZ Signature Pen</span> if you
                   want the cleanest everyday reusable setup and premium color finish.
                 </li>
                 <li>
@@ -494,7 +494,7 @@ function ReusablePenDifferencePage() {
                   when you already have the pen and need restock essentials.
                 </li>
                 <li>
-                  <span className="font-bold text-foreground">Choose ZXG Disposable Pen</span> if
+                  <span className="font-bold text-foreground">Choose GXZ Disposable Pen</span> if
                   you need a simple single-use option instead of a reusable pen system.
                 </li>
               </ul>
@@ -534,7 +534,7 @@ function ReusablePenDifferencePage() {
               {unavailableProduct.name} is not available right now.
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              We currently sell the ZXG Signature Pen, our V2 reusable pen. This option is not in
+              We currently sell the GXZ Signature Pen, our V2 reusable pen. This option is not in
               stock yet, but the V2 pen is ready to order now.
             </p>
 
@@ -542,7 +542,7 @@ function ReusablePenDifferencePage() {
               <div className="text-[11px] font-bold uppercase tracking-wide text-gold">
                 Recommended available option
               </div>
-              <div className="mt-1 text-base font-extrabold">ZXG Signature Pen V2</div>
+              <div className="mt-1 text-base font-extrabold">GXZ Signature Pen V2</div>
               <div className="mt-1 text-sm text-muted-foreground">
                 Premium reusable setup with the easiest everyday handling.
               </div>

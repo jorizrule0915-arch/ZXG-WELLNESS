@@ -1,8 +1,8 @@
-export const siteName = "ZXG Wellness";
+export const siteName = "GXZ Health and Wellness";
 export const siteUrl = "https://www.zxgwellness.com";
 export const defaultSeoDescription =
-  "Shop ZXG Wellness reusable peptide injection pens, 3mL cartridges, pen needles, creatine, hydration, and premium recovery products.";
-export const defaultOgImage = "/og/zxg-wellness-products.webp";
+  "Shop GXZ Health and Wellness reusable peptide injection pens, 3mL cartridges, pen needles, creatine, hydration, and premium recovery products.";
+export const defaultOgImage = "/og/gxz-health-and-wellness.png";
 
 export function absoluteUrl(path: string) {
   if (!path) return siteUrl;
@@ -22,7 +22,7 @@ export function organizationSchema() {
     "@type": "OnlineStore",
     name: siteName,
     url: siteUrl,
-    logo: absoluteUrl("/android-chrome-512x512.png"),
+    logo: absoluteUrl("/gxz-mark.svg"),
     email: "g@zxgwellness.com",
     ...(sameAs.length > 0 ? { sameAs } : {}),
     contactPoint: {

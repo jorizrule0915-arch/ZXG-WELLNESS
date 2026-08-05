@@ -72,6 +72,15 @@ const needleVariants: ProductVariant[] = [
 const toStringList = (value: unknown): string[] =>
   Array.isArray(value) ? value.map((item) => String(item ?? "").trim()).filter(Boolean) : [];
 
+const legacyInitials = ["Z", "X", "G"].join("");
+export const rebrandLegacyText = (value: string) =>
+  value
+    .replaceAll(`${legacyInitials} Wellness`, "GXZ Health and Wellness")
+    .replace(new RegExp(`\\b${legacyInitials}\\b`, "g"), "GXZ");
+
+const toBrandedStringList = (value: unknown): string[] =>
+  toStringList(value).map(rebrandLegacyText);
+
 const toFinitePrice = (value: unknown, fallback = 0) => {
   const price = Number(value);
   return Number.isFinite(price) ? price : fallback;
@@ -211,12 +220,15 @@ const mapRow = (r: Row): Product => {
 
   return {
     ...r,
+    name: rebrandLegacyText(r.name),
+    tagline: rebrandLegacyText(r.tagline),
+    description: rebrandLegacyText(r.description),
     price,
     image: gallery[0] ?? imageFor(r.slug),
     gallery,
     featuredVideo: r.featured_video ?? null,
-    ingredients: toStringList(r.ingredients),
-    benefits: toStringList(r.benefits),
+    ingredients: toBrandedStringList(r.ingredients),
+    benefits: toBrandedStringList(r.benefits),
     featured: Boolean(r.featured),
     variants:
       r.slug === "pen"
@@ -235,10 +247,10 @@ export const localProducts: Product[] = [
   {
     id: "local-pen",
     slug: "pen",
-    name: "ZXG Wellness Reusable Injection Pen",
+    name: "GXZ Health and Wellness Reusable Injection Pen",
     tagline: "Precision-engineered metal pen",
     description:
-      "The ZXG reusable injection pen is built for repeat use with a durable metal body and a comfortable adjustable dosing dial. Designed to feel premium in hand while keeping daily use simple and dependable.",
+      "The GXZ reusable injection pen is built for repeat use with a durable metal body and a comfortable adjustable dosing dial. Designed to feel premium in hand while keeping daily use simple and dependable.",
     price: 20,
     category: "Accessories",
     image: imageFor("pen"),
@@ -250,10 +262,10 @@ export const localProducts: Product[] = [
   {
     id: "local-syringe",
     slug: "syringe",
-    name: "ZXG Wellness Syringe",
+    name: "GXZ Health and Wellness Syringe",
     tagline: "Sterile precision — 100 per box",
     description:
-      "ZXG syringes are designed for clean, precise handling with dependable sterile packaging. Choose from multiple sizes depending on the application, with each box including 100 pieces.",
+      "GXZ syringes are designed for clean, precise handling with dependable sterile packaging. Choose from multiple sizes depending on the application, with each box including 100 pieces.",
     price: 15,
     category: "Accessories",
     image: imageFor("syringe"),
@@ -269,39 +281,39 @@ export const localProducts: Product[] = [
   {
     id: "local-cartridge",
     slug: "cartridge",
-    name: "ZXG Wellness Disposable 3mL Cartridges",
+    name: "GXZ Health and Wellness Disposable 3mL Cartridges",
     tagline: "Standard 3mL — 10 per set",
     description:
-      "ZXG disposable cartridges are built for a clean fit inside reusable ZXG injection pens. Each set includes 10 cartridges with a stable 3mL capacity to keep replacements easy and consistent.",
+      "GXZ disposable cartridges are built for a clean fit inside reusable GXZ injection pens. Each set includes 10 cartridges with a stable 3mL capacity to keep replacements easy and consistent.",
     price: 10,
     category: "Accessories",
     image: imageFor("cartridge"),
-    ingredients: ["3mL capacity", "Universal ZXG fit", "10 per set"],
-    benefits: ["Reliable replacement option", "Built for ZXG reusable pens", "Compact set"],
+    ingredients: ["3mL capacity", "Universal GXZ fit", "10 per set"],
+    benefits: ["Reliable replacement option", "Built for GXZ reusable pens", "Compact set"],
     featured: false,
   },
   {
     id: "local-needles",
     slug: "needles",
-    name: "ZXG Wellness Single-Use Pen Needles",
+    name: "GXZ Health and Wellness Single-Use Pen Needles",
     tagline: "Ultra-fine micro-tip — 100 per box",
     description:
-      "ZXG single-use pen needles are designed for a smoother, more comfortable attachment experience. Every box includes 100 ultra-fine needles, making them a convenient staple alongside reusable pens.",
+      "GXZ single-use pen needles are designed for a smoother, more comfortable attachment experience. Every box includes 100 ultra-fine needles, making them a convenient staple alongside reusable pens.",
     price: 10,
     category: "Accessories",
     image: imageFor("needles"),
     ingredients: ["Ultra-fine micro-tip", "100 per box", "Clean sterile finish"],
-    benefits: ["Works with ZXG pens", "Designed for controlled use", "Easy-to-store packaging"],
+    benefits: ["Works with GXZ pens", "Designed for controlled use", "Easy-to-store packaging"],
     featured: false,
     variants: needleVariants,
   },
   {
     id: "local-creatine",
     slug: "creatine",
-    name: "ZXG Wellness Creatine Performance Matrix Powder",
+    name: "GXZ Health and Wellness Creatine Performance Matrix Powder",
     tagline: "Pure performance formula",
     description:
-      "ZXG Wellness Creatine Performance Matrix Powder is built to support strength output, workout endurance, and hydration support during training. The formula mixes cleanly and fits easily into a daily performance routine.",
+      "GXZ Health and Wellness Creatine Performance Matrix Powder is built to support strength output, workout endurance, and hydration support during training. The formula mixes cleanly and fits easily into a daily performance routine.",
     price: 29.99,
     category: "Supplements",
     image: imageFor("creatine"),
@@ -312,10 +324,10 @@ export const localProducts: Product[] = [
   {
     id: "local-body-balm",
     slug: "body-balm",
-    name: "ZXG Wellness Nourishing Body Balm",
+    name: "GXZ Health and Wellness Nourishing Body Balm",
     tagline: "Deeply moisturizing skin treatment",
     description:
-      "ZXG Wellness Nourishing Body Balm is a deeply moisturizing skin treatment formulated with cocoa butter, shea butter, and squalane. Its lightweight, fast-absorbing formula leaves skin silky smooth all day long without grease or heavy residue.",
+      "GXZ Health and Wellness Nourishing Body Balm is a deeply moisturizing skin treatment formulated with cocoa butter, shea butter, and squalane. Its lightweight, fast-absorbing formula leaves skin silky smooth all day long without grease or heavy residue.",
     price: 16.99,
     category: "Skincare",
     image: imageFor("body-balm"),

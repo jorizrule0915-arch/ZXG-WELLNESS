@@ -10,16 +10,16 @@ export type ProductSeoContent = {
 const productSeoContent: Record<string, ProductSeoContent> = {
   creatine: {
     metaDescription:
-      "Shop ZXG Wellness Creatine Performance Matrix Powder for a clean daily performance routine supporting training strength, endurance, and recovery.",
+      "Shop GXZ Health and Wellness Creatine Performance Matrix Powder for a clean daily performance routine supporting training strength, endurance, and recovery.",
     overview: [
-      "ZXG Wellness Creatine Performance Matrix Powder is built for athletes and everyday wellness customers who want a simple, consistent creatine routine.",
+      "GXZ Health and Wellness Creatine Performance Matrix Powder is built for athletes and everyday wellness customers who want a simple, consistent creatine routine.",
       "Use it as part of a training plan focused on strength output, workout consistency, hydration support, and post-workout recovery habits.",
     ],
     faqs: [
       {
-        question: "What is ZXG creatine best used for?",
+        question: "What is GXZ creatine best used for?",
         answer:
-          "ZXG creatine is designed for daily performance routines, especially strength training, workout consistency, and recovery-focused wellness habits.",
+          "GXZ creatine is designed for daily performance routines, especially strength training, workout consistency, and recovery-focused wellness habits.",
       },
       {
         question: "How should I add creatine to my routine?",
@@ -29,7 +29,7 @@ const productSeoContent: Record<string, ProductSeoContent> = {
       {
         question: "Is this product part of the recovery category?",
         answer:
-          "Yes. Creatine sits inside the ZXG performance and recovery collection because it supports a consistent training routine.",
+          "Yes. Creatine sits inside the GXZ performance and recovery collection because it supports a consistent training routine.",
       },
     ],
     internalLinks: [
@@ -47,9 +47,9 @@ const productSeoContent: Record<string, ProductSeoContent> = {
   },
   "body-balm": {
     metaDescription:
-      "Shop ZXG Wellness Nourishing Body Balm, a recovery-focused skin treatment with cocoa butter, shea butter, and squalane for daily moisture.",
+      "Shop GXZ Health and Wellness Nourishing Body Balm, a recovery-focused skin treatment with cocoa butter, shea butter, and squalane for daily moisture.",
     overview: [
-      "ZXG Wellness Nourishing Body Balm is made for daily recovery care when skin feels dry, stressed, or in need of extra comfort.",
+      "GXZ Health and Wellness Nourishing Body Balm is made for daily recovery care when skin feels dry, stressed, or in need of extra comfort.",
       "The formula combines cocoa butter, shea butter, and squalane for a smooth, non-greasy feel that fits easily into morning or evening routines.",
     ],
     faqs: [
@@ -64,16 +64,16 @@ const productSeoContent: Record<string, ProductSeoContent> = {
           "Yes. It is positioned as a daily-use body balm. Apply as needed and avoid use on irritated or broken skin unless advised by a professional.",
       },
       {
-        question: "Which ZXG category does Body Balm belong to?",
+        question: "Which GXZ category does Body Balm belong to?",
         answer:
-          "Body Balm belongs to the ZXG recovery and skincare collection because it supports comfortable skin care after training, travel, or everyday dryness.",
+          "Body Balm belongs to the GXZ recovery and skincare collection because it supports comfortable skin care after training, travel, or everyday dryness.",
       },
     ],
     internalLinks: [
       {
         label: "Shop the wellness collection",
         path: "/products",
-        description: "Compare ZXG skincare, recovery, and performance essentials.",
+        description: "Compare GXZ skincare, recovery, and performance essentials.",
       },
       {
         label: "Contact customer care",
@@ -84,21 +84,21 @@ const productSeoContent: Record<string, ProductSeoContent> = {
   },
   pen: {
     metaDescription:
-      "Shop the ZXG Wellness reusable peptide injection pen with a durable metal body, color options, 3mL cartridge compatibility, and adjustable dial.",
+      "Shop the GXZ Health and Wellness reusable peptide injection pen with a durable metal body, color options, 3mL cartridge compatibility, and adjustable dial.",
     overview: [
-      "The ZXG Wellness Reusable Injection Pen is an insulin-style peptide pen accessory for customers who want a durable, premium-feeling refillable setup.",
-      "Pair the reusable pen with compatible ZXG 3mL cartridges and single-use pen needles to build a complete, easier-to-understand accessory system.",
+      "The GXZ Health and Wellness Reusable Injection Pen is an insulin-style peptide pen accessory for customers who want a durable, premium-feeling refillable setup.",
+      "Pair the reusable pen with compatible GXZ 3mL cartridges and single-use pen needles to build a complete, easier-to-understand accessory system.",
     ],
     faqs: [
       {
-        question: "What makes the ZXG reusable pen different?",
+        question: "What makes the GXZ reusable pen different?",
         answer:
           "It uses a reusable metal body, color options, an adjustable dial, and a setup built around replaceable cartridges and single-use needles.",
       },
       {
-        question: "Does the reusable pen work with ZXG cartridges?",
+        question: "Does the reusable pen work with GXZ cartridges?",
         answer:
-          "Yes. The reusable pen is presented alongside ZXG disposable 3mL cartridges and single-use pen needles for a complete accessory setup.",
+          "Yes. The reusable pen is presented alongside GXZ disposable 3mL cartridges and single-use pen needles for a complete accessory setup.",
       },
       {
         question: "Where can I compare reusable pen options?",
@@ -108,7 +108,7 @@ const productSeoContent: Record<string, ProductSeoContent> = {
       {
         question: "Can this pen be used for GLP-1 medication?",
         answer:
-          "Compatibility depends on the prescribed product, cartridge, and instructions from your healthcare professional or pharmacist. ZXG provides the accessory only and does not offer medication, dosing, or treatment advice.",
+          "Compatibility depends on the prescribed product, cartridge, and instructions from your healthcare professional or pharmacist. GXZ provides the accessory only and does not offer medication, dosing, or treatment advice.",
       },
     ],
     internalLinks: [
@@ -126,9 +126,9 @@ const productSeoContent: Record<string, ProductSeoContent> = {
   },
   syringe: {
     metaDescription:
-      "Shop ZXG Wellness sterile syringes in multiple size options, packaged for precise handling and convenient wellness accessory use.",
+      "Shop GXZ Health and Wellness sterile syringes in multiple size options, packaged for precise handling and convenient wellness accessory use.",
     overview: [
-      "ZXG Wellness Syringes are packaged as practical accessories for customers who need clean, precise handling and easy size selection.",
+      "GXZ Health and Wellness Syringes are packaged as practical accessories for customers who need clean, precise handling and easy size selection.",
       "Each box includes multiple sterile syringes with clear sizing options so customers can choose the format that fits their intended use.",
     ],
     faqs: [
@@ -140,12 +140,12 @@ const productSeoContent: Record<string, ProductSeoContent> = {
       {
         question: "How many syringes come in a box?",
         answer:
-          "The ZXG syringe product is presented as a 100-count box, with size options shown on the product page.",
+          "The GXZ syringe product is presented as a 100-count box, with size options shown on the product page.",
       },
       {
         question: "Where can I learn more before buying?",
         answer:
-          "Visit the how-to-use page for general handling guidance and contact ZXG Wellness if you have order or product questions.",
+          "Visit the how-to-use page for general handling guidance and contact GXZ Health and Wellness if you have order or product questions.",
       },
     ],
     internalLinks: [
@@ -163,21 +163,21 @@ const productSeoContent: Record<string, ProductSeoContent> = {
   },
   cartridge: {
     metaDescription:
-      "Shop ZXG Wellness disposable 3mL cartridges, a 10-piece refill set designed for clean fit and consistent replacement with ZXG reusable pens.",
+      "Shop GXZ Health and Wellness disposable 3mL cartridges, a 10-piece refill set designed for clean fit and consistent replacement with GXZ reusable pens.",
     overview: [
-      "ZXG disposable 3mL cartridges are built as a refill accessory for the ZXG reusable pen system.",
+      "GXZ disposable 3mL cartridges are built as a refill accessory for the GXZ reusable pen system.",
       "Each set includes 10 cartridges, making replacement planning simpler for customers who want an organized wellness accessory routine.",
     ],
     faqs: [
       {
         question: "How many cartridges are included?",
         answer:
-          "Each ZXG disposable cartridge set includes 10 cartridges with a standard 3mL capacity.",
+          "Each GXZ disposable cartridge set includes 10 cartridges with a standard 3mL capacity.",
       },
       {
-        question: "Are these made for the ZXG reusable pen?",
+        question: "Are these made for the GXZ reusable pen?",
         answer:
-          "Yes. The cartridges are positioned as replacement accessories for the ZXG reusable injection pen.",
+          "Yes. The cartridges are positioned as replacement accessories for the GXZ reusable injection pen.",
       },
       {
         question: "What should I buy with cartridges?",
@@ -189,7 +189,7 @@ const productSeoContent: Record<string, ProductSeoContent> = {
       {
         label: "Shop the reusable pen",
         path: "/products/pen",
-        description: "Pair cartridges with the reusable ZXG pen.",
+        description: "Pair cartridges with the reusable GXZ pen.",
       },
       {
         label: "Shop pen needles",
@@ -200,9 +200,9 @@ const productSeoContent: Record<string, ProductSeoContent> = {
   },
   needles: {
     metaDescription:
-      "Shop ZXG Wellness single-use pen needles in 100-count boxes with ultra-fine options for compatible reusable pen accessories.",
+      "Shop GXZ Health and Wellness single-use pen needles in 100-count boxes with ultra-fine options for compatible reusable pen accessories.",
     overview: [
-      "ZXG Wellness Single-Use Pen Needles are designed as a convenient accessory for compatible pen setups.",
+      "GXZ Health and Wellness Single-Use Pen Needles are designed as a convenient accessory for compatible pen setups.",
       "The product page includes size options and a 100-count box format, helping customers choose the right refill accessory before checkout.",
     ],
     faqs: [
@@ -212,14 +212,14 @@ const productSeoContent: Record<string, ProductSeoContent> = {
           "The product is presented as a 100-count box with size options available on the product page.",
       },
       {
-        question: "Are these compatible with ZXG pens?",
+        question: "Are these compatible with GXZ pens?",
         answer:
-          "They are designed to work with compatible ZXG reusable pen accessories. Review product details before purchasing.",
+          "They are designed to work with compatible GXZ reusable pen accessories. Review product details before purchasing.",
       },
       {
         question: "Can I compare these with other accessories?",
         answer:
-          "Yes. Browse the full ZXG accessories collection or review the reusable pen difference guide for context.",
+          "Yes. Browse the full GXZ accessories collection or review the reusable pen difference guide for context.",
       },
     ],
     internalLinks: [
@@ -243,7 +243,7 @@ export function getProductSeoContent(product: Product): ProductSeoContent {
       metaDescription: product.description,
       overview: [
         product.description,
-        `Explore ${product.name} as part of the ZXG Wellness ${product.category.toLowerCase()} collection.`,
+        `Explore ${product.name} as part of the GXZ Health and Wellness ${product.category.toLowerCase()} collection.`,
       ],
       faqs: [
         {
@@ -251,15 +251,16 @@ export function getProductSeoContent(product: Product): ProductSeoContent {
           answer: product.description,
         },
         {
-          question: "Where can I find related ZXG products?",
-          answer: "Browse the ZXG Wellness collection to compare related products and accessories.",
+          question: "Where can I find related GXZ products?",
+          answer:
+            "Browse the GXZ Health and Wellness collection to compare related products and accessories.",
         },
       ],
       internalLinks: [
         {
           label: "Browse all products",
           path: "/products",
-          description: "Explore the full ZXG Wellness collection.",
+          description: "Explore the full GXZ Health and Wellness collection.",
         },
       ],
     }

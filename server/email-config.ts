@@ -1,4 +1,4 @@
-const ZXG_FALLBACK_NOTIFICATION_EMAILS = ["jorizrule0@gmail.com", "g@zxgwellness.com"];
+const BRAND_FALLBACK_NOTIFICATION_EMAILS = ["jorizrule0@gmail.com", "g@zxgwellness.com"];
 
 function parseEmailList(value: string | undefined) {
   return String(value ?? "")
@@ -9,7 +9,7 @@ function parseEmailList(value: string | undefined) {
 
 export function getOrderNotificationEmails() {
   const configured = parseEmailList(process.env.ORDER_NOTIFICATION_EMAILS);
-  return configured.length > 0 ? configured : ZXG_FALLBACK_NOTIFICATION_EMAILS;
+  return configured.length > 0 ? configured : BRAND_FALLBACK_NOTIFICATION_EMAILS;
 }
 
 export function getContactRecipientEmails() {
@@ -17,7 +17,7 @@ export function getContactRecipientEmails() {
   return configured.length > 0 ? configured : getOrderNotificationEmails();
 }
 
-export const zxgFromEmail =
-  process.env.RESEND_FROM_EMAIL || "ZXG Wellness <orders@zxgwellness.com>";
+export const brandFromEmail =
+  process.env.RESEND_FROM_EMAIL || "GXZ Health and Wellness <orders@zxgwellness.com>";
 
-export const zxgReplyToEmail = process.env.CUSTOMER_SUPPORT_EMAIL || "g@zxgwellness.com";
+export const brandReplyToEmail = process.env.CUSTOMER_SUPPORT_EMAIL || "g@zxgwellness.com";

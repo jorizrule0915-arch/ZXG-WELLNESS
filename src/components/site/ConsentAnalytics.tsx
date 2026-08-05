@@ -52,7 +52,7 @@ export function ConsentAnalytics() {
       className="fixed inset-x-4 bottom-4 z-[100] mx-auto max-w-2xl border border-gold/30 bg-obsidian p-5 shadow-2xl"
     >
       <p className="text-sm leading-6 text-foreground/85">
-        ZXG uses optional analytics to understand website performance. You can accept or decline;
+        GXZ uses optional analytics to understand website performance. You can accept or decline;
         checkout and essential site features work either way.
       </p>
       <div className="mt-4 flex flex-wrap gap-3">

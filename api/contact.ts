@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
-import { getContactRecipientEmails, zxgFromEmail } from "../server/email-config";
+import { getContactRecipientEmails, brandFromEmail } from "../server/email-config";
 import {
   getClientIp,
   publicErrorMessage,
@@ -84,20 +84,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const safeEmail = escapeHtml(email);
     const safeMessage = escapeHtml(message).replace(/\n/g, "<br />");
     const { error } = await resend.emails.send({
-      from: zxgFromEmail,
+      from: brandFromEmail,
       to: recipients,
       replyTo: email,
-      subject: `ZXG website message from ${name}`,
+      subject: `GXZ website message from ${name}`,
       html: `
         <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111">
-          <h2>New ZXG Wellness website message</h2>
+          <h2>New GXZ Health and Wellness website message</h2>
           <p><strong>Name:</strong> ${safeName}</p>
           <p><strong>Email:</strong> <a href="mailto:${safeEmail}">${safeEmail}</a></p>
           <p><strong>Message:</strong></p>
           <div style="padding:16px;background:#f6f6f6;border-left:4px solid #c9a84c">${safeMessage}</div>
         </div>
       `,
-      text: `New ZXG Wellness website message\n\nName: ${name}\nEmail: ${email}\n\n${message}`,
+      text: `New GXZ Health and Wellness website message\n\nName: ${name}\nEmail: ${email}\n\n${message}`,
     });
 
     if (error) throw new Error(error.message || "Email delivery failed.");

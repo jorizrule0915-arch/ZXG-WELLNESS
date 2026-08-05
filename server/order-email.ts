@@ -3,7 +3,7 @@ import { Resend } from "resend";
 const PEN_DISCOUNT_MIN_QTY = 5;
 const PEN_DISCOUNT_RATE = 0.1;
 const FREE_SHIPPING_THRESHOLD = 50;
-const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
+const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
 const DEFAULT_ADMIN_EMAILS = ["jorizrule0@gmail.com", "g@zxgwellness.com"];
 
 const money = (value: number) => Math.round(value * 100) / 100;
@@ -156,7 +156,7 @@ export function buildOrderEmailHtml(order: OrderEmail) {
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order Confirmed — ZXG Wellness</title>
+  <title>Order Confirmed — GXZ Health and Wellness</title>
 </head>
 <body bgcolor="#f6f4ef" style="margin:0;padding:0;background-color:#f6f4ef;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f6f4ef" style="border-collapse:collapse;background-color:#f6f4ef;">
@@ -165,7 +165,7 @@ export function buildOrderEmailHtml(order: OrderEmail) {
         <table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width:640px;max-width:100%;border-collapse:collapse;background-color:#ffffff;border:1px solid #e5e7eb;">
           <tr>
             <td style="padding:24px 28px;border-bottom:4px solid #c9a84c;font-family:Arial,Helvetica,sans-serif;">
-              <p style="margin:0 0 8px 0;font-size:12px;line-height:18px;color:#8a6f24;font-weight:bold;">ZXG Wellness</p>
+              <p style="margin:0 0 8px 0;font-size:12px;line-height:18px;color:#8a6f24;font-weight:bold;">GXZ Health and Wellness</p>
               <h1 style="margin:0 0 8px 0;font-size:24px;line-height:30px;color:#111827;font-weight:bold;">Order Confirmed</h1>
               <p style="margin:0;font-size:14px;line-height:22px;color:#374151;">Payment status: <strong style="color:#047857;">Paid</strong></p>
             </td>
@@ -236,7 +236,7 @@ function buildOrderEmailText(order: OrderEmail) {
     )
     .join("\n");
 
-  return `ZXG Wellness Order Confirmed
+  return `GXZ Health and Wellness Order Confirmed
 
 Order: #${shortId}
 Date: ${orderDate}
@@ -316,7 +316,7 @@ function buildLegacyOrderEmailHtml(order: OrderEmail) {
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="x-apple-disable-message-reformatting" />
-  <title>Order Confirmed — ZXG Wellness</title>
+  <title>Order Confirmed — GXZ Health and Wellness</title>
 </head>
 <body bgcolor="#0a0a0a" style="margin:0;padding:0;background-color:#0a0a0a;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
   <center style="width:100%;background-color:#0a0a0a;">
@@ -327,7 +327,7 @@ function buildLegacyOrderEmailHtml(order: OrderEmail) {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#111111" style="width:100%;max-width:640px;border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;background-color:#111111;border:1px solid #2a2a2a;">
             <tr>
               <td align="center" bgcolor="#0d0d0d" style="padding:38px 32px 34px 32px;background-color:#0d0d0d;border-bottom:2px solid #c9a84c;">
-                <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;">ZXG WELLNESS</p>
+                <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;">GXZ HEALTH AND WELLNESS</p>
                 <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:38px;font-weight:400;color:#f5f0e8;">Order Confirmed</h1>
                 <p style="margin:12px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#b8b0a4;">Payment status: <strong style="color:#7ee787;font-weight:700;">Paid</strong></p>
               </td>
@@ -441,7 +441,7 @@ export async function sendOrderConfirmationEmail(order: OrderEmail): Promise<Ord
       from,
       to: order.email,
       replyTo: "admin@zxgwellness.com",
-      subject: `Order Confirmed & Paid — #${shortId} | ZXG Wellness`,
+      subject: `Order Confirmed & Paid — #${shortId} | GXZ Health and Wellness`,
       html,
       text,
     },
@@ -461,7 +461,7 @@ export async function sendOrderConfirmationEmail(order: OrderEmail): Promise<Ord
         from,
         to: adminEmails,
         replyTo: order.email,
-        subject: `Paid Order Received — #${shortId} | ZXG Wellness`,
+        subject: `Paid Order Received — #${shortId} | GXZ Health and Wellness`,
         html,
         text,
       },

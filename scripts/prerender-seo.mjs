@@ -3,8 +3,8 @@ import { dirname, join } from "node:path";
 
 const outputDirectory = join(process.cwd(), "dist", "vercel");
 const siteUrl = "https://www.zxgwellness.com";
-const siteName = "ZXG Wellness";
-const defaultImage = `${siteUrl}/og/zxg-wellness-products.webp`;
+const siteName = "GXZ Health and Wellness";
+const defaultImage = `${siteUrl}/og/gxz-health-and-wellness.png`;
 const googleVerification = String(process.env.VITE_GOOGLE_SITE_VERIFICATION ?? "").trim();
 const socialProfiles = [
   process.env.VITE_INSTAGRAM_URL,
@@ -17,44 +17,44 @@ const socialProfiles = [
 const products = [
   {
     path: "/products/pen",
-    title: "ZXG Wellness Reusable Injection Pen",
+    title: "GXZ Health and Wellness Reusable Injection Pen",
     description:
-      "Shop the ZXG Wellness reusable peptide injection pen with a durable metal body, color options, 3mL cartridge compatibility, and adjustable dial.",
+      "Shop the GXZ Health and Wellness reusable peptide injection pen with a durable metal body, color options, 3mL cartridge compatibility, and adjustable dial.",
     price: "20.00",
   },
   {
     path: "/products/syringe",
-    title: "ZXG Wellness Syringe",
+    title: "GXZ Health and Wellness Syringe",
     description:
-      "Shop ZXG Wellness sterile syringes in multiple size options, packaged for precise handling and convenient wellness accessory use.",
+      "Shop GXZ Health and Wellness sterile syringes in multiple size options, packaged for precise handling and convenient wellness accessory use.",
     price: "15.00",
   },
   {
     path: "/products/cartridge",
-    title: "ZXG Wellness Disposable 3mL Cartridges",
+    title: "GXZ Health and Wellness Disposable 3mL Cartridges",
     description:
-      "Shop ZXG Wellness disposable 3mL cartridges, a 10-piece refill set designed for clean fit and consistent replacement with ZXG reusable pens.",
+      "Shop GXZ Health and Wellness disposable 3mL cartridges, a 10-piece refill set designed for clean fit and consistent replacement with GXZ reusable pens.",
     price: "10.00",
   },
   {
     path: "/products/needles",
-    title: "ZXG Wellness Single-Use Pen Needles",
+    title: "GXZ Health and Wellness Single-Use Pen Needles",
     description:
-      "Shop ZXG Wellness single-use pen needles in 100-count boxes with ultra-fine options for compatible reusable pen accessories.",
+      "Shop GXZ Health and Wellness single-use pen needles in 100-count boxes with ultra-fine options for compatible reusable pen accessories.",
     price: "10.00",
   },
   {
     path: "/products/creatine",
-    title: "ZXG Wellness Creatine Performance Matrix Powder",
+    title: "GXZ Health and Wellness Creatine Performance Matrix Powder",
     description:
-      "Shop ZXG Wellness Creatine Performance Matrix Powder for a clean daily performance routine supporting training strength, endurance, and recovery.",
+      "Shop GXZ Health and Wellness Creatine Performance Matrix Powder for a clean daily performance routine supporting training strength, endurance, and recovery.",
     price: "29.99",
   },
   {
     path: "/products/body-balm",
-    title: "ZXG Wellness Nourishing Body Balm",
+    title: "GXZ Health and Wellness Nourishing Body Balm",
     description:
-      "Shop ZXG Wellness Nourishing Body Balm, a recovery-focused skin treatment with cocoa butter, shea butter, and squalane for daily moisture.",
+      "Shop GXZ Health and Wellness Nourishing Body Balm, a recovery-focused skin treatment with cocoa butter, shea butter, and squalane for daily moisture.",
     price: "16.99",
   },
 ];
@@ -80,7 +80,7 @@ const articles = [
     path: "/blog/reusable-pen-cartridge-needle-setup-guide",
     title: "Reusable Peptide Pen Setup Guide: Cartridges and Pen Needles Explained",
     description:
-      "Compare a reusable peptide injection pen, disposable 3mL cartridges, and single-use pen needles so you can shop ZXG accessories with confidence.",
+      "Compare a reusable peptide injection pen, disposable 3mL cartridges, and single-use pen needles so you can shop GXZ accessories with confidence.",
     datePublished: "2026-06-29",
     dateModified: "2026-07-25",
   },
@@ -99,55 +99,55 @@ const staticRoutes = [
     path: "/",
     title: "Reusable Peptide Pens & Wellness Products",
     description:
-      "Shop ZXG Wellness reusable peptide injection pens, 3mL cartridges, pen needles, creatine, hydration, and premium recovery products.",
+      "Shop GXZ Health and Wellness reusable peptide injection pens, 3mL cartridges, pen needles, creatine, hydration, and premium recovery products.",
   },
   {
     path: "/products",
     title: "Wellness Products & Reusable Pen Accessories",
     description:
-      "Explore the ZXG Wellness collection of creatine, recovery skincare, reusable pens, cartridges, needles, and accessories.",
+      "Explore the GXZ Health and Wellness collection of creatine, recovery skincare, reusable pens, cartridges, needles, and accessories.",
   },
   {
     path: "/blog",
-    title: "ZXG Wellness Journal",
+    title: "GXZ Health and Wellness Journal",
     description:
-      "Read ZXG Wellness articles on creatine, recovery routines, wellness habits, reusable pens, cartridges, and accessories.",
+      "Read GXZ Health and Wellness articles on creatine, recovery routines, wellness habits, reusable pens, cartridges, and accessories.",
   },
   {
     path: "/about",
-    title: "About ZXG Wellness",
+    title: "About GXZ Health and Wellness",
     description:
-      "Learn the ZXG Wellness story, our approach to premium wellness products, and our commitment to considered daily care.",
+      "Learn the GXZ Health and Wellness story, our approach to premium wellness products, and our commitment to considered daily care.",
   },
   {
     path: "/contact",
-    title: "Contact ZXG Wellness",
+    title: "Contact GXZ Health and Wellness",
     description:
-      "Contact ZXG Wellness customer care for order, shipping, product, and return questions.",
+      "Contact GXZ Health and Wellness customer care for order, shipping, product, and return questions.",
   },
   {
     path: "/returns",
     title: "Returns & Refunds",
     description:
-      "Read the ZXG Wellness return, refund, damaged item, cancellation, and customer care policy before ordering.",
+      "Read the GXZ Health and Wellness return, refund, damaged item, cancellation, and customer care policy before ordering.",
   },
   {
     path: "/how-to-use",
-    title: "How to Use ZXG Wellness Accessories",
+    title: "How to Use GXZ Health and Wellness Accessories",
     description:
-      "Review ZXG Wellness setup videos, pen guidance, cartridge steps, needle attachment tips, and accessory handling resources.",
+      "Review GXZ Health and Wellness setup videos, pen guidance, cartridge steps, needle attachment tips, and accessory handling resources.",
   },
   {
     path: "/reusable-pen-difference",
     title: "Reusable Pen Comparison",
     description:
-      "Compare reusable pens, refill cartridges, single-use pen needles, and compatible accessory options from ZXG Wellness.",
+      "Compare reusable pens, refill cartridges, single-use pen needles, and compatible accessory options from GXZ Health and Wellness.",
   },
   {
     path: "/blog/authors/zxg-wellness-editorial-team",
-    title: "ZXG Wellness Editorial Team",
+    title: "GXZ Health and Wellness Editorial Team",
     description:
-      "Meet the ZXG Wellness editorial team behind practical product, recovery, hydration, and reusable-pen education.",
+      "Meet the GXZ Health and Wellness editorial team behind practical product, recovery, hydration, and reusable-pen education.",
   },
 ];
 
@@ -198,7 +198,7 @@ function schemaFor(route) {
       dateModified,
       mainEntityOfPage: url,
       image: defaultImage,
-      author: { "@type": "Organization", name: "ZXG Wellness Editorial Team" },
+      author: { "@type": "Organization", name: "GXZ Health and Wellness Editorial Team" },
       publisher: { "@type": "Organization", name: siteName },
     };
   }

@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { loadLocalEnv } from "./local-env";
 import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
 
-const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
+const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
 const REPLY_TO_EMAIL = "admin@zxgwellness.com";
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -147,7 +147,7 @@ function buildWarningEmailHtml({ name, message }: { name?: string; message: stri
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="x-apple-disable-message-reformatting" />
-  <title>Important Notice — ZXG Wellness</title>
+  <title>Important Notice — GXZ Health and Wellness</title>
 </head>
 <body bgcolor="#0a0a0a" style="margin:0;padding:0;background-color:#0a0a0a;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
   <center style="width:100%;background-color:#0a0a0a;">
@@ -158,7 +158,7 @@ function buildWarningEmailHtml({ name, message }: { name?: string; message: stri
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#111111" style="width:100%;max-width:640px;border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;background-color:#111111;border:1px solid #2a2a2a;">
             <tr>
               <td align="center" bgcolor="#0d0d0d" style="padding:38px 32px 34px 32px;background-color:#0d0d0d;border-bottom:2px solid #c9a84c;">
-                <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;">ZXG WELLNESS</p>
+                <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;">GXZ HEALTH AND WELLNESS</p>
                 <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:38px;font-weight:400;color:#f5f0e8;">Account Notice</h1>
                 <p style="margin:12px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#b8b0a4;">Important message from customer care</p>
               </td>
@@ -181,7 +181,7 @@ function buildWarningEmailHtml({ name, message }: { name?: string; message: stri
             </tr>
             <tr>
               <td align="center" bgcolor="#0d0d0d" style="padding:24px 32px;background-color:#0d0d0d;border-top:1px solid #2a2a2a;">
-                <p style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;">ZXG WELLNESS</p>
+                <p style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;">GXZ HEALTH AND WELLNESS</p>
                 <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:18px;color:#746b61;">
                   Customer care: <a href="mailto:${REPLY_TO_EMAIL}" style="color:#c9a84c;text-decoration:none;">${REPLY_TO_EMAIL}</a>
                 </p>
@@ -223,11 +223,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       from: DEFAULT_FROM_EMAIL,
       to: cleanEmail,
       replyTo: REPLY_TO_EMAIL,
-      subject: "Important Notice — ZXG Wellness",
+      subject: "Important Notice — GXZ Health and Wellness",
       html: buildWarningEmailHtml({ name: cleanName, message: cleanMessage }),
-      text: `ZXG Wellness Account Notice\n\nDear ${
+      text: `GXZ Health and Wellness Account Notice\n\nDear ${
         cleanName.trim() || "Valued Customer"
-      },\n\n${cleanMessage}\n\nIf you have questions, please reply to this email.\n\nZXG Wellness`,
+      },\n\n${cleanMessage}\n\nIf you have questions, please reply to this email.\n\nGXZ Health and Wellness`,
     });
 
     if (error) {

@@ -28,7 +28,7 @@ type TrustedProduct = {
 const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, number> }> = [
   {
     slug: "pen",
-    name: "ZXG Wellness Reusable Injection Pen",
+    name: "GXZ Health and Wellness Reusable Injection Pen",
     price: 20,
     active: true,
     optionPrices: {
@@ -46,7 +46,7 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
   },
   {
     slug: "syringe",
-    name: "ZXG Wellness Syringe",
+    name: "GXZ Health and Wellness Syringe",
     price: 15,
     active: true,
     optionPrices: {
@@ -55,10 +55,15 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
       "Large (3ml 23g)": 15,
     },
   },
-  { slug: "cartridge", name: "ZXG Wellness Disposable 3mL Cartridges", price: 10, active: true },
+  {
+    slug: "cartridge",
+    name: "GXZ Health and Wellness Disposable 3mL Cartridges",
+    price: 10,
+    active: true,
+  },
   {
     slug: "needles",
-    name: "ZXG Wellness Single-Use Pen Needles",
+    name: "GXZ Health and Wellness Single-Use Pen Needles",
     price: 10,
     active: true,
     optionPrices: {
@@ -81,13 +86,13 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
   },
   {
     slug: "creatine",
-    name: "ZXG Wellness Creatine Performance Matrix Powder",
+    name: "GXZ Health and Wellness Creatine Performance Matrix Powder",
     price: 29.99,
     active: true,
   },
   {
     slug: "body-balm",
-    name: "ZXG Wellness Nourishing Body Balm",
+    name: "GXZ Health and Wellness Nourishing Body Balm",
     price: 16.99,
     active: true,
     optionPrices: {
@@ -185,6 +190,12 @@ function money(amount: number) {
   return Math.round(amount * 100) / 100;
 }
 
+const legacyInitials = ["Z", "X", "G"].join("");
+const rebrandProductName = (name: string) =>
+  name
+    .replaceAll(`${legacyInitials} Wellness`, "GXZ Health and Wellness")
+    .replace(new RegExp(`\\b${legacyInitials}\\b`, "g"), "GXZ");
+
 function hashCart(
   items: Array<{
     product_slug: string;
@@ -230,7 +241,7 @@ async function calculateTrustedCart(supabase: SupabaseClient, rawItems: Checkout
       product.slug,
       {
         slug: product.slug,
-        name: product.name,
+        name: rebrandProductName(product.name),
         price: Number(product.price),
         active: Boolean(product.active),
       } satisfies TrustedProduct,

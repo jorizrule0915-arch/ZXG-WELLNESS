@@ -63,7 +63,7 @@ function BlogArticlePage() {
             },
             publisher: {
               "@type": "Organization",
-              name: "ZXG Wellness",
+              name: "GXZ Health and Wellness",
             },
             mainEntityOfPage: absoluteUrl(articlePath),
             keywords: article.keywords.join(", "),
@@ -352,7 +352,7 @@ function ArticleNotFound() {
     <main className="mx-auto max-w-3xl px-4 py-24 text-center sm:px-6">
       <Seo
         title="Article Not Found"
-        description="The requested ZXG Wellness article was not found."
+        description="The requested GXZ Health and Wellness article was not found."
         path="/blog"
         noIndex
       />

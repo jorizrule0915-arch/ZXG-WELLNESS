@@ -114,7 +114,7 @@ function ProductDetail() {
     sku: product.slug,
     brand: {
       "@type": "Brand",
-      name: "ZXG Wellness",
+      name: "GXZ Health and Wellness",
     },
     category: product.category,
     offers: {
@@ -212,6 +212,10 @@ function ProductDetail() {
                 ))}
               </div>
             )}
+            <p className="border-l border-gold/40 pl-4 text-xs leading-relaxed text-muted-foreground">
+              Brand transition: some product photography may show our previous mark while GXZ Health
+              and Wellness packaging is introduced. Product specifications are unchanged.
+            </p>
           </motion.div>
 
           {/* Info */}

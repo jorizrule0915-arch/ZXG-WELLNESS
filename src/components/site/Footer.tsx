@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import footerLogo from "@/assets/Logo/footer-logo-400.png";
+import footerLogo from "@/assets/Logo/gxz-footer-logo.svg";
 import { NewsletterSignup } from "@/components/site/NewsletterSignup";
 import { Instagram } from "lucide-react";
 
@@ -12,7 +12,7 @@ export function Footer() {
         <div className="md:col-span-2">
           <img
             src={footerLogo}
-            alt="ZXG Wellness"
+            alt="GXZ Health and Wellness"
             width="96"
             height="96"
             loading="lazy"
@@ -86,7 +86,7 @@ export function Footer() {
                 href={instagramUrl}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Follow ZXG Wellness on Instagram"
+                aria-label="Follow GXZ Health and Wellness on Instagram"
                 className="group inline-flex items-center gap-3 border border-gold/20 bg-obsidian/40 px-4 py-3 text-sm text-foreground/75 transition-all hover:border-gold/60 hover:text-gold"
               >
                 <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/30 bg-gold/5 transition-colors group-hover:bg-gold group-hover:text-obsidian">
@@ -96,7 +96,7 @@ export function Footer() {
                   <span className="block text-[10px] uppercase tracking-wide text-gold">
                     Instagram
                   </span>
-                  <span className="mt-0.5 block text-xs">Follow ZXG Wellness</span>
+                  <span className="mt-0.5 block text-xs">Follow GXZ Health and Wellness</span>
                 </span>
               </a>
             </div>
@@ -104,7 +104,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-gold/10 py-6 text-center text-[11px] uppercase tracking-luxury text-muted-foreground">
-        © {new Date().getFullYear()} ZXG Wellness — All rights reserved
+        © {new Date().getFullYear()} GXZ Health and Wellness — All rights reserved
       </div>
     </footer>
   );

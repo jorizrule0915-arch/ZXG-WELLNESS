@@ -56,9 +56,9 @@ function AdminLayout() {
       </Helmet>
       <aside className="w-64 shrink-0 border-r border-gold/15 bg-charcoal min-h-screen sticky top-0 hidden md:flex flex-col">
         <div className="px-6 py-8 border-b border-gold/15">
-          <div className="font-display text-3xl text-gold tracking-luxury">ZXG</div>
+          <div className="font-display text-3xl text-gold tracking-luxury">GXZ</div>
           <div className="text-[10px] uppercase tracking-luxury text-muted-foreground mt-1">
-            ZXG Admin
+            GXZ Admin
           </div>
         </div>
         <nav className="flex-1 py-6 px-4 space-y-1">
@@ -91,7 +91,7 @@ function AdminLayout() {
       </aside>
 
       <div className="md:hidden fixed top-0 inset-x-0 h-14 z-40 bg-charcoal border-b border-gold/15 flex items-center justify-between px-4">
-        <div className="font-display text-xl text-gold tracking-luxury">ZXG Admin</div>
+        <div className="font-display text-xl text-gold tracking-luxury">GXZ Admin</div>
         <Link to="/" className="text-[10px] uppercase tracking-luxury text-muted-foreground">
           Exit
         </Link>

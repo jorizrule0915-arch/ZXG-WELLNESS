@@ -249,7 +249,7 @@ function AdminDashboard() {
   return (
     <>
       <Helmet>
-        <title>Dashboard — ZXG Admin</title>
+        <title>Dashboard — GXZ Admin</title>
       </Helmet>
       <div className="px-5 py-7 lg:px-8">
         <motion.div

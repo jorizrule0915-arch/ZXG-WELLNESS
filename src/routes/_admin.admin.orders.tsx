@@ -233,7 +233,7 @@ function AdminOrders() {
   return (
     <>
       <Helmet>
-        <title>Orders - ZXG Admin</title>
+        <title>Orders - GXZ Admin</title>
       </Helmet>
       <div className="overflow-x-hidden px-4 py-5 sm:px-5 sm:py-6 lg:px-8">
         <motion.div

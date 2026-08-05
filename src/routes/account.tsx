@@ -82,7 +82,7 @@ const progressSteps = [
   },
   {
     title: "Preparing",
-    description: "ZXG is packing your items.",
+    description: "GXZ is packing your items.",
   },
   {
     title: "With courier",
@@ -181,7 +181,7 @@ function AccountPage() {
     <>
       <Seo
         title="My Account"
-        description="View your ZXG Wellness orders."
+        description="View your GXZ Health and Wellness orders."
         path="/account"
         noIndex
       />
@@ -200,7 +200,7 @@ function AccountPage() {
                 Hi, <span className="text-gradient-gold italic">{displayName}</span>
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">
-                Track every ZXG order from purchase to delivery. Open any order to see what you
+                Track every GXZ order from purchase to delivery. Open any order to see what you
                 bought, where it is shipping, and the courier details once the package leaves us.
               </p>
 
@@ -626,7 +626,7 @@ function TrackingDetails({ order }: { order: Order }) {
         </a>
       ) : (
         <div className="border border-gold/10 bg-gold/5 p-4 text-sm leading-6 text-muted-foreground">
-          Tracking is added after ZXG hands the package to the shipping company. Until then, this
+          Tracking is added after GXZ hands the package to the shipping company. Until then, this
           page shows your order status and delivery destination.
         </div>
       )}
@@ -683,7 +683,7 @@ function TrackingExplainer() {
         />
         <ExplainerStep
           number="2"
-          title="ZXG prepares it"
+          title="GXZ prepares it"
           text="The team packs your items and updates the order status."
         />
         <ExplainerStep

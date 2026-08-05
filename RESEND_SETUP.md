@@ -25,7 +25,7 @@ Once you've verified your domain in Resend, follow these steps:
 The order sender is hardcoded in the app:
 
 ```typescript
-const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
+const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
 ```
 
 No extra sender environment variable is required. Just confirm `RESEND_API_KEY` is copied from the

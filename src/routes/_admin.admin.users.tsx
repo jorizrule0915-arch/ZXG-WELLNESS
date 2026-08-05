@@ -161,7 +161,7 @@ function AdminUsers() {
   return (
     <>
       <Helmet>
-        <title>Users — ZXG Admin</title>
+        <title>Users — GXZ Admin</title>
       </Helmet>
       <div className="px-5 lg:px-8 py-8">
         <motion.div

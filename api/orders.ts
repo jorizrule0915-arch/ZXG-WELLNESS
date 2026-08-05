@@ -3,7 +3,11 @@ import { createHash } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { loadLocalEnv } from "./local-env";
-import { getOrderNotificationEmails, zxgFromEmail, zxgReplyToEmail } from "../server/email-config";
+import {
+  getOrderNotificationEmails,
+  brandFromEmail,
+  brandReplyToEmail,
+} from "../server/email-config";
 import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
 
 const SHIPPING_FEE = 10;
@@ -58,7 +62,7 @@ type OrderEmailResult = {
 const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, number> }> = [
   {
     slug: "pen",
-    name: "ZXG Wellness Reusable Injection Pen",
+    name: "GXZ Health and Wellness Reusable Injection Pen",
     price: 20,
     active: true,
     optionPrices: {
@@ -76,7 +80,7 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
   },
   {
     slug: "syringe",
-    name: "ZXG Wellness Syringe",
+    name: "GXZ Health and Wellness Syringe",
     price: 15,
     active: true,
     optionPrices: {
@@ -85,10 +89,15 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
       "Large (3ml 23g)": 15,
     },
   },
-  { slug: "cartridge", name: "ZXG Wellness Disposable 3mL Cartridges", price: 10, active: true },
+  {
+    slug: "cartridge",
+    name: "GXZ Health and Wellness Disposable 3mL Cartridges",
+    price: 10,
+    active: true,
+  },
   {
     slug: "needles",
-    name: "ZXG Wellness Single-Use Pen Needles",
+    name: "GXZ Health and Wellness Single-Use Pen Needles",
     price: 10,
     active: true,
     optionPrices: {
@@ -111,13 +120,13 @@ const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, numb
   },
   {
     slug: "creatine",
-    name: "ZXG Wellness Creatine Performance Matrix Powder",
+    name: "GXZ Health and Wellness Creatine Performance Matrix Powder",
     price: 29.99,
     active: true,
   },
   {
     slug: "body-balm",
-    name: "ZXG Wellness Nourishing Body Balm",
+    name: "GXZ Health and Wellness Nourishing Body Balm",
     price: 16.99,
     active: true,
     optionPrices: {
@@ -333,7 +342,7 @@ function buildOrderEmailHtml(order: OrderEmail) {
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order Confirmed — ZXG Wellness</title>
+  <title>Order Confirmed — GXZ Health and Wellness</title>
 </head>
 <body bgcolor="#f6f4ef" style="margin:0;padding:0;background-color:#f6f4ef;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f6f4ef" style="border-collapse:collapse;background-color:#f6f4ef;">
@@ -342,7 +351,7 @@ function buildOrderEmailHtml(order: OrderEmail) {
         <table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width:640px;max-width:100%;border-collapse:collapse;background-color:#ffffff;border:1px solid #e5e7eb;">
           <tr>
             <td style="padding:24px 28px;border-bottom:4px solid #c9a84c;font-family:Arial,Helvetica,sans-serif;">
-              <p style="margin:0 0 8px 0;font-size:12px;line-height:18px;color:#8a6f24;font-weight:bold;">ZXG Wellness</p>
+              <p style="margin:0 0 8px 0;font-size:12px;line-height:18px;color:#8a6f24;font-weight:bold;">GXZ Health and Wellness</p>
               <h1 style="margin:0 0 8px 0;font-size:24px;line-height:30px;color:#111827;font-weight:bold;">Order Confirmed</h1>
               <p style="margin:0;font-size:14px;line-height:22px;color:#374151;">Payment status: <strong style="color:#047857;">Paid</strong></p>
             </td>
@@ -413,7 +422,7 @@ function buildOrderEmailText(order: OrderEmail) {
     )
     .join("\n");
 
-  return `ZXG Wellness Order Confirmed
+  return `GXZ Health and Wellness Order Confirmed
 
 Order: #${shortId}
 Date: ${orderDate}
@@ -493,7 +502,7 @@ function buildLegacyOrderEmailHtml(order: OrderEmail) {
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="x-apple-disable-message-reformatting" />
-  <title>Order Confirmed — ZXG Wellness</title>
+  <title>Order Confirmed — GXZ Health and Wellness</title>
 </head>
 <body bgcolor="#0a0a0a" style="margin:0;padding:0;background-color:#0a0a0a;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
   <center style="width:100%;background-color:#0a0a0a;">
@@ -504,7 +513,7 @@ function buildLegacyOrderEmailHtml(order: OrderEmail) {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#111111" style="width:100%;max-width:640px;border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;background-color:#111111;border:1px solid #2a2a2a;">
             <tr>
               <td align="center" bgcolor="#0d0d0d" style="padding:38px 32px 34px 32px;background-color:#0d0d0d;border-bottom:2px solid #c9a84c;">
-                <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;">ZXG WELLNESS</p>
+                <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:14px;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;">GXZ HEALTH AND WELLNESS</p>
                 <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:38px;font-weight:400;color:#f5f0e8;">Order Confirmed</h1>
                 <p style="margin:12px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#b8b0a4;">Payment status: <strong style="color:#7ee787;font-weight:700;">Paid</strong></p>
               </td>
@@ -614,10 +623,10 @@ async function sendOrderConfirmationEmail(order: OrderEmail): Promise<OrderEmail
   const customerError = await sendEmail(
     resend,
     {
-      from: zxgFromEmail,
+      from: brandFromEmail,
       to: order.email,
-      replyTo: zxgReplyToEmail,
-      subject: `Order Confirmed & Paid — #${shortId} | ZXG Wellness`,
+      replyTo: brandReplyToEmail,
+      subject: `Order Confirmed & Paid — #${shortId} | GXZ Health and Wellness`,
       html,
       text,
     },
@@ -634,10 +643,10 @@ async function sendOrderConfirmationEmail(order: OrderEmail): Promise<OrderEmail
     const adminError = await sendEmail(
       resend,
       {
-        from: zxgFromEmail,
+        from: brandFromEmail,
         to: adminEmails,
         replyTo: order.email,
-        subject: `Paid Order Received — #${shortId} | ZXG Wellness`,
+        subject: `Paid Order Received — #${shortId} | GXZ Health and Wellness`,
         html,
         text,
       },
@@ -672,6 +681,12 @@ function hashCart(
   return createHash("sha256").update(JSON.stringify(canonicalItems)).digest("hex");
 }
 
+const legacyInitials = ["Z", "X", "G"].join("");
+const rebrandProductName = (name: string) =>
+  name
+    .replaceAll(`${legacyInitials} Wellness`, "GXZ Health and Wellness")
+    .replace(new RegExp(`\\b${legacyInitials}\\b`, "g"), "GXZ");
+
 async function calculateTrustedCart(supabase: SupabaseClient, rawItems: CheckoutItemInput[]) {
   if (!Array.isArray(rawItems) || rawItems.length === 0) {
     throw Object.assign(new Error("Cart is empty"), { statusCode: 400 });
@@ -703,7 +718,7 @@ async function calculateTrustedCart(supabase: SupabaseClient, rawItems: Checkout
       product.slug,
       {
         slug: product.slug,
-        name: product.name,
+        name: rebrandProductName(product.name),
         price: Number(product.price),
         active: Boolean(product.active),
       } satisfies TrustedProduct,

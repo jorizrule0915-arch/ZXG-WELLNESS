@@ -33,7 +33,7 @@ function ReturnsPage() {
     <>
       <Seo
         title="Refund & Return Policy"
-        description="Read the ZXG Wellness return, refund, damaged item, cancellation, and customer care policy before ordering."
+        description="Read the GXZ Health and Wellness return, refund, damaged item, cancellation, and customer care policy before ordering."
         path="/returns"
       />
       <JsonLd
@@ -54,8 +54,8 @@ function ReturnsPage() {
             Refund &amp; <span className="text-gradient-gold italic">Return Policy</span>
           </h1>
           <p className="mt-6 text-muted-foreground text-sm">
-            At ZXG Wellness, we stand behind the quality of our products and strive to ensure every
-            customer has a positive experience.
+            At GXZ Health and Wellness, we stand behind the quality of our products and strive to
+            ensure every customer has a positive experience.
           </p>
           <p className="mt-3 text-[11px] uppercase tracking-luxury text-gold/60">
             Last updated: March 14, 2026

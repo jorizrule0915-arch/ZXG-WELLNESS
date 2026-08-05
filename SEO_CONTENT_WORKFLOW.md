@@ -1,4 +1,4 @@
-# ZXG Wellness SEO Content Workflow
+# GXZ Health and Wellness SEO Content Workflow
 
 Use this workflow to publish 2–3 high-quality articles each week without letting AI output go live unedited.
 
@@ -12,7 +12,7 @@ Use this workflow to publish 2–3 high-quality articles each week without letti
 ## Somnus AI Draft Prompt
 
 ```text
-Write a helpful, brand-safe SEO article for ZXG Wellness.
+Write a helpful, brand-safe SEO article for GXZ Health and Wellness.
 
 Topic:
 [INSERT TOPIC]
@@ -28,7 +28,7 @@ Requirements:
 - Do not make medical claims, treatment claims, or dosing promises.
 - Aim for 2,000–3,500 words for core authority articles.
 - Include a clear introduction, quick answer, table of contents, 4–8 sections, 3–6 FAQs, and internal link suggestions.
-- Mention relevant ZXG products naturally where useful.
+- Mention relevant GXZ products naturally where useful.
 - Include references from trusted sources such as PubMed, NIH, FDA, MedlinePlus, or professional organizations when making health, supplement, safety, or science-adjacent claims.
 - Add an educational disclaimer when discussing supplements or accessories.
 - Keep paragraphs short and easy to read on mobile.

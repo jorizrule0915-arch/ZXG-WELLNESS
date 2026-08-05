@@ -68,11 +68,11 @@ export const blogCategories: BlogCategory[] = [
 export const blogAuthors: BlogAuthor[] = [
   {
     slug: "zxg-wellness-editorial-team",
-    name: "ZXG Wellness Editorial Team",
+    name: "GXZ Health and Wellness Editorial Team",
     role: "Product education and wellness editorial team",
     credentials:
-      "ZXG Wellness product research, customer education, and brand review. Articles are written for general education, use conservative wellness language, and reference external scientific or public-health sources where relevant.",
-    bio: "The ZXG Wellness Editorial Team creates practical guides that help customers understand wellness routines, recovery habits, supplements, and product accessories before they buy. The team focuses on plain-language education, transparent sourcing, and clear safety notes rather than replacing professional medical advice.",
+      "GXZ Health and Wellness product research, customer education, and brand review. Articles are written for general education, use conservative wellness language, and reference external scientific or public-health sources where relevant.",
+    bio: "The GXZ Health and Wellness Editorial Team creates practical guides that help customers understand wellness routines, recovery habits, supplements, and product accessories before they buy. The team focuses on plain-language education, transparent sourcing, and clear safety notes rather than replacing professional medical advice.",
     expertise: [
       "Product education",
       "Creatine and supplement shopping guidance",
@@ -95,14 +95,14 @@ export const blogArticles: BlogArticle[] = [
     publishedAt: "2026-06-29",
     updatedAt: "2026-06-29",
     readingTime: "6 min read",
-    author: "ZXG Wellness Editorial Team",
+    author: "GXZ Health and Wellness Editorial Team",
     authorSlug: "zxg-wellness-editorial-team",
-    reviewedBy: "ZXG Wellness Editorial Team",
+    reviewedBy: "GXZ Health and Wellness Editorial Team",
     reviewedAt: "2026-06-29",
     summaryAnswer:
       "Creatine fits best as a consistent daily habit inside a broader routine that includes resistance training, hydration, food, sleep, and recovery.",
     image: creatineImage,
-    imageAlt: "ZXG Wellness Creatine Performance Matrix Powder",
+    imageAlt: "GXZ Health and Wellness Creatine Performance Matrix Powder",
     keywords: [
       "creatine routine",
       "creatine recovery",
@@ -197,9 +197,9 @@ export const blogArticles: BlogArticle[] = [
     ],
     relatedLinks: [
       {
-        label: "Shop ZXG Creatine",
+        label: "Shop GXZ Creatine",
         path: "/products/creatine",
-        description: "View the ZXG Wellness creatine product page and product details.",
+        description: "View the GXZ Health and Wellness creatine product page and product details.",
       },
       {
         label: "Browse wellness products",
@@ -217,14 +217,14 @@ export const blogArticles: BlogArticle[] = [
     publishedAt: "2026-06-29",
     updatedAt: "2026-06-29",
     readingTime: "7 min read",
-    author: "ZXG Wellness Editorial Team",
+    author: "GXZ Health and Wellness Editorial Team",
     authorSlug: "zxg-wellness-editorial-team",
-    reviewedBy: "ZXG Wellness Editorial Team",
+    reviewedBy: "GXZ Health and Wellness Editorial Team",
     reviewedAt: "2026-06-29",
     summaryAnswer:
       "A strong post-workout recovery routine is short, repeatable, and built around cooling down, rehydrating, caring for dry skin, eating appropriately, and getting enough rest.",
     image: bodyBalmImage,
-    imageAlt: "ZXG Wellness Nourishing Body Balm",
+    imageAlt: "GXZ Health and Wellness Nourishing Body Balm",
     keywords: [
       "post workout recovery routine",
       "recovery skincare",
@@ -314,7 +314,8 @@ export const blogArticles: BlogArticle[] = [
       {
         label: "Shop Body Balm",
         path: "/products/body-balm",
-        description: "See ZXG Wellness Nourishing Body Balm for daily recovery skin care.",
+        description:
+          "See GXZ Health and Wellness Nourishing Body Balm for daily recovery skin care.",
       },
       {
         label: "Shop Creatine",
@@ -327,19 +328,19 @@ export const blogArticles: BlogArticle[] = [
     slug: "reusable-pen-cartridge-needle-setup-guide",
     title: "Reusable Peptide Pen Setup Guide: Cartridges and Pen Needles Explained",
     description:
-      "Compare a reusable peptide injection pen, disposable 3mL cartridges, and single-use pen needles so you can shop ZXG accessories with confidence.",
+      "Compare a reusable peptide injection pen, disposable 3mL cartridges, and single-use pen needles so you can shop GXZ accessories with confidence.",
     category: "Accessories",
     publishedAt: "2026-06-29",
     updatedAt: "2026-07-25",
     readingTime: "8 min read",
-    author: "ZXG Wellness Editorial Team",
+    author: "GXZ Health and Wellness Editorial Team",
     authorSlug: "zxg-wellness-editorial-team",
-    reviewedBy: "ZXG Wellness Editorial Team",
+    reviewedBy: "GXZ Health and Wellness Editorial Team",
     reviewedAt: "2026-06-29",
     summaryAnswer:
       "A reusable pen setup is easiest to understand as a system: the reusable pen body, compatible cartridges, and single-use pen needles each serve a different role.",
     image: penImage,
-    imageAlt: "ZXG Wellness reusable injection pen accessory",
+    imageAlt: "GXZ Health and Wellness reusable injection pen accessory",
     keywords: [
       "reusable peptide pen",
       "peptide injection pen",
@@ -369,7 +370,7 @@ export const blogArticles: BlogArticle[] = [
       {
         heading: "Cartridges are the refill component",
         paragraphs: [
-          "Disposable cartridges are the replacement piece that fits into the reusable pen system. ZXG cartridges are presented as a 3mL, 10-piece set for simple restocking.",
+          "Disposable cartridges are the replacement piece that fits into the reusable pen system. GXZ cartridges are presented as a 3mL, 10-piece set for simple restocking.",
           "If you are buying a reusable pen for the first time, it is helpful to check whether cartridges are needed for your intended setup.",
         ],
         bullets: [
@@ -390,7 +391,7 @@ export const blogArticles: BlogArticle[] = [
         heading: "Shop the system, not just one item",
         paragraphs: [
           "The easiest way to shop is to think in systems. If you are comparing accessories, look at the reusable pen, cartridges, and needles together so the full setup makes sense.",
-          "For any medical, dosing, or personal-use questions, speak with a qualified healthcare professional. ZXG product pages are designed to explain accessories and shopping details, not to replace professional guidance.",
+          "For any medical, dosing, or personal-use questions, speak with a qualified healthcare professional. GXZ product pages are designed to explain accessories and shopping details, not to replace professional guidance.",
         ],
       },
     ],
@@ -441,7 +442,7 @@ export const blogArticles: BlogArticle[] = [
       {
         label: "Shop reusable pen",
         path: "/products/pen",
-        description: "View ZXG Wellness reusable pen colors and product details.",
+        description: "View GXZ Health and Wellness reusable pen colors and product details.",
       },
       {
         label: "View setup guides",
@@ -459,14 +460,14 @@ export const blogArticles: BlogArticle[] = [
     publishedAt: "2026-07-01",
     updatedAt: "2026-07-01",
     readingTime: "9 min read",
-    author: "ZXG Wellness Editorial Team",
+    author: "GXZ Health and Wellness Editorial Team",
     authorSlug: "zxg-wellness-editorial-team",
-    reviewedBy: "ZXG Wellness Editorial Team",
+    reviewedBy: "GXZ Health and Wellness Editorial Team",
     reviewedAt: "2026-07-01",
     summaryAnswer:
       "Most people can support daily hydration with water and regular meals, while electrolyte or sports-drink products may be useful during heavy sweating, prolonged exercise, heat exposure, or fluid loss from illness.",
     image: hydrationProductImage,
-    imageAlt: "ZXG Wellness hydration electrolyte and amino formula packets",
+    imageAlt: "GXZ Health and Wellness hydration electrolyte and amino formula packets",
     keywords: [
       "hydration products",
       "electrolyte drinks",
@@ -630,9 +631,9 @@ export const blogArticles: BlogArticle[] = [
           "Build a repeatable post-workout routine around hydration, skin care, and rest.",
       },
       {
-        label: "Shop ZXG Creatine",
+        label: "Shop GXZ Creatine",
         path: "/products/creatine",
-        description: "Explore ZXG Wellness Creatine Performance Matrix Powder.",
+        description: "Explore GXZ Health and Wellness Creatine Performance Matrix Powder.",
       },
     ],
   },

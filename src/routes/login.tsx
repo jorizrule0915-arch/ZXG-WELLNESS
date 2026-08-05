@@ -166,7 +166,7 @@ function LoginPage() {
 
       <Seo
         title="Sign In"
-        description="Sign in to your ZXG Wellness account."
+        description="Sign in to your GXZ Health and Wellness account."
         path="/login"
         noIndex
       />

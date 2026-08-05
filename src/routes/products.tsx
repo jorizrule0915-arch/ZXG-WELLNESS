@@ -34,7 +34,7 @@ function ProductsPage() {
     <>
       <Seo
         title="Wellness Products, Creatine, Recovery Care & Accessories"
-        description="Explore the ZXG Wellness collection of creatine, recovery skincare, reusable pens, cartridges, needles, and accessories."
+        description="Explore the GXZ Health and Wellness collection of creatine, recovery skincare, reusable pens, cartridges, needles, and accessories."
         path="/products"
       />
       <JsonLd
@@ -46,7 +46,7 @@ function ProductsPage() {
           {
             "@context": "https://schema.org",
             "@type": "ItemList",
-            name: "ZXG Wellness Product Collection",
+            name: "GXZ Health and Wellness Product Collection",
             itemListElement: products.map((product, index) => ({
               "@type": "ListItem",
               position: index + 1,

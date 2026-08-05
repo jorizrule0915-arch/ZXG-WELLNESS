@@ -28,7 +28,7 @@ export function NewsletterSignup() {
 
       form.reset();
       setStatus("sent");
-      setMessage("You’re on the list. Watch your inbox for ZXG updates.");
+      setMessage("You’re on the list. Watch your inbox for GXZ updates.");
     } catch (error) {
       setStatus("error");
       setMessage(error instanceof Error ? error.message : "Subscription failed.");
@@ -64,7 +64,9 @@ export function NewsletterSignup() {
       </div>
       <label className="mt-3 flex items-start gap-2 text-xs leading-5 text-muted-foreground">
         <input name="consent" type="checkbox" required className="mt-1 accent-[#c9a84c]" />
-        <span>I agree to receive ZXG Wellness news and offers. Unsubscribe at any time.</span>
+        <span>
+          I agree to receive GXZ Health and Wellness news and offers. Unsubscribe at any time.
+        </span>
       </label>
       {message && (
         <p

@@ -9,7 +9,7 @@ export const Route = createFileRoute("/contact")({ component: ContactPage });
 
 const contactFaqs = [
   {
-    question: "How quickly does ZXG Wellness respond?",
+    question: "How quickly does GXZ Health and Wellness respond?",
     answer:
       "We aim to reply to website messages as soon as possible during normal business days. Including your order number and the email used at checkout helps us assist you faster.",
   },
@@ -21,7 +21,7 @@ const contactFaqs = [
   {
     question: "Can you help me choose compatible pen accessories?",
     answer:
-      "Yes. Tell us which ZXG pen or accessory you are considering, and we can explain the available cartridges, pen needles, sizes, and product options. We cannot provide medication, treatment, or dosing advice.",
+      "Yes. Tell us which GXZ pen or accessory you are considering, and we can explain the available cartridges, pen needles, sizes, and product options. We cannot provide medication, treatment, or dosing advice.",
   },
   {
     question: "How do I request a return or report a damaged item?",
@@ -29,9 +29,9 @@ const contactFaqs = [
       "Contact us with your order number and a description of the issue. For damaged items, include clear photographs when possible. Review the Returns page for eligibility, timing, and next steps.",
   },
   {
-    question: "Can ZXG Wellness answer medical or dosing questions?",
+    question: "Can GXZ Health and Wellness answer medical or dosing questions?",
     answer:
-      "No. ZXG customer care can explain product features, accessory compatibility, ordering, and general handling resources. Medical, medication, and dosing questions should be directed to a qualified healthcare professional or pharmacist.",
+      "No. GXZ customer care can explain product features, accessory compatibility, ordering, and general handling resources. Medical, medication, and dosing questions should be directed to a qualified healthcare professional or pharmacist.",
   },
 ];
 
@@ -83,8 +83,8 @@ function ContactPage() {
   return (
     <>
       <Seo
-        title="Contact ZXG Wellness"
-        description="Contact ZXG Wellness customer care for order, shipping, product, and return questions."
+        title="Contact GXZ Health and Wellness"
+        description="Contact GXZ Health and Wellness customer care for order, shipping, product, and return questions."
         path="/contact"
       />
       <JsonLd
@@ -108,7 +108,7 @@ function ContactPage() {
               loop
               playsInline
               preload="metadata"
-              aria-label="ZXG Wellness featured brand video"
+              aria-label="GXZ Health and Wellness featured brand video"
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/20 to-transparent" />
@@ -120,7 +120,7 @@ function ContactPage() {
                 Personal support, thoughtfully delivered.
               </h2>
               <p className="mt-4 max-w-md text-sm leading-7 text-white/70">
-                Whether you need help choosing an accessory or checking an order, the ZXG team is
+                Whether you need help choosing an accessory or checking an order, the GXZ team is
                 here to make the next step clear.
               </p>
             </div>
@@ -169,7 +169,7 @@ function ContactPage() {
                     Message received
                   </div>
                   <p className="mt-3 text-sm text-muted-foreground">
-                    Thank you. The ZXG team will reply soon.
+                    Thank you. The GXZ team will reply soon.
                   </p>
                   <button
                     type="button"

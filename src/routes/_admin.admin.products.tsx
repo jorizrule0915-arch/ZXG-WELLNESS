@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { authFetch, readApiJson } from "@/lib/api";
+import { rebrandLegacyText } from "@/lib/products";
 
 export const Route = createFileRoute("/_admin/admin/products")({ component: AdminProducts });
 
@@ -21,10 +22,25 @@ type Row = {
 };
 
 function StockBadge({ track_stock, stock_qty }: { track_stock: boolean; stock_qty: number }) {
-  if (!track_stock) return <span className="text-[10px] text-muted-foreground uppercase tracking-luxury">—</span>;
-  if (stock_qty === 0) return <span className="text-[10px] uppercase tracking-luxury px-2 py-0.5 bg-destructive/10 text-destructive border border-destructive/30">Out of Stock</span>;
-  if (stock_qty <= 5) return <span className="text-[10px] uppercase tracking-luxury px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/30">Low ({stock_qty})</span>;
-  return <span className="text-[10px] uppercase tracking-luxury px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">In Stock ({stock_qty})</span>;
+  if (!track_stock)
+    return <span className="text-[10px] text-muted-foreground uppercase tracking-luxury">—</span>;
+  if (stock_qty === 0)
+    return (
+      <span className="text-[10px] uppercase tracking-luxury px-2 py-0.5 bg-destructive/10 text-destructive border border-destructive/30">
+        Out of Stock
+      </span>
+    );
+  if (stock_qty <= 5)
+    return (
+      <span className="text-[10px] uppercase tracking-luxury px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/30">
+        Low ({stock_qty})
+      </span>
+    );
+  return (
+    <span className="text-[10px] uppercase tracking-luxury px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+      In Stock ({stock_qty})
+    </span>
+  );
 }
 
 function AdminProducts() {
@@ -42,7 +58,11 @@ function AdminProducts() {
     try {
       const res = await authFetch("/api/admin-data?resource=products");
       const data = await readApiJson<Row[]>(res);
-      setRows(Array.isArray(data) ? data : []);
+      setRows(
+        Array.isArray(data)
+          ? data.map((row) => ({ ...row, name: rebrandLegacyText(row.name) }))
+          : [],
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to load products";
       setLoadError(message);
@@ -62,7 +82,11 @@ function AdminProducts() {
       const res = await authFetch("/api/admin-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "toggle-product-active", id, payload: { active: !current } }),
+        body: JSON.stringify({
+          action: "toggle-product-active",
+          id,
+          payload: { active: !current },
+        }),
       });
       await readApiJson(res);
       toast.success(`Product ${!current ? "published" : "hidden"}`);
@@ -95,7 +119,7 @@ function AdminProducts() {
   return (
     <>
       <Helmet>
-        <title>Products — ZXG Admin</title>
+        <title>Products — GXZ Admin</title>
       </Helmet>
       <div className="px-5 lg:px-8 py-8">
         <motion.div
@@ -124,7 +148,9 @@ function AdminProducts() {
             ["Featured", featuredCount],
           ].map(([label, value]) => (
             <div key={label} className="border border-gold/15 bg-charcoal px-5 py-4">
-              <div className="text-[10px] uppercase tracking-luxury text-muted-foreground">{label}</div>
+              <div className="text-[10px] uppercase tracking-luxury text-muted-foreground">
+                {label}
+              </div>
               <div className="font-display text-2xl text-gold mt-1">{value}</div>
             </div>
           ))}

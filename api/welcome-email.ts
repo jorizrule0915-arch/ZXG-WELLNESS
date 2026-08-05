@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { loadLocalEnv } from "./local-env";
 import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
 
-const DEFAULT_FROM_EMAIL = "ZXG Wellness <orders@zxgwellness.com>";
+const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
 type WelcomeRequest = {
@@ -166,20 +166,20 @@ function buildWelcomeEmailHtml({ fullName }: { fullName: string }) {
     <div style="margin:0;padding:32px;background:#0a0a0a;color:#e8e8e8;font-family:Georgia,serif;">
       <div style="max-width:640px;margin:0 auto;background:#111;border:1px solid #2a2a2a;">
         <div style="padding:34px;text-align:center;border-bottom:2px solid #c9a84c;">
-          <div style="color:#c9a84c;letter-spacing:6px;font-size:11px;">ZXG WELLNESS</div>
-          <h1 style="margin:16px 0 8px;font-weight:400;color:#f5f0e8;">Welcome to ZXG Wellness</h1>
+          <div style="color:#c9a84c;letter-spacing:6px;font-size:11px;">GXZ HEALTH AND WELLNESS</div>
+          <h1 style="margin:16px 0 8px;font-weight:400;color:#f5f0e8;">Welcome to GXZ Health and Wellness</h1>
           <p style="margin:0;color:#9a9a9a;line-height:1.6;">Your account has been created.</p>
         </div>
         <div style="padding:32px;line-height:1.8;color:#d8d8d8;">
           <p style="margin-top:0;">${greeting}</p>
-          <p>Welcome to ZXG Wellness — your account is ready for a cleaner, more organized shopping experience.</p>
+          <p>Welcome to GXZ Health and Wellness — your account is ready for a cleaner, more organized shopping experience.</p>
           <p>You can now view your orders, see delivery updates when tracking is added, and return to your saved account details whenever you shop.</p>
           <div style="margin:28px 0;padding:20px;border:1px solid #2a2a2a;background:#0a0a0a;">
             <p style="margin:0 0 10px;color:#c9a84c;letter-spacing:3px;font-size:12px;">WHAT YOU CAN DO NEXT</p>
             <ul style="margin:0;padding-left:20px;color:#d8d8d8;">
               <li>Browse creatine, recovery care, and accessories.</li>
               <li>Track your orders from your account page.</li>
-              <li>Read product guides in the ZXG Wellness Journal.</li>
+              <li>Read product guides in the GXZ Health and Wellness Journal.</li>
             </ul>
           </div>
           <p style="margin-bottom:0;color:#9a9a9a;">If this was not you, you can ignore this message or contact us at <a href="mailto:admin@zxgwellness.com" style="color:#c9a84c;text-decoration:none;">admin@zxgwellness.com</a>.</p>
@@ -194,14 +194,14 @@ function buildWelcomeEmailText({ fullName }: { fullName: string }) {
 
   return `${greeting}
 
-Welcome to ZXG Wellness. Your account has been created.
+Welcome to GXZ Health and Wellness. Your account has been created.
 
 You can now view your orders, see delivery updates when tracking is added, and return to your saved account details whenever you shop.
 
 What you can do next:
 - Browse creatine, recovery care, and accessories.
 - Track your orders from your account page.
-- Read product guides in the ZXG Wellness Journal.
+- Read product guides in the GXZ Health and Wellness Journal.
 
 If this was not you, you can ignore this message or contact us at admin@zxgwellness.com.`;
 }
@@ -212,7 +212,7 @@ async function sendWelcomeEmail(values: { email: string; fullName: string }) {
     from: DEFAULT_FROM_EMAIL,
     to: values.email,
     replyTo: "admin@zxgwellness.com",
-    subject: "Welcome to ZXG Wellness",
+    subject: "Welcome to GXZ Health and Wellness",
     html: buildWelcomeEmailHtml(values),
     text: buildWelcomeEmailText(values),
   });

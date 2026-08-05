@@ -247,8 +247,8 @@ function HowToUsePage() {
   return (
     <>
       <Seo
-        title="How to Use ZXG Wellness Accessories"
-        description="Review ZXG Wellness setup videos, pen guidance, cartridge steps, needle attachment tips, and accessory handling resources."
+        title="How to Use GXZ Health and Wellness Accessories"
+        description="Review GXZ Health and Wellness setup videos, pen guidance, cartridge steps, needle attachment tips, and accessory handling resources."
         path="/how-to-use"
       />
       <JsonLd

@@ -214,7 +214,12 @@ function CheckoutPage() {
 
   return (
     <>
-      <Seo title="Checkout" description="Secure ZXG Wellness checkout." path="/checkout" noIndex />
+      <Seo
+        title="Checkout"
+        description="Secure GXZ Health and Wellness checkout."
+        path="/checkout"
+        noIndex
+      />
       <div className="mx-auto max-w-6xl px-6 lg:px-10 py-20 md:py-28">
         <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Final Step</div>
         <h1 className="font-display text-5xl md:text-6xl mb-6">Checkout</h1>
@@ -318,7 +323,12 @@ function CheckoutPaymentForm({
 
   return (
     <>
-      <Seo title="Payment" description="Secure ZXG Wellness payment." path="/checkout" noIndex />
+      <Seo
+        title="Payment"
+        description="Secure GXZ Health and Wellness payment."
+        path="/checkout"
+        noIndex
+      />
       <div className="mx-auto max-w-6xl px-6 lg:px-10 py-20 md:py-28">
         <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Secure Payment</div>
         <h1 className="font-display text-5xl md:text-6xl mb-6">Complete Payment</h1>

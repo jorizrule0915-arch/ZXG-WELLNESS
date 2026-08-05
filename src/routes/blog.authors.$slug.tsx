@@ -18,7 +18,7 @@ function BlogAuthorPage() {
     <>
       <Seo
         title={`${author.name} Author Profile`}
-        description={`${author.name} writes ZXG Wellness educational articles about ${author.expertise.join(", ")}.`}
+        description={`${author.name} writes GXZ Health and Wellness educational articles about ${author.expertise.join(", ")}.`}
         path={authorPath}
       />
       <JsonLd
@@ -113,7 +113,7 @@ function AuthorNotFound() {
     <main className="mx-auto max-w-3xl px-4 py-24 text-center sm:px-6">
       <Seo
         title="Author Not Found"
-        description="The requested ZXG Wellness author profile was not found."
+        description="The requested GXZ Health and Wellness author profile was not found."
         path="/blog"
         noIndex
       />

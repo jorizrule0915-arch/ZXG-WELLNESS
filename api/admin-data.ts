@@ -9,7 +9,7 @@ const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 const defaultProducts = [
   {
     slug: "pen",
-    name: "ZXG Wellness Reusable Injection Pen",
+    name: "GXZ Health and Wellness Reusable Injection Pen",
     tagline: "Precision-engineered metal pen",
     description:
       "Durable reusable injection pen with a premium metal body and adjustable dosing dial.",
@@ -42,7 +42,7 @@ const defaultProducts = [
   },
   {
     slug: "syringe",
-    name: "ZXG Wellness Syringe",
+    name: "GXZ Health and Wellness Syringe",
     tagline: "Sterile precision - 100 per box",
     description:
       "Clean, precise syringes with dependable sterile packaging and multiple size choices.",
@@ -64,14 +64,14 @@ const defaultProducts = [
   },
   {
     slug: "cartridge",
-    name: "ZXG Wellness Disposable 3mL Cartridges",
+    name: "GXZ Health and Wellness Disposable 3mL Cartridges",
     tagline: "Standard 3mL - 10 per set",
-    description: "Disposable cartridges built for a clean fit inside reusable ZXG injection pens.",
+    description: "Disposable cartridges built for a clean fit inside reusable GXZ injection pens.",
     price: 10,
     category: "Accessories",
     image: "cartridge",
-    ingredients: ["3mL capacity", "Universal ZXG fit", "10 per set"],
-    benefits: ["Reliable replacement option", "Built for ZXG reusable pens", "Compact set"],
+    ingredients: ["3mL capacity", "Universal GXZ fit", "10 per set"],
+    benefits: ["Reliable replacement option", "Built for GXZ reusable pens", "Compact set"],
     featured: false,
     active: true,
     track_stock: false,
@@ -80,7 +80,7 @@ const defaultProducts = [
   },
   {
     slug: "needles",
-    name: "ZXG Wellness Single-Use Pen Needles",
+    name: "GXZ Health and Wellness Single-Use Pen Needles",
     tagline: "Ultra-fine micro-tip - 100 per box",
     description:
       "Single-use pen needles designed for a smoother attachment experience. Each box includes 100 needles.",
@@ -88,7 +88,7 @@ const defaultProducts = [
     category: "Accessories",
     image: "needles",
     ingredients: ["Ultra-fine micro-tip", "100 per box", "Clean sterile finish"],
-    benefits: ["Works with ZXG pens", "Designed for controlled use", "Easy-to-store packaging"],
+    benefits: ["Works with GXZ pens", "Designed for controlled use", "Easy-to-store packaging"],
     featured: false,
     active: true,
     track_stock: false,
@@ -121,7 +121,7 @@ const defaultProducts = [
   },
   {
     slug: "creatine",
-    name: "ZXG Wellness Creatine Performance Matrix Powder",
+    name: "GXZ Health and Wellness Creatine Performance Matrix Powder",
     tagline: "Pure performance formula",
     description:
       "Creatine formula built to support strength output, workout endurance, and training recovery.",
@@ -138,7 +138,7 @@ const defaultProducts = [
   },
   {
     slug: "body-balm",
-    name: "ZXG Wellness Nourishing Body Balm",
+    name: "GXZ Health and Wellness Nourishing Body Balm",
     tagline: "Deeply moisturizing skin treatment",
     description: "Moisturizing body balm formulated with cocoa butter, shea butter, and squalane.",
     price: 16.99,

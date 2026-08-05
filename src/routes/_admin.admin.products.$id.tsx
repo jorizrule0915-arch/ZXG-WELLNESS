@@ -5,6 +5,7 @@ import { ChevronLeft } from "lucide-react";
 import { ProductForm, type ProductInput } from "@/components/admin/ProductForm";
 import { authFetch, readApiJson } from "@/lib/api";
 import { imageRefsFrom } from "@/lib/productImages";
+import { rebrandLegacyText } from "@/lib/products";
 
 export const Route = createFileRoute("/_admin/admin/products/$id")({ component: EditProduct });
 
@@ -26,9 +27,9 @@ function EditProduct() {
       setInitial({
         id: data.id,
         slug: data.slug,
-        name: data.name,
-        tagline: data.tagline,
-        description: data.description,
+        name: rebrandLegacyText(data.name),
+        tagline: rebrandLegacyText(data.tagline),
+        description: rebrandLegacyText(data.description),
         price: Number(data.price),
         category: data.category,
         image: data.image,
@@ -48,7 +49,7 @@ function EditProduct() {
   return (
     <>
       <Helmet>
-        <title>Edit Product — ZXG Admin</title>
+        <title>Edit Product — GXZ Admin</title>
       </Helmet>
       <div className="px-6 lg:px-10 py-10">
         <Link

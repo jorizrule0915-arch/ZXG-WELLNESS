@@ -2,7 +2,11 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 import Stripe from "stripe";
 import { loadLocalEnv } from "./local-env";
-import { getOrderNotificationEmails, zxgFromEmail, zxgReplyToEmail } from "../server/email-config";
+import {
+  getOrderNotificationEmails,
+  brandFromEmail,
+  brandReplyToEmail,
+} from "../server/email-config";
 
 type PaidPaymentIntent = {
   id: string;
@@ -46,9 +50,9 @@ async function sendPaidPaymentEmail(paymentIntent: PaidPaymentIntent) {
   const to = getOrderNotificationEmails();
 
   await getResend().emails.send({
-    from: zxgFromEmail,
+    from: brandFromEmail,
     to,
-    replyTo: zxgReplyToEmail,
+    replyTo: brandReplyToEmail,
     subject: `Stripe Payment Approved - $${amount}`,
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111;">

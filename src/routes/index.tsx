@@ -28,8 +28,8 @@ const testimonials = [
     quote:
       "The reusable pen feels much more premium than I expected. The weight, dial, and finish make my whole setup feel cleaner and easier to keep organized.",
     messages: [
-      { from: "Maya", text: "Just got my ZXG pen — the metal finish is really nice." },
-      { from: "ZXG", text: "Glad it arrived safely. How does the setup feel?" },
+      { from: "Maya", text: "Just got my GXZ pen — the metal finish is really nice." },
+      { from: "GXZ", text: "Glad it arrived safely. How does the setup feel?" },
       { from: "Maya", text: "Super simple. The cartridge system makes everything feel neat." },
     ],
   },
@@ -42,10 +42,10 @@ const testimonials = [
     verified: "Verified buyer",
     product: "Pen + Cartridges",
     quote:
-      "I wanted something that looked professional and did not feel disposable. ZXG’s pen has become the part of my routine that feels the most intentional.",
+      "I wanted something that looked professional and did not feel disposable. GXZ’s pen has become the part of my routine that feels the most intentional.",
     messages: [
       { from: "Daniel", text: "Do I need cartridges with the reusable pen?" },
-      { from: "ZXG", text: "Yes — pen body, cartridges, and pen needles work together." },
+      { from: "GXZ", text: "Yes — pen body, cartridges, and pen needles work together." },
       { from: "Daniel", text: "Perfect. That makes restocking way easier." },
     ],
   },
@@ -61,7 +61,7 @@ const testimonials = [
       "The site helped me understand the difference between the reusable pen and the refill pieces. It felt clear, polished, and not overwhelming.",
     messages: [
       { from: "Erin", text: "The pen diff page helped a lot, thank you." },
-      { from: "ZXG", text: "Happy it made the setup clearer." },
+      { from: "GXZ", text: "Happy it made the setup clearer." },
       { from: "Erin", text: "Yes — now I know what to buy first and what to restock." },
     ],
   },
@@ -98,7 +98,7 @@ function Index() {
     <>
       <Seo
         title="Reusable Peptide Pens & Wellness Products"
-        description="Shop ZXG Wellness reusable peptide injection pens, 3mL cartridges, pen needles, creatine, hydration, and premium recovery products."
+        description="Shop GXZ Health and Wellness reusable peptide injection pens, 3mL cartridges, pen needles, creatine, hydration, and premium recovery products."
         path="/"
       />
       <JsonLd data={[organizationSchema(), websiteSchema()]} />
@@ -121,7 +121,7 @@ function Index() {
         <div className="relative mx-auto max-w-7xl px-6 lg:px-10 w-full grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <div className="inline-block text-[10px] uppercase tracking-luxury text-gold border border-gold/40 px-3 py-1.5 mb-8">
-              ZXG Wellness
+              GXZ Health and Wellness
             </div>
             <h1 className="font-display text-5xl md:text-7xl leading-[1.05] tracking-tight">
               Wellness, <br />
@@ -133,7 +133,7 @@ function Index() {
             <div className="mt-10 flex flex-wrap items-center gap-5">
               <Link
                 to="/products"
-                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gold text-obsidian text-[11px] uppercase tracking-luxury font-medium hover:bg-gold-light transition-all glow-gold"
+                className="group relative inline-flex w-full items-center justify-center gap-3 bg-gold px-5 py-4 text-center text-[11px] font-medium uppercase tracking-luxury text-obsidian transition-all hover:bg-gold-light sm:w-auto sm:px-8 glow-gold"
               >
                 Discover the Collection
                 <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -238,11 +238,11 @@ function Index() {
             {[
               {
                 t: "Performance",
-                d: "ZXG Creatine is formulated to support strength output, endurance, and hydration during training.",
+                d: "GXZ Creatine is formulated to support strength output, endurance, and hydration during training.",
               },
               {
                 t: "Recovery",
-                d: "ZXG Body Balm restores and hydrates skin with botanical extracts. No fillers, no compromises.",
+                d: "GXZ Body Balm restores and hydrates skin with botanical extracts. No fillers, no compromises.",
               },
               { t: "Ritual", d: "Packaged to be displayed. Designed to be returned to, daily." },
             ].map((b, i) => (
@@ -279,7 +279,7 @@ function Index() {
               <span className="text-gradient-gold italic">shared by customers.</span>
             </h2>
             <p className="mt-5 text-base text-muted-foreground leading-relaxed">
-              A few notes from people using ZXG products in their wellness routines.
+              A few notes from people using GXZ products in their wellness routines.
             </p>
             <p className="mt-3 text-sm text-muted-foreground/90">
               Purchase context is included so each testimonial feels clear and grounded.
@@ -416,7 +416,7 @@ function Index() {
             muted
             playsInline
             preload="none"
-            aria-label="ZXG Wellness creatine product presentation"
+            aria-label="GXZ Health and Wellness creatine product presentation"
             className="w-full object-cover max-h-[80vh]"
           />
         </motion.div>

@@ -59,7 +59,7 @@ function BlogPage() {
     <>
       <Seo
         title="Wellness Journal"
-        description="Read ZXG Wellness articles on creatine, recovery routines, wellness habits, reusable pens, cartridges, and accessories."
+        description="Read GXZ Health and Wellness articles on creatine, recovery routines, wellness habits, reusable pens, cartridges, and accessories."
         path="/blog"
       />
       <JsonLd
@@ -71,7 +71,7 @@ function BlogPage() {
           {
             "@context": "https://schema.org",
             "@type": "Blog",
-            name: "ZXG Wellness Journal",
+            name: "GXZ Health and Wellness Journal",
             url: absoluteUrl("/blog"),
             blogPost: blogArticles.map((article) => ({
               "@type": "BlogPosting",
@@ -96,13 +96,13 @@ function BlogPage() {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 border border-gold/20 bg-gold/10 px-3 py-2 text-xs font-medium uppercase tracking-wide-2 text-gold">
                 <Sparkles className="h-4 w-4" />
-                ZXG Wellness Journal
+                GXZ Health and Wellness Journal
               </div>
               <h1 className="mt-5 max-w-2xl font-display text-3xl leading-tight text-foreground sm:text-4xl lg:text-[2.75rem]">
                 Clear wellness guides for smarter product choices.
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">
-                Read practical articles on hydration, creatine, recovery, wellness routines, and ZXG
+                Read practical articles on hydration, creatine, recovery, wellness routines, and GXZ
                 product education before you shop.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
