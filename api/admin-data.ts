@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { randomUUID } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
-import { loadLocalEnv } from "./local-env";
-import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
+import { loadLocalEnv } from "./local-env.js";
+import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security.js";
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 

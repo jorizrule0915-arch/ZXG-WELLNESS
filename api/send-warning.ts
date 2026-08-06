@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { Resend } from "resend";
-import { loadLocalEnv } from "./local-env";
-import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
+import { loadLocalEnv } from "./local-env.js";
+import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security.js";
 
 const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
 const REPLY_TO_EMAIL = "admin@zxgwellness.com";

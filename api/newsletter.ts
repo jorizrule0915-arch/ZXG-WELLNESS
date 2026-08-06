@@ -5,8 +5,8 @@ import {
   publicErrorMessage,
   rejectDisallowedOrigin,
   setApiHeaders,
-} from "../server/http-security";
-import { loadLocalEnv } from "./local-env";
+} from "../server/http-security.js";
+import { loadLocalEnv } from "./local-env.js";
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

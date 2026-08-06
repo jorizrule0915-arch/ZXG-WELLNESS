@@ -2,13 +2,13 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { Resend } from "resend";
-import { loadLocalEnv } from "./local-env";
+import { loadLocalEnv } from "./local-env.js";
 import {
   getOrderNotificationEmails,
   brandFromEmail,
   brandReplyToEmail,
-} from "../server/email-config";
-import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security";
+} from "../server/email-config.js";
+import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security.js";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;

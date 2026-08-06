@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 import Stripe from "stripe";
-import { loadLocalEnv } from "./local-env";
+import { loadLocalEnv } from "./local-env.js";
 import {
   getOrderNotificationEmails,
   brandFromEmail,
   brandReplyToEmail,
-} from "../server/email-config";
+} from "../server/email-config.js";
 
 type PaidPaymentIntent = {
   id: string;

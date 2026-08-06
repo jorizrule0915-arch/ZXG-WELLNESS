@@ -1,13 +1,13 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
-import { getContactRecipientEmails, brandFromEmail } from "../server/email-config";
+import { getContactRecipientEmails, brandFromEmail } from "../server/email-config.js";
 import {
   getClientIp,
   publicErrorMessage,
   rejectDisallowedOrigin,
   setApiHeaders,
-} from "../server/http-security";
-import { loadLocalEnv } from "./local-env";
+} from "../server/http-security.js";
+import { loadLocalEnv } from "./local-env.js";
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
