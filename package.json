@@ -5,7 +5,6 @@
     "node": "22.x"
   },
   "sideEffects": false,
-  "type": "module",
   "scripts": {
     "dev": "vite dev --config vite.vercel.config.ts",
     "dev:local": "vite dev --config vite.vercel.config.ts",
