@@ -31,7 +31,6 @@
     }
   ],
   "routes": [
-    { "src": "/sitemap.xml", "dest": "/api/sitemap" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
