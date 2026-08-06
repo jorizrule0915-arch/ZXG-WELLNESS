@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { loadLocalEnv } from "./local-env";
 
 const siteUrl = String(
-  process.env.SITE_URL || process.env.VITE_SITE_URL || "https://www.zxgwellness.com",
+  process.env.SITE_URL || process.env.VITE_SITE_URL || "https://www.gxzhealthandwellness.com",
 ).replace(/\/+$/, "");
 const defaultLastmod = "2026-06-29";
 const fallbackProductSlugs = ["pen", "syringe", "cartridge", "needles", "creatine", "body-balm"];

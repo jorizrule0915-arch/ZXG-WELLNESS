@@ -31,7 +31,7 @@ function request({ method = "POST", origin, body, rawBody = "" } = {}) {
   req.method = method;
   req.body = body;
   req.headers = {
-    host: "www.zxgwellness.com",
+    host: "www.gxzhealthandwellness.com",
     ...(origin ? { origin } : {}),
   };
   req.socket = { remoteAddress: "127.0.0.1" };

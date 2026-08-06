@@ -405,7 +405,7 @@ function buildLegacyOrderEmailHtml(order: OrderEmail) {
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">
                   <tr>
                     <td align="center" bgcolor="#c9a84c" style="background-color:#c9a84c;">
-                      <a href="https://zxgwellness.com/account" style="display:inline-block;padding:13px 26px;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:14px;letter-spacing:2px;text-transform:uppercase;color:#0a0a0a;text-decoration:none;font-weight:700;">View My Orders</a>
+                      <a href="https://www.gxzhealthandwellness.com/account" style="display:inline-block;padding:13px 26px;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:14px;letter-spacing:2px;text-transform:uppercase;color:#0a0a0a;text-decoration:none;font-weight:700;">View My Orders</a>
                     </td>
                   </tr>
                 </table>

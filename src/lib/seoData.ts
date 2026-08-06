@@ -1,5 +1,5 @@
 export const siteName = "GXZ Health and Wellness";
-export const siteUrl = "https://www.zxgwellness.com";
+export const siteUrl = "https://www.gxzhealthandwellness.com";
 export const defaultSeoDescription =
   "Shop GXZ Health and Wellness reusable peptide injection pens, 3mL cartridges, pen needles, creatine, hydration, and premium recovery products.";
 export const defaultOgImage = "/og/gxz-health-and-wellness.png";

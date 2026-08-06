@@ -7,7 +7,7 @@ import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const apiProxyTarget =
-    env.VITE_API_PROXY_TARGET || env.ZXG_API_PROXY_TARGET || "https://www.zxgwellness.com";
+    env.VITE_API_PROXY_TARGET || env.ZXG_API_PROXY_TARGET || "https://www.gxzhealthandwellness.com";
   const devPort = Number(process.env.PORT || env.PORT || 8080);
 
   return {

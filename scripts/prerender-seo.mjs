@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
 const outputDirectory = join(process.cwd(), "dist", "vercel");
-const siteUrl = "https://www.zxgwellness.com";
+const siteUrl = "https://www.gxzhealthandwellness.com";
 const siteName = "GXZ Health and Wellness";
 const defaultImage = `${siteUrl}/og/gxz-health-and-wellness.png`;
 const googleVerification = String(process.env.VITE_GOOGLE_SITE_VERIFICATION ?? "").trim();

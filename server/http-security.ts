@@ -1,6 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-const productionOrigins = new Set(["https://zxgwellness.com", "https://www.zxgwellness.com"]);
+const productionOrigins = new Set([
+  "https://gxzhealthandwellness.com",
+  "https://www.gxzhealthandwellness.com",
+  "https://zxgwellness.com",
+  "https://www.zxgwellness.com",
+]);
 
 function configuredOrigins() {
   return String(process.env.ALLOWED_ORIGINS ?? "")

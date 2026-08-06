@@ -344,7 +344,7 @@ function getOrigin(req: VercelRequest) {
   const origin = req.headers.origin;
   if (origin && !Array.isArray(origin)) return origin;
   const host = req.headers.host;
-  return host ? `https://${host}` : "https://www.zxgwellness.com";
+  return host ? `https://${host}` : "https://www.gxzhealthandwellness.com";
 }
 
 async function createCheckoutSession(
