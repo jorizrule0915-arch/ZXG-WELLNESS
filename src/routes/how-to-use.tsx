@@ -27,7 +27,7 @@ const videoInstructions = [
   },
   {
     title: "What to expect when you receive your pen",
-    videoId: "g5kVjiQakKs",
+    src: "/Video/what-to-expect-when-you-receive-your-pen.mp4",
     description:
       "An overview of what comes in the package, how your pen is delivered, and important things to check before first use.",
   },
@@ -538,7 +538,7 @@ function HowToUsePage() {
                 const isEven = index % 2 === 0;
                 return (
                   <motion.div
-                    key={video.videoId}
+                    key={"videoId" in video ? video.videoId : video.src}
                     initial={{ opacity: 0, y: 24 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -547,14 +547,27 @@ function HowToUsePage() {
                   >
                     <div className={isEven ? "md:order-1" : "md:order-2"}>
                       <div className="relative w-full overflow-hidden rounded-sm border border-gold/15 pt-[56.25%] shadow-[0_0_40px_-10px_rgba(0,0,0,0.8)]">
-                        <iframe
-                          src={`https://www.youtube.com/embed/${video.videoId}?rel=0`}
-                          title={video.title}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          allowFullScreen
-                          className="absolute top-0 left-0 w-full h-full"
-                        />
+                        {"src" in video ? (
+                          <video
+                            className="absolute inset-0 h-full w-full bg-black object-contain"
+                            controls
+                            playsInline
+                            preload="metadata"
+                            title={video.title}
+                          >
+                            <source src={video.src} type="video/mp4" />
+                            Your browser does not support this instructional video.
+                          </video>
+                        ) : (
+                          <iframe
+                            src={`https://www.youtube.com/embed/${video.videoId}?rel=0`}
+                            title={video.title}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                            className="absolute top-0 left-0 w-full h-full"
+                          />
+                        )}
                       </div>
                     </div>
 
