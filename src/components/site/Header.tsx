@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { ChevronDown, Moon, ShoppingBag, Menu, Sun, X, User } from "lucide-react";
 import { useCart, cartCount } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
-import headerLogoDark from "@/assets/Logo/official/gxz-wordmark-dark.webp";
-import headerLogoLight from "@/assets/Logo/official/gxz-wordmark-light.webp";
+import headerLogo from "@/assets/Logo/gxz-header-logo.svg";
 
 type NavTo =
   | "/"
@@ -91,12 +90,12 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-6 lg:px-10 h-[68px] flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <img
-            src={theme === "dark" ? headerLogoDark : headerLogoLight}
+            src={headerLogo}
             alt="GXZ Health and Wellness"
-            width="120"
-            height="60"
+            width="137"
+            height="50"
             fetchPriority="high"
-            className="h-[60px] w-[120px] object-contain"
+            className="h-[50px] w-auto"
           />
         </Link>
 
