@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import footerLogo from "@/assets/Logo/gxz-footer-logo.svg";
+import footerLogo from "@/assets/Logo/official/gxz-stacked-dark.webp";
 import { NewsletterSignup } from "@/components/site/NewsletterSignup";
 import { Instagram } from "lucide-react";
 
@@ -13,10 +13,10 @@ export function Footer() {
           <img
             src={footerLogo}
             alt="GXZ Health and Wellness"
-            width="96"
-            height="96"
+            width="144"
+            height="144"
             loading="lazy"
-            className="h-24 w-24"
+            className="h-36 w-36 object-contain"
           />
           <p className="mt-4 text-sm text-muted-foreground max-w-sm leading-relaxed">
             A luxury wellness brand — premium, editorial, considered. Crafted in small batches for

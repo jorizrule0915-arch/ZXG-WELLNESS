@@ -22,7 +22,7 @@ export function organizationSchema() {
     "@type": "OnlineStore",
     name: siteName,
     url: siteUrl,
-    logo: absoluteUrl("/gxz-mark.svg"),
+    logo: absoluteUrl("/android-chrome-512x512.png"),
     email: "g@zxgwellness.com",
     ...(sameAs.length > 0 ? { sameAs } : {}),
     contactPoint: {
