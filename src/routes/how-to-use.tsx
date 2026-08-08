@@ -26,12 +26,6 @@ const videoInstructions = [
       "A step-by-step guide on how to properly operate your refillable injection pen, from setup to correct usage.",
   },
   {
-    title: "What to expect when you receive your pen",
-    src: "/Video/what-to-expect-when-you-receive-your-pen.mp4",
-    description:
-      "An overview of what comes in the package, how your pen is delivered, and important things to check before first use.",
-  },
-  {
     title: "How to reconstitute your compound",
     videoId: "djPEGo9uurk",
     description:
@@ -50,6 +44,18 @@ const videoInstructions = [
       "A simple tutorial on how to securely attach the needle to your pen for safe and proper use.",
   },
 ];
+
+const arrivalVideo = {
+  title: "What to Expect When You Receive Your Pen",
+  src: "/Video/what-to-expect-when-you-receive-your-pen.mp4",
+  description:
+    "See what comes in your package, how your pen arrives, and the important details to check before first use.",
+  highlights: [
+    "See exactly what arrives in the package",
+    "Review the pen and included components",
+    "Know what to check before setup",
+  ],
+};
 
 const doseCheckVideo = {
   title: "How to Verify Your Dosing Pen Is Accurate — Step-by-Step Dose Check",
@@ -279,6 +285,66 @@ function HowToUsePage() {
               <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
                 Follow this interactive 22-step guide to safely prepare and use your injection pen.
               </p>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Latest Instructional Video */}
+        <section className="pb-20 px-6">
+          <div className="mx-auto max-w-6xl">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="overflow-hidden rounded-sm border border-gold/25 bg-charcoal shadow-[0_30px_80px_-45px_rgba(190,157,99,0.65)]"
+            >
+              <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
+                <div className="relative flex min-h-[420px] justify-center border-b border-gold/10 bg-black lg:min-h-[600px] lg:border-b-0 lg:border-r">
+                  <video
+                    className="absolute inset-0 h-full w-full bg-black object-contain"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    title={arrivalVideo.title}
+                  >
+                    <source src={arrivalVideo.src} type="video/mp4" />
+                    Your browser does not support this instructional video.
+                  </video>
+                </div>
+
+                <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-12">
+                  <div className="mb-5 flex flex-wrap items-center gap-3">
+                    <span className="border border-gold/30 bg-gold/10 px-3 py-1 text-[10px] uppercase tracking-luxury text-gold">
+                      Newest Video
+                    </span>
+                    <span className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+                      Start Here
+                    </span>
+                  </div>
+
+                  <h2 className="font-display text-3xl font-light leading-tight text-foreground sm:text-4xl">
+                    {arrivalVideo.title}
+                  </h2>
+                  <div className="my-6 h-px w-12 bg-gold/45" />
+                  <p className="text-sm leading-7 text-muted-foreground sm:text-[15px]">
+                    {arrivalVideo.description}
+                  </p>
+
+                  <div className="mt-7 grid gap-3">
+                    {arrivalVideo.highlights.map((highlight) => (
+                      <div
+                        key={highlight}
+                        className="flex items-start gap-3 border border-gold/10 bg-surface/60 px-4 py-3 text-sm text-foreground/85"
+                      >
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold text-obsidian">
+                          <Check className="h-3.5 w-3.5" />
+                        </span>
+                        <span>{highlight}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </div>
         </section>
@@ -538,7 +604,7 @@ function HowToUsePage() {
                 const isEven = index % 2 === 0;
                 return (
                   <motion.div
-                    key={"videoId" in video ? video.videoId : video.src}
+                    key={video.videoId}
                     initial={{ opacity: 0, y: 24 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -547,27 +613,14 @@ function HowToUsePage() {
                   >
                     <div className={isEven ? "md:order-1" : "md:order-2"}>
                       <div className="relative w-full overflow-hidden rounded-sm border border-gold/15 pt-[56.25%] shadow-[0_0_40px_-10px_rgba(0,0,0,0.8)]">
-                        {"src" in video ? (
-                          <video
-                            className="absolute inset-0 h-full w-full bg-black object-contain"
-                            controls
-                            playsInline
-                            preload="metadata"
-                            title={video.title}
-                          >
-                            <source src={video.src} type="video/mp4" />
-                            Your browser does not support this instructional video.
-                          </video>
-                        ) : (
-                          <iframe
-                            src={`https://www.youtube.com/embed/${video.videoId}?rel=0`}
-                            title={video.title}
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowFullScreen
-                            className="absolute top-0 left-0 w-full h-full"
-                          />
-                        )}
+                        <iframe
+                          src={`https://www.youtube.com/embed/${video.videoId}?rel=0`}
+                          title={video.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          className="absolute top-0 left-0 w-full h-full"
+                        />
                       </div>
                     </div>
 
