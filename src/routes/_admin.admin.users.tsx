@@ -29,6 +29,8 @@ type UserRow = {
   total_spent: number;
 };
 
+type RawUserRow = Partial<UserRow> & { id?: unknown };
+
 const STATUS_CONFIG = {
   active: { label: "Active", color: "text-emerald-400 border-emerald-400/40" },
   suspended: { label: "Suspended", color: "text-yellow-400 border-yellow-400/40" },
@@ -38,6 +40,7 @@ const STATUS_CONFIG = {
 function AdminUsers() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [notes, setNotes] = useState<Record<string, string>>({});
@@ -47,18 +50,23 @@ function AdminUsers() {
 
   const load = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await authFetch("/api/admin-data?resource=users");
-      const rows = await readApiJson<UserRow[]>(res);
-      const nextUsers = Array.isArray(rows) ? rows : [];
+      const rows = await readApiJson<RawUserRow[]>(res);
+      const nextUsers = Array.isArray(rows)
+        ? rows.map(normalizeUser).filter((user): user is UserRow => user !== null)
+        : [];
       setUsers(nextUsers);
       const initialNotes: Record<string, string> = {};
       nextUsers.forEach((r) => {
         initialNotes[r.id] = r.admin_notes ?? "";
       });
       setNotes(initialNotes);
-    } catch {
-      toast.error("Failed to load users");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to load customers";
+      setLoadError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -152,10 +160,11 @@ function AdminUsers() {
     }
   };
 
+  const normalizedSearch = search.trim().toLowerCase();
   const filtered = users.filter(
-    (u) =>
-      u.email.toLowerCase().includes(search.toLowerCase()) ||
-      (u.full_name ?? "").toLowerCase().includes(search.toLowerCase()),
+    (user) =>
+      user.email.toLowerCase().includes(normalizedSearch) ||
+      user.full_name.toLowerCase().includes(normalizedSearch),
   );
 
   return (
@@ -163,29 +172,31 @@ function AdminUsers() {
       <Helmet>
         <title>Users — GXZ Admin</title>
       </Helmet>
-      <div className="px-5 lg:px-8 py-8">
+      <div className="px-4 py-5 sm:px-6 lg:px-8 lg:py-7">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="border-b border-gold/15 pb-6">
-            <div className="text-[10px] uppercase tracking-luxury text-gold mb-2">Management</div>
-            <h1 className="font-display text-3xl md:text-4xl">Accounts</h1>
-            <p className="text-sm text-muted-foreground mt-2">
+          <div className="border-b border-white/[0.08] pb-6">
+            <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c9a84c]">
+              Customer management
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight text-white">Customers</h1>
+            <p className="mt-2 text-sm text-slate-400">
               Manage customer access, notes, warning emails, and admin roles.
             </p>
           </div>
         </motion.div>
 
         {/* Search */}
-        <div className="mt-6 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="relative mt-6">
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by email or name…"
-            className="w-full bg-charcoal border border-gold/20 pl-11 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-gold/60 transition-colors"
+            className="min-h-11 w-full rounded-md border border-white/10 bg-[#101318] pl-11 pr-4 text-sm text-white outline-none placeholder:text-slate-600 focus:border-[#c9a84c]/60"
           />
         </div>
 
@@ -203,16 +214,28 @@ function AdminUsers() {
         </div>
 
         {/* Table */}
-        <div className="mt-6 border border-gold/15 bg-charcoal">
+        <div className="mt-6 overflow-hidden rounded-lg border border-white/[0.08] bg-[#101318]">
           {loading ? (
             <div className="p-12 text-center text-muted-foreground text-sm">Loading…</div>
+          ) : loadError ? (
+            <div className="p-10 text-center">
+              <p className="text-sm font-medium text-red-300">Customers could not load</p>
+              <p className="mx-auto mt-2 max-w-lg text-xs leading-5 text-slate-500">{loadError}</p>
+              <button
+                type="button"
+                onClick={load}
+                className="mt-5 min-h-10 rounded-md border border-white/10 px-4 text-sm text-slate-200 hover:bg-white/[0.06]"
+              >
+                Try again
+              </button>
+            </div>
           ) : filtered.length === 0 ? (
             <div className="p-12 text-center text-muted-foreground text-sm">No users found</div>
           ) : (
             <ul className="divide-y divide-gold/10">
               {filtered.map((user) => {
                 const isOpen = expanded === user.id;
-                const sc = STATUS_CONFIG[user.status];
+                const sc = STATUS_CONFIG[user.status] ?? STATUS_CONFIG.active;
                 return (
                   <li key={user.id}>
                     {/* Row */}
@@ -384,4 +407,28 @@ function AdminUsers() {
       </div>
     </>
   );
+}
+
+function normalizeUser(row: RawUserRow): UserRow | null {
+  if (typeof row.id !== "string" || !row.id) return null;
+
+  const status =
+    row.status === "suspended" || row.status === "banned" || row.status === "active"
+      ? row.status
+      : "active";
+
+  return {
+    id: row.id,
+    email: typeof row.email === "string" ? row.email : "",
+    full_name: typeof row.full_name === "string" ? row.full_name : "",
+    status,
+    admin_notes: typeof row.admin_notes === "string" ? row.admin_notes : "",
+    created_at:
+      typeof row.created_at === "string" && row.created_at
+        ? row.created_at
+        : new Date(0).toISOString(),
+    is_admin: row.is_admin === true,
+    order_count: Number.isFinite(Number(row.order_count)) ? Number(row.order_count) : 0,
+    total_spent: Number.isFinite(Number(row.total_spent)) ? Number(row.total_spent) : 0,
+  };
 }
