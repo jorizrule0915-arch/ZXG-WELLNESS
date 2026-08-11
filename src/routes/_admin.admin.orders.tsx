@@ -45,6 +45,8 @@ type Order = {
   shipped_at?: string | null;
   estimated_delivery_date?: string | null;
   shipment_note?: string | null;
+  tracking_location?: string | null;
+  tracking_updated_at?: string | null;
   order_items: Item[];
 };
 
@@ -55,6 +57,8 @@ type TrackingDraft = {
   tracking_status: TrackingStatus;
   estimated_delivery_date: string;
   shipment_note: string;
+  tracking_location: string;
+  tracking_updated_at: string;
 };
 
 const STATUSES: Order["status"][] = ["pending", "paid", "fulfilled", "cancelled"];
@@ -68,6 +72,7 @@ const TRACKING_STATUSES: Array<{ value: TrackingStatus; label: string }> = [
   { value: "delayed", label: "Delayed" },
   { value: "returned", label: "Returned" },
 ];
+const TRACKING_CARRIERS = ["USPS", "UPS", "FedEx", "DHL", "Canada Post", "Royal Mail", "Other"];
 
 const emptyTrackingDraft: TrackingDraft = {
   tracking_carrier: "",
@@ -76,6 +81,8 @@ const emptyTrackingDraft: TrackingDraft = {
   tracking_status: "processing",
   estimated_delivery_date: "",
   shipment_note: "",
+  tracking_location: "",
+  tracking_updated_at: "",
 };
 
 const noEstimatedDeliveryNote =
@@ -89,6 +96,7 @@ function AdminOrders() {
   const [trackingDrafts, setTrackingDrafts] = useState<Record<string, TrackingDraft>>({});
   const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
   const [resendingOrderId, setResendingOrderId] = useState<string | null>(null);
+  const [sendingTrackingOrderId, setSendingTrackingOrderId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -140,18 +148,25 @@ function AdminOrders() {
     const draft = trackingDrafts[order.id] ?? trackingDraftFromOrder(order);
     const payload = trackingPayloadFromDraft(draft, order.shipped_at);
 
+    setSendingTrackingOrderId(order.id);
     try {
       const res = await authFetch("/api/admin-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: "update-order-tracking",
+          action: "save-and-send-tracking",
           id: order.id,
           payload,
         }),
       });
-      const updated = await readApiJson<Order>(res);
-      toast.success("Tracking updated");
+      const result = await readApiJson<{
+        order: Order;
+        emailSent: boolean;
+        recipients: string[];
+      }>(res);
+      if (!result.emailSent) throw new Error("Email delivery was not confirmed");
+      const updated = { ...order, ...result.order };
+      toast.success("Tracking saved and email sent successfully");
       setOrders((prev) =>
         prev.map((item) => (item.id === order.id ? { ...item, ...updated } : item)),
       );
@@ -160,7 +175,9 @@ function AdminOrders() {
         [order.id]: trackingDraftFromOrder(updated),
       }));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update tracking");
+      toast.error(error instanceof Error ? error.message : "Failed to save and send tracking");
+    } finally {
+      setSendingTrackingOrderId(null);
     }
   };
 
@@ -365,6 +382,7 @@ function AdminOrders() {
                         removeOrder={() => removeOrder(order)}
                         deleting={deletingOrderId === order.id}
                         resending={resendingOrderId === order.id}
+                        savingTracking={sendingTrackingOrderId === order.id}
                       />
                     )}
                   </li>
@@ -388,6 +406,7 @@ function OrderDetails({
   removeOrder,
   deleting,
   resending,
+  savingTracking,
 }: {
   order: Order;
   draft: TrackingDraft;
@@ -398,6 +417,7 @@ function OrderDetails({
   removeOrder: () => void;
   deleting: boolean;
   resending: boolean;
+  savingTracking: boolean;
 }) {
   return (
     <div className="border-t border-gold/10 bg-obsidian/35 p-4 sm:p-5">
@@ -421,6 +441,7 @@ function OrderDetails({
               draft={draft}
               updateDraft={updateDraft}
               save={saveTracking}
+              saving={savingTracking}
             />
           </Panel>
           <Panel title="Customer email">
@@ -560,23 +581,34 @@ function TrackingEditor({
   draft,
   updateDraft,
   save,
+  saving,
 }: {
   order: Order;
   draft: TrackingDraft;
   updateDraft: (patch: Partial<TrackingDraft>) => void;
   save: () => void;
+  saving: boolean;
 }) {
   return (
     <div className="space-y-3">
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block">
-          <FieldLabel>Shipping company</FieldLabel>
-          <input
+          <FieldLabel>Shipping carrier</FieldLabel>
+          <select
             value={draft.tracking_carrier}
             onChange={(event) => updateDraft({ tracking_carrier: event.target.value })}
-            placeholder="UPS, FedEx, DHL, LBC"
             className={fieldClassName}
-          />
+          >
+            <option value="">Select carrier</option>
+            {!TRACKING_CARRIERS.includes(draft.tracking_carrier) && draft.tracking_carrier && (
+              <option value={draft.tracking_carrier}>{draft.tracking_carrier}</option>
+            )}
+            {TRACKING_CARRIERS.map((carrier) => (
+              <option key={carrier} value={carrier}>
+                {carrier}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label className="block">
@@ -591,18 +623,18 @@ function TrackingEditor({
       </div>
 
       <label className="block">
-        <FieldLabel>Tracking link</FieldLabel>
+        <FieldLabel>Custom tracking link (only needed for Other)</FieldLabel>
         <input
           value={draft.tracking_url}
           onChange={(event) => updateDraft({ tracking_url: event.target.value })}
-          placeholder="https://courier.com/track/..."
+          placeholder="Known carriers use their official tracking page automatically"
           className={fieldClassName}
         />
       </label>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block">
-          <FieldLabel>Courier status</FieldLabel>
+          <FieldLabel>Shipment status</FieldLabel>
           <select
             value={draft.tracking_status}
             onChange={(event) =>
@@ -650,13 +682,35 @@ function TrackingEditor({
         </div>
       </div>
 
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="block">
+          <FieldLabel>Current shipment location</FieldLabel>
+          <input
+            value={draft.tracking_location}
+            onChange={(event) => updateDraft({ tracking_location: event.target.value })}
+            placeholder="Albuquerque, NM distribution center"
+            className={fieldClassName}
+          />
+        </label>
+
+        <label className="block">
+          <FieldLabel>Update date and time</FieldLabel>
+          <input
+            type="datetime-local"
+            value={draft.tracking_updated_at}
+            onChange={(event) => updateDraft({ tracking_updated_at: event.target.value })}
+            className={fieldClassName}
+          />
+        </label>
+      </div>
+
       <label className="block">
-        <FieldLabel>Customer note</FieldLabel>
+        <FieldLabel>Latest shipment update</FieldLabel>
         <textarea
           value={draft.shipment_note}
           onChange={(event) => updateDraft({ shipment_note: event.target.value })}
           rows={3}
-          placeholder="Package has been handed to the courier."
+          placeholder="Package arrived at the carrier facility."
           className={`${fieldClassName} h-auto resize-none py-2`}
         />
       </label>
@@ -664,10 +718,11 @@ function TrackingEditor({
       <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center">
         <button
           onClick={save}
-          className="inline-flex min-h-11 items-center justify-center gap-2 bg-gold px-4 py-2 text-sm font-medium text-obsidian transition-colors hover:bg-gold-light"
+          disabled={saving}
+          className="inline-flex min-h-11 items-center justify-center gap-2 bg-gold px-4 py-2 text-sm font-medium text-obsidian transition-colors hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Save className="h-3.5 w-3.5" />
-          Save tracking
+          {saving ? "Saving & sending..." : "Save & Send"}
         </button>
 
         {order.shipped_at && (
@@ -779,6 +834,8 @@ function trackingDraftFromOrder(order: Order): TrackingDraft {
     tracking_status: isTrackingStatus(order.tracking_status) ? order.tracking_status : "processing",
     estimated_delivery_date: order.estimated_delivery_date?.slice(0, 10) ?? "",
     shipment_note: order.shipment_note ?? "",
+    tracking_location: order.tracking_location ?? "",
+    tracking_updated_at: toDateTimeLocal(order.tracking_updated_at),
   };
 }
 
@@ -789,6 +846,10 @@ function trackingPayloadFromDraft(draft: TrackingDraft, shippedAt?: string | nul
     tracking_url: draft.tracking_url,
     tracking_status: draft.tracking_status,
     shipment_note: draft.shipment_note,
+    tracking_location: draft.tracking_location,
+    tracking_updated_at: draft.tracking_updated_at
+      ? new Date(draft.tracking_updated_at).toISOString()
+      : null,
     shipped_at: shippedAt ?? null,
   };
 
@@ -797,6 +858,14 @@ function trackingPayloadFromDraft(draft: TrackingDraft, shippedAt?: string | nul
   }
 
   return payload;
+}
+
+function toDateTimeLocal(value: string | null | undefined) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const offset = date.getTimezoneOffset() * 60_000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 }
 
 function isTrackingStatus(status: unknown): status is TrackingStatus {

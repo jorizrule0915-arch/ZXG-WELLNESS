@@ -2,7 +2,12 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { randomUUID } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { loadLocalEnv } from "./local-env.js";
-import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security.js";
+import {
+  publicErrorMessage,
+  rejectDisallowedOrigin,
+  setApiHeaders,
+} from "../server/http-security.js";
+import { resolveTrackingUrl, sendTrackingUpdateEmails } from "../server/tracking-email.js";
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -213,6 +218,18 @@ function cleanOptionalDate(value: unknown) {
     });
   }
   return text;
+}
+
+function cleanOptionalDateTime(value: unknown) {
+  const text = cleanOptionalText(value, 40);
+  if (!text) return null;
+  const date = new Date(text);
+  if (Number.isNaN(date.getTime())) {
+    throw Object.assign(new Error("Tracking update date and time is not valid"), {
+      statusCode: 400,
+    });
+  }
+  return date.toISOString();
 }
 
 function cleanTrackingStatus(value: unknown) {
@@ -704,6 +721,110 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { data, error } = await updateOrderTracking(supabase, id, update);
         if (error) return res.status(500).json({ error: error.message });
         return res.status(200).json(data);
+      }
+
+      if (action === "save-and-send-tracking") {
+        const trackingStatus = cleanTrackingStatus(payload?.tracking_status);
+        const trackingCarrier = cleanOptionalText(payload?.tracking_carrier, 80);
+        const trackingNumber = cleanOptionalText(payload?.tracking_number, 120);
+        const trackingLocation = cleanOptionalText(payload?.tracking_location, 160);
+        const trackingUpdatedAt = cleanOptionalDateTime(payload?.tracking_updated_at);
+        const shipmentNote = cleanOptionalText(payload?.shipment_note, 500);
+        const shippedStatuses = new Set(["shipped", "in_transit", "out_for_delivery", "delivered"]);
+
+        if (!trackingCarrier) {
+          return res.status(400).json({ error: "Select a shipping carrier" });
+        }
+        if (!trackingNumber) {
+          return res.status(400).json({ error: "Enter the tracking number" });
+        }
+        if (!shipmentNote) {
+          return res.status(400).json({ error: "Enter the latest shipment update" });
+        }
+        if (!trackingLocation) {
+          return res.status(400).json({ error: "Enter the shipment location" });
+        }
+        if (!trackingUpdatedAt) {
+          return res.status(400).json({ error: "Enter the tracking update date and time" });
+        }
+
+        const enteredTrackingUrl = cleanOptionalUrl(payload?.tracking_url);
+        const officialTrackingUrl = resolveTrackingUrl({
+          id: String(id ?? ""),
+          email: "",
+          tracking_carrier: trackingCarrier,
+          tracking_number: trackingNumber,
+          tracking_url: null,
+        });
+        const trackingUrl = officialTrackingUrl ?? enteredTrackingUrl;
+        if (!trackingUrl) {
+          return res.status(400).json({
+            error: "Enter the carrier's official tracking link for this shipping company",
+          });
+        }
+
+        const update: Record<string, unknown> = {
+          tracking_carrier: trackingCarrier,
+          tracking_number: trackingNumber,
+          tracking_url: trackingUrl,
+          tracking_status: trackingStatus,
+          shipment_note: shipmentNote,
+          tracking_location: trackingLocation,
+          tracking_updated_at: trackingUpdatedAt,
+          shipped_at: shippedStatuses.has(trackingStatus)
+            ? (cleanOptionalText(payload?.shipped_at, 40) ?? new Date().toISOString())
+            : null,
+        };
+
+        const estimatedDeliveryDate = cleanOptionalDate(payload?.estimated_delivery_date);
+        if (estimatedDeliveryDate) update.estimated_delivery_date = estimatedDeliveryDate;
+
+        const { data: savedTracking, error: trackingError } = await updateOrderTracking(
+          supabase,
+          id,
+          update,
+        );
+        if (trackingError) return res.status(500).json({ error: trackingError.message });
+        if (!("tracking_location" in savedTracking) || !("tracking_updated_at" in savedTracking)) {
+          return res.status(500).json({
+            error: "The tracking database update has not been installed yet.",
+          });
+        }
+
+        const { data: customer, error: customerError } = await supabase
+          .from("orders")
+          .select("id, email, shipping_name")
+          .eq("id", id)
+          .single();
+        if (customerError || !customer?.email) {
+          return res.status(500).json({
+            error: "Tracking was saved, but the customer email address could not be loaded.",
+            saved: true,
+            emailSent: false,
+          });
+        }
+
+        const savedOrder = { ...customer, ...savedTracking };
+        try {
+          const delivery = await sendTrackingUpdateEmails(savedOrder);
+          return res.status(200).json({
+            order: savedOrder,
+            emailSent: true,
+            emailIds: {
+              customer: delivery.customerEmailId,
+              admins: delivery.adminEmailId,
+            },
+            recipients: delivery.recipients,
+          });
+        } catch (emailError) {
+          return res.status(502).json({
+            error:
+              "Tracking was saved, but email delivery was not confirmed. Please try Save & Send again.",
+            detail: publicErrorMessage(emailError, "Tracking email failed"),
+            saved: true,
+            emailSent: false,
+          });
+        }
       }
 
       if (action === "delete-order") {

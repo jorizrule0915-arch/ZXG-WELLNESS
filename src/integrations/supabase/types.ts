@@ -72,8 +72,10 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"];
           total: number;
           tracking_carrier: string | null;
+          tracking_location: string | null;
           tracking_number: string | null;
           tracking_status: string;
+          tracking_updated_at: string | null;
           tracking_url: string | null;
           updated_at: string;
           user_id: string;
@@ -93,8 +95,10 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"];
           total: number;
           tracking_carrier?: string | null;
+          tracking_location?: string | null;
           tracking_number?: string | null;
           tracking_status?: string;
+          tracking_updated_at?: string | null;
           tracking_url?: string | null;
           updated_at?: string;
           user_id: string;
@@ -114,8 +118,10 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"];
           total?: number;
           tracking_carrier?: string | null;
+          tracking_location?: string | null;
           tracking_number?: string | null;
           tracking_status?: string;
+          tracking_updated_at?: string | null;
           tracking_url?: string | null;
           updated_at?: string;
           user_id?: string;

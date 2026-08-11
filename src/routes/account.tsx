@@ -45,6 +45,8 @@ type Order = {
   shipped_at?: string | null;
   estimated_delivery_date?: string | null;
   shipment_note?: string | null;
+  tracking_location?: string | null;
+  tracking_updated_at?: string | null;
   order_items: OrderItem[];
 };
 
@@ -52,7 +54,7 @@ type OrderFilter = "all" | "active" | "delivered";
 type PillTone = "gold" | "muted" | "green" | "red" | "amber";
 
 const orderSelect =
-  "id, created_at, status, total, shipping_name, shipping_address, shipping_city, shipping_zip, tracking_carrier, tracking_number, tracking_url, tracking_status, shipped_at, estimated_delivery_date, shipment_note, order_items(product_name, product_slug, quantity, unit_price)";
+  "id, created_at, status, total, shipping_name, shipping_address, shipping_city, shipping_zip, tracking_carrier, tracking_number, tracking_url, tracking_status, shipped_at, estimated_delivery_date, shipment_note, tracking_location, tracking_updated_at, order_items(product_name, product_slug, quantity, unit_price)";
 
 const legacyOrderSelect =
   "id, created_at, status, total, shipping_name, shipping_address, shipping_city, shipping_zip, order_items(product_name, product_slug, quantity, unit_price)";
@@ -614,6 +616,21 @@ function TrackingDetails({ order }: { order: Order }) {
       )}
 
       {order.shipment_note && <TrackingField label="Latest Update" value={order.shipment_note} />}
+
+      <div className="grid gap-5 md:grid-cols-2">
+        {order.tracking_location && (
+          <TrackingField label="Current Location" value={order.tracking_location} />
+        )}
+        {order.tracking_updated_at && (
+          <TrackingField
+            label="Last Updated"
+            value={new Date(order.tracking_updated_at).toLocaleString(undefined, {
+              dateStyle: "medium",
+              timeStyle: "short",
+            })}
+          />
+        )}
+      </div>
 
       {order.tracking_url ? (
         <a
