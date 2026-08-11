@@ -32,6 +32,9 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/admin(?:/.*)?", "dest": "/index.html" },
+    { "src": "/(login|account|cart|checkout|reset-password)(?:/.*)?", "dest": "/index.html" },
+    { "src": "/auth/callback", "dest": "/index.html" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
