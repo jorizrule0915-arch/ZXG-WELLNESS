@@ -785,9 +785,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           update,
         );
         if (trackingError) return res.status(500).json({ error: trackingError.message });
-        if (!("tracking_location" in savedTracking) || !("tracking_updated_at" in savedTracking)) {
+        const requiredSavedFields = [
+          "tracking_carrier",
+          "tracking_number",
+          "tracking_url",
+          "tracking_status",
+          "shipment_note",
+          "tracking_location",
+          "tracking_updated_at",
+        ];
+        if (requiredSavedFields.some((field) => !(field in savedTracking))) {
           return res.status(500).json({
-            error: "The tracking database update has not been installed yet.",
+            error: "The complete tracking database update has not been installed yet.",
           });
         }
 
