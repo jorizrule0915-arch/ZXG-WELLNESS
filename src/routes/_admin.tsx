@@ -1,38 +1,60 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Package, ShoppingCart, Users, ArrowLeft } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { Toaster } from "sonner";
+import {
+  ArrowLeft,
+  ExternalLink,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Package,
+  ShoppingCart,
+  Users,
+  X,
+} from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import { Toaster } from "sonner";
+import adminLogo from "@/assets/Logo/official/gxz-wordmark-dark.webp";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_admin")({ component: AdminLayout });
 
 const navItems: {
   to: "/admin" | "/admin/products" | "/admin/orders" | "/admin/users";
   label: string;
+  description: string;
   icon: typeof LayoutDashboard;
   exact?: boolean;
 }[] = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/admin/products", label: "Products", icon: Package },
-  { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { to: "/admin/users", label: "Users", icon: Users },
+  {
+    to: "/admin",
+    label: "Overview",
+    description: "Store performance",
+    icon: LayoutDashboard,
+    exact: true,
+  },
+  {
+    to: "/admin/orders",
+    label: "Orders",
+    description: "Fulfillment & tracking",
+    icon: ShoppingCart,
+  },
+  { to: "/admin/products", label: "Products", description: "Catalog & inventory", icon: Package },
+  { to: "/admin/users", label: "Customers", description: "Accounts & access", icon: Users },
 ];
 
 function AdminLayout() {
-  const nav = useNavigate();
-  const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const [mounted, setMounted] = useState(false);
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (router) => router.location.pathname });
   const [checking, setChecking] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     (async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
-        nav({ to: "/login" });
+        navigate({ to: "/login" });
         return;
       }
       const { data: isAdmin } = await supabase.rpc("has_role", {
@@ -40,87 +62,147 @@ function AdminLayout() {
         _role: "admin",
       });
       if (!isAdmin) {
-        nav({ to: "/account" });
+        navigate({ to: "/account" });
         return;
       }
       setChecking(false);
     })();
-  }, [nav]);
+  }, [navigate]);
 
-  if (checking) return <div className="py-32 text-center text-muted-foreground">…</div>;
+  useEffect(() => setMobileMenuOpen(false), [pathname]);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
+  };
+
+  if (checking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0b0d10] text-sm text-slate-400">
+        Loading admin workspace...
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-obsidian flex">
+    <div className="min-h-screen bg-[#0b0d10] text-slate-100 lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       <Helmet>
         <meta name="robots" content="noindex,nofollow" />
       </Helmet>
-      <aside className="w-64 shrink-0 border-r border-gold/15 bg-charcoal min-h-screen sticky top-0 hidden md:flex flex-col">
-        <div className="px-6 py-8 border-b border-gold/15">
-          <div className="font-display text-3xl text-gold tracking-luxury">GXZ</div>
-          <div className="text-[10px] uppercase tracking-luxury text-muted-foreground mt-1">
-            GXZ Admin
-          </div>
+
+      <aside className="sticky top-0 hidden h-screen flex-col border-r border-white/[0.07] bg-[#101318] lg:flex">
+        <div className="flex h-20 items-center border-b border-white/[0.07] px-6">
+          <img
+            src={adminLogo}
+            alt="GXZ Health and Wellness"
+            className="h-9 w-auto object-contain"
+          />
         </div>
-        <nav className="flex-1 py-6 px-4 space-y-1">
-          {navItems.map((item) => {
-            const active = item.exact
-              ? pathname === "/admin" || pathname === "/admin/"
-              : pathname.startsWith(item.to);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`flex items-center gap-3 px-4 py-3 text-[11px] uppercase tracking-luxury transition-all ${active ? "bg-gold text-obsidian" : "text-foreground/70 hover:text-gold hover:bg-surface"}`}
-              >
-                <Icon className="h-4 w-4" strokeWidth={1.5} />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="p-4 border-t border-gold/15">
+
+        <div className="px-4 py-5">
+          <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+            Workspace
+          </p>
+          <nav className="mt-3 space-y-1" aria-label="Admin navigation">
+            {navItems.map((item) => (
+              <AdminNavLink key={item.to} item={item} pathname={pathname} />
+            ))}
+          </nav>
+        </div>
+
+        <div className="mt-auto border-t border-white/[0.07] p-4">
           <Link
             to="/"
-            className="flex items-center gap-2 px-4 py-2 text-[10px] uppercase tracking-luxury text-muted-foreground hover:text-gold transition-colors"
+            className="flex min-h-10 items-center gap-3 rounded-md px-3 text-sm text-slate-400 transition-colors hover:bg-white/[0.05] hover:text-white"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Storefront
+            <ExternalLink className="h-4 w-4" />
+            View storefront
           </Link>
+          <button
+            type="button"
+            onClick={signOut}
+            className="mt-1 flex min-h-10 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign out
+          </button>
         </div>
       </aside>
 
-      <div className="md:hidden fixed top-0 inset-x-0 h-14 z-40 bg-charcoal border-b border-gold/15 flex items-center justify-between px-4">
-        <div className="font-display text-xl text-gold tracking-luxury">GXZ Admin</div>
-        <Link to="/" className="text-[10px] uppercase tracking-luxury text-muted-foreground">
-          Exit
-        </Link>
-      </div>
+      <div className="min-w-0">
+        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-white/[0.07] bg-[#101318]/95 px-4 backdrop-blur lg:hidden">
+          <img src={adminLogo} alt="GXZ Health and Wellness" className="h-8 w-auto" />
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 text-slate-300"
+            aria-expanded={mobileMenuOpen}
+            aria-label="Toggle admin navigation"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </header>
 
-      <main
-        className={`flex-1 min-w-0 pt-14 md:pt-0 ${mounted ? "opacity-100" : "opacity-0"} transition-opacity duration-500`}
-      >
-        <div className="md:hidden flex border-b border-gold/15 bg-charcoal">
-          {navItems.map((item) => {
-            const active = item.exact
-              ? pathname === "/admin" || pathname === "/admin/"
-              : pathname.startsWith(item.to);
-            return (
+        {mobileMenuOpen && (
+          <div className="fixed inset-x-0 top-16 z-30 border-b border-white/10 bg-[#101318] p-3 shadow-2xl lg:hidden">
+            <nav className="space-y-1" aria-label="Mobile admin navigation">
+              {navItems.map((item) => (
+                <AdminNavLink key={item.to} item={item} pathname={pathname} />
+              ))}
+            </nav>
+            <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/[0.07] pt-3">
               <Link
-                key={item.to}
-                to={item.to}
-                className={`flex-1 text-center py-3 text-[10px] uppercase tracking-luxury ${active ? "text-gold border-b-2 border-gold" : "text-muted-foreground"}`}
+                to="/"
+                className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-white/10 text-sm text-slate-300"
               >
-                {item.label}
+                <ArrowLeft className="h-4 w-4" /> Store
               </Link>
-            );
-          })}
-        </div>
-        <div className="mx-auto w-full max-w-[1500px]">
-          <Outlet />
-        </div>
-      </main>
-      <Toaster theme="dark" position="top-right" />
+              <button
+                type="button"
+                onClick={signOut}
+                className="flex min-h-10 items-center justify-center gap-2 rounded-md border border-white/10 text-sm text-slate-300"
+              >
+                <LogOut className="h-4 w-4" /> Sign out
+              </button>
+            </div>
+          </div>
+        )}
+
+        <main className="min-h-screen min-w-0 bg-[#0b0d10]">
+          <div className="mx-auto w-full max-w-[1600px]">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+      <Toaster theme="dark" position="top-right" richColors />
     </div>
+  );
+}
+
+function AdminNavLink({ item, pathname }: { item: (typeof navItems)[number]; pathname: string }) {
+  const active = item.exact
+    ? pathname === "/admin" || pathname === "/admin/"
+    : pathname.startsWith(item.to);
+  const Icon = item.icon;
+
+  return (
+    <Link
+      to={item.to}
+      className={`flex min-h-12 items-center gap-3 rounded-md px-3 transition-colors ${
+        active
+          ? "bg-[#c9a84c]/12 text-[#e3c66e]"
+          : "text-slate-400 hover:bg-white/[0.05] hover:text-slate-100"
+      }`}
+    >
+      <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} />
+      <span className="min-w-0">
+        <span className="block text-sm font-medium">{item.label}</span>
+        <span
+          className={`block truncate text-[11px] ${active ? "text-[#c9a84c]/65" : "text-slate-600"}`}
+        >
+          {item.description}
+        </span>
+      </span>
+    </Link>
   );
 }
