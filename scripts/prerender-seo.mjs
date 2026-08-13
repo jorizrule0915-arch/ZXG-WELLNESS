@@ -5,6 +5,13 @@ const outputDirectory = join(process.cwd(), "dist", "vercel");
 const siteUrl = "https://www.gxzhealthandwellness.com";
 const siteName = "GXZ Health and Wellness";
 const defaultImage = `${siteUrl}/og/gxz-health-and-wellness.png`;
+const merchantReturnPolicy = {
+  "@type": "MerchantReturnPolicy",
+  applicableCountry: "US",
+  returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+  merchantReturnDays: 30,
+  merchantReturnLink: `${siteUrl}/returns`,
+};
 const googleVerification = String(process.env.VITE_GOOGLE_SITE_VERIFICATION ?? "").trim();
 const socialProfiles = [
   process.env.VITE_INSTAGRAM_URL,
@@ -181,6 +188,7 @@ function schemaFor(route) {
         price: route.price,
         availability: "https://schema.org/InStock",
         itemCondition: "https://schema.org/NewCondition",
+        hasMerchantReturnPolicy: merchantReturnPolicy,
       },
     };
   }

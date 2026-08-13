@@ -15,7 +15,12 @@ import { galleryFor, penColorImages } from "@/lib/productImages";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getProductSeoContent } from "@/lib/productSeo";
 import { JsonLd, Seo } from "@/lib/seo";
-import { absoluteUrl, breadcrumbSchema, faqSchema } from "@/lib/seoData";
+import {
+  absoluteUrl,
+  breadcrumbSchema,
+  faqSchema,
+  merchantReturnPolicySchema,
+} from "@/lib/seoData";
 
 export const Route = createFileRoute("/products/$slug")({ component: ProductDetail });
 
@@ -126,6 +131,7 @@ function ProductDetail() {
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
       itemCondition: "https://schema.org/NewCondition",
+      hasMerchantReturnPolicy: merchantReturnPolicySchema,
     },
   };
 
