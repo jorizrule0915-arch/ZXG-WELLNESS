@@ -1,0 +1,27 @@
+# GXZ Health and Wellness
+
+> GXZ Health and Wellness is an online wellness store offering reusable injection pens, pen cartridges, pen needles, creatine, recovery care, and educational product guides.
+
+## Main pages
+
+- [Homepage](https://www.gxzhealthandwellness.com/): Explore GXZ Health and Wellness products and brand information.
+- [Products](https://www.gxzhealthandwellness.com/products): Browse the complete product collection.
+- [About GXZ](https://www.gxzhealthandwellness.com/about): Learn about the company and its approach to wellness products.
+- [How to Use](https://www.gxzhealthandwellness.com/how-to-use): Watch product setup and instructional videos.
+- [Blog](https://www.gxzhealthandwellness.com/blog): Read educational product and wellness guides.
+
+## Featured products
+
+- [Reusable Injection Pen](https://www.gxzhealthandwellness.com/products/pen): Product details for the reusable injection pen.
+- [Disposable 3mL Cartridges](https://www.gxzhealthandwellness.com/products/cartridge): Product details for compatible disposable cartridges.
+- [Single-Use Pen Needles](https://www.gxzhealthandwellness.com/products/needles): Product details for single-use pen needles.
+
+## Customer support
+
+- [Contact](https://www.gxzhealthandwellness.com/contact): Contact the GXZ customer support team.
+- [Returns](https://www.gxzhealthandwellness.com/returns): Review the return and refund policy.
+
+## Discovery files
+
+- [Sitemap](https://www.gxzhealthandwellness.com/sitemap.xml): List of public pages available for crawling.
+- [Robots instructions](https://www.gxzhealthandwellness.com/robots.txt): Search and crawler access instructions.
