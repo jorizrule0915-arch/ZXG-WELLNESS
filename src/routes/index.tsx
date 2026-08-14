@@ -70,7 +70,24 @@ const testimonials = [
 function Index() {
   const [heroIdx, setHeroIdx] = useState(0);
   const [loadVideo, setLoadVideo] = useState(false);
+  const [showDesktopMotion, setShowDesktopMotion] = useState(false);
   const videoSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const desktopQuery = window.matchMedia("(min-width: 1024px)");
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => {
+      setShowDesktopMotion(desktopQuery.matches && !reducedMotionQuery.matches);
+    };
+
+    updateMotionPreference();
+    desktopQuery.addEventListener("change", updateMotionPreference);
+    reducedMotionQuery.addEventListener("change", updateMotionPreference);
+    return () => {
+      desktopQuery.removeEventListener("change", updateMotionPreference);
+      reducedMotionQuery.removeEventListener("change", updateMotionPreference);
+    };
+  }, []);
 
   useEffect(() => {
     const t = setInterval(() => setHeroIdx((i) => (i + 1) % heroSlides.length), 3000);
@@ -107,15 +124,16 @@ function Index() {
 
       <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-background">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {Array.from({ length: 14 }).map((_, i) => (
-            <motion.span
-              key={i}
-              className="absolute h-1 w-1 rounded-full bg-gold/60"
-              style={{ left: `${(i * 7.3 + 3) % 100}%`, top: `${(i * 6.7 + 5) % 100}%` }}
-              animate={{ y: [0, -30, 0], opacity: [0.2, 0.8, 0.2] }}
-              transition={{ duration: 4 + (i % 4), repeat: Infinity, delay: i * 0.3 }}
-            />
-          ))}
+          {showDesktopMotion &&
+            Array.from({ length: 14 }).map((_, i) => (
+              <motion.span
+                key={i}
+                className="absolute h-1 w-1 rounded-full bg-gold/60"
+                style={{ left: `${(i * 7.3 + 3) % 100}%`, top: `${(i * 6.7 + 5) % 100}%` }}
+                animate={{ y: [0, -30, 0], opacity: [0.2, 0.8, 0.2] }}
+                transition={{ duration: 4 + (i % 4), repeat: Infinity, delay: i * 0.3 }}
+              />
+            ))}
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 lg:px-10 w-full grid lg:grid-cols-2 gap-12 items-center">
@@ -147,77 +165,81 @@ function Index() {
             </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="hidden lg:flex flex-col items-center gap-6"
-          >
-            <div className="relative w-full max-w-sm aspect-[3/4] border border-gold/20 overflow-hidden bg-surface">
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={heroSlides[heroIdx].slug}
-                  src={productImages[heroSlides[heroIdx].slug]}
-                  alt={heroSlides[heroIdx].label}
-                  width="600"
-                  height="800"
-                  fetchPriority={heroIdx === 0 ? "high" : "auto"}
-                  className="absolute inset-0 h-full w-full object-cover"
-                  initial={{ opacity: 0, scale: 1.04 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                />
-              </AnimatePresence>
-              <div className="absolute inset-0 bg-gradient-to-t from-obsidian/60 to-transparent" />
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={heroSlides[heroIdx].slug + "-label"}
-                  className="absolute bottom-5 left-5 right-5"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <div className="font-display text-lg text-white leading-tight">
-                    {heroSlides[heroIdx].label}
-                  </div>
-                  <div className="text-[10px] uppercase tracking-luxury text-gold mt-1">
-                    {heroSlides[heroIdx].tagline}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            <div className="flex gap-2">
-              {heroSlides.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setHeroIdx(i)}
-                  aria-label={`Show ${heroSlides[i].label}`}
-                  aria-pressed={i === heroIdx}
-                  className={`h-px w-8 transition-all duration-300 ${i === heroIdx ? "bg-gold" : "bg-gold/30"}`}
-                />
-              ))}
-            </div>
-          </motion.div>
+          {showDesktopMotion && (
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="hidden lg:flex flex-col items-center gap-6"
+            >
+              <div className="relative w-full max-w-sm aspect-[3/4] border border-gold/20 overflow-hidden bg-surface">
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={heroSlides[heroIdx].slug}
+                    src={productImages[heroSlides[heroIdx].slug]}
+                    alt={heroSlides[heroIdx].label}
+                    width="600"
+                    height="800"
+                    fetchPriority={heroIdx === 0 ? "high" : "auto"}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    initial={{ opacity: 0, scale: 1.04 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.97 }}
+                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                </AnimatePresence>
+                <div className="absolute inset-0 bg-gradient-to-t from-obsidian/60 to-transparent" />
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={heroSlides[heroIdx].slug + "-label"}
+                    className="absolute bottom-5 left-5 right-5"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className="font-display text-lg text-white leading-tight">
+                      {heroSlides[heroIdx].label}
+                    </div>
+                    <div className="text-[10px] uppercase tracking-luxury text-gold mt-1">
+                      {heroSlides[heroIdx].tagline}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              <div className="flex gap-2">
+                {heroSlides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setHeroIdx(i)}
+                    aria-label={`Show ${heroSlides[i].label}`}
+                    aria-pressed={i === heroIdx}
+                    className={`h-px w-8 transition-all duration-300 ${i === heroIdx ? "bg-gold" : "bg-gold/30"}`}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-luxury text-gold/70"
-        >
-          <span className="block text-center">Scroll</span>
+        {showDesktopMotion && (
           <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="mt-2 mx-auto h-6 w-px bg-gold/50"
-          />
-        </motion.div>
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 1 }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-luxury text-gold/70"
+          >
+            <span className="block text-center">Scroll</span>
+            <motion.div
+              animate={{ y: [0, 6, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="mt-2 mx-auto h-6 w-px bg-gold/50"
+            />
+          </motion.div>
+        )}
       </section>
 
-      <section className="py-32 border-t border-gold/10">
+      <section className="defer-section py-32 border-t border-gold/10">
         <div className="mx-auto max-w-5xl px-6 lg:px-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -262,7 +284,7 @@ function Index() {
         </div>
       </section>
 
-      <section className="py-28 md:py-32 border-t border-gold/10 bg-background">
+      <section className="defer-section py-28 md:py-32 border-t border-gold/10 bg-background">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -383,7 +405,7 @@ function Index() {
         </div>
       </section>
 
-      <section className="border-t border-gold/10">
+      <section className="defer-section border-t border-gold/10">
         <div className="mx-auto max-w-7xl px-6 lg:px-10 pt-32 pb-10">
           <div className="flex items-end justify-between flex-wrap gap-6 mb-10">
             <div>
@@ -423,7 +445,7 @@ function Index() {
         <div className="pb-16" />
       </section>
 
-      <section className="py-32 border-t border-gold/10">
+      <section className="defer-section py-32 border-t border-gold/10">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <h2 className="font-display text-4xl md:text-6xl leading-tight">
             Begin your <span className="text-gradient-gold italic">wellness</span> journey.

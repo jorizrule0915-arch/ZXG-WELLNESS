@@ -7,7 +7,6 @@ import { CartDrawer } from "@/components/site/CartDrawer";
 import { ConsentAnalytics } from "@/components/site/ConsentAnalytics";
 import { AuthProvider } from "@/lib/auth";
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -40,12 +39,23 @@ function RootComponent() {
   const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        nav({ to: "/reset-password" });
-      }
+    let active = true;
+    let unsubscribe: (() => void) | undefined;
+
+    void import("@/integrations/supabase/client").then(({ supabase }) => {
+      if (!active) return;
+      const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "PASSWORD_RECOVERY") {
+          nav({ to: "/reset-password" });
+        }
+      });
+      unsubscribe = () => sub.subscription.unsubscribe();
     });
-    return () => sub.subscription.unsubscribe();
+
+    return () => {
+      active = false;
+      unsubscribe?.();
+    };
   }, [nav]);
 
   return (

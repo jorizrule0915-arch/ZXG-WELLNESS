@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+
+async function getSupabase() {
+  return (await import("@/integrations/supabase/client")).supabase;
+}
 
 type AuthCtx = {
   user: User | null;
@@ -30,29 +33,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Listener FIRST (per Supabase auth recipe)
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) {
-        // Defer role fetch to avoid deadlocks inside the callback
-        setTimeout(() => loadAdminStatus(s.user.id), 0);
-      } else {
-        setIsAdmin(false);
-      }
+    let active = true;
+    let unsubscribe: (() => void) | undefined;
+
+    void getSupabase().then((supabase) => {
+      if (!active) return;
+
+      // Listener FIRST (per Supabase auth recipe)
+      const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+        if (!active) return;
+        setSession(s);
+        setUser(s?.user ?? null);
+        if (s?.user) {
+          // Defer role fetch to avoid deadlocks inside the callback
+          setTimeout(() => loadAdminStatus(s.user.id), 0);
+        } else {
+          setIsAdmin(false);
+        }
+      });
+      unsubscribe = () => sub.subscription.unsubscribe();
+
+      void supabase.auth.getSession().then(({ data: { session: s } }) => {
+        if (!active) return;
+        setSession(s);
+        setUser(s?.user ?? null);
+        if (s?.user) void loadAdminStatus(s.user.id);
+        setLoading(false);
+      });
     });
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) loadAdminStatus(s.user.id);
-      setLoading(false);
-    });
-
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      active = false;
+      unsubscribe?.();
+    };
   }, []);
 
   const loadAdminStatus = async (uid: string) => {
+    const supabase = await getSupabase();
     const { data, error } = await supabase.rpc("has_role", {
       _user_id: uid,
       _role: "admin",
@@ -68,11 +85,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn: AuthCtx["signIn"] = async (email, password) => {
+    const supabase = await getSupabase();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error?.message ?? null };
   };
 
   const signUp: AuthCtx["signUp"] = async (email, password, fullName) => {
+    const supabase = await getSupabase();
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -95,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    const supabase = await getSupabase();
     await supabase.auth.signOut();
   };
 
