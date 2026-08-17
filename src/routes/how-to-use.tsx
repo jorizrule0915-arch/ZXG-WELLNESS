@@ -57,6 +57,13 @@ const arrivalVideo = {
   ],
 };
 
+const lidFitVideo = {
+  title: "Make Your Lid Fit Better",
+  src: "/Video/make-your-lid-fit-better.mp4",
+  description:
+    "A quick visual guide showing how to adjust and seat your pen lid so it fits more securely.",
+};
+
 const doseCheckVideo = {
   title: "How to Verify Your Dosing Pen Is Accurate — Step-by-Step Dose Check",
   src: "/Video/How%20to%20Verify%20Your%20Dosing%20Pen%20Is%20Accurate%20%E2%80%94%20Step-by-Step%20Dose%20Check.mov",
@@ -541,6 +548,47 @@ function HowToUsePage() {
               <p className="text-muted-foreground text-base max-w-2xl mx-auto">
                 Watch these detailed guides for step-by-step visual instructions.
               </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12 overflow-hidden rounded-sm border border-gold/20 bg-charcoal shadow-[0_30px_80px_-45px_rgba(190,157,99,0.45)]"
+            >
+              <div className="grid gap-0 md:grid-cols-[0.85fr_1.15fr]">
+                <div className="relative flex min-h-[360px] justify-center border-b border-gold/10 bg-black md:min-h-[460px] md:border-b-0 md:border-r">
+                  <video
+                    className="absolute inset-0 h-full w-full bg-black object-contain"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    title={lidFitVideo.title}
+                  >
+                    <source src={lidFitVideo.src} type="video/mp4" />
+                    Your browser does not support this instructional video.
+                  </video>
+                </div>
+
+                <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+                  <div className="mb-5 flex flex-wrap items-center gap-3">
+                    <span className="border border-gold/30 bg-gold/10 px-3 py-1 text-[10px] uppercase tracking-luxury text-gold">
+                      Quick Guide
+                    </span>
+                    <span className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+                      Pen Lid Fit
+                    </span>
+                  </div>
+
+                  <h3 className="font-display text-2xl font-light leading-tight text-foreground sm:text-3xl">
+                    {lidFitVideo.title}
+                  </h3>
+                  <div className="my-5 h-px w-12 bg-gold/45" />
+                  <p className="text-sm leading-7 text-muted-foreground sm:text-[15px]">
+                    {lidFitVideo.description}
+                  </p>
+                </div>
+              </div>
             </motion.div>
 
             <motion.div
