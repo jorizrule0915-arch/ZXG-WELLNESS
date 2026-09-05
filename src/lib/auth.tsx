@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { fetchAdminStatus } from "@/lib/admin-status";
 
 async function getSupabase() {
   return (await import("@/integrations/supabase/client")).supabase;
@@ -46,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(s?.user ?? null);
         if (s?.user) {
           // Defer role fetch to avoid deadlocks inside the callback
-          setTimeout(() => loadAdminStatus(s.user.id), 0);
+          setTimeout(() => loadAdminStatus(s.access_token), 0);
         } else {
           setIsAdmin(false);
         }
@@ -57,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!active) return;
         setSession(s);
         setUser(s?.user ?? null);
-        if (s?.user) void loadAdminStatus(s.user.id);
+        if (s?.user) void loadAdminStatus(s.access_token);
         setLoading(false);
       });
     });
@@ -68,20 +69,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const loadAdminStatus = async (uid: string) => {
-    const supabase = await getSupabase();
-    const { data, error } = await supabase.rpc("has_role", {
-      _user_id: uid,
-      _role: "admin",
-    });
-
-    if (error) {
-      console.error("[Auth] Unable to load admin status:", error?.message ?? "Unknown error");
-      setIsAdmin(false);
-      return;
-    }
-
-    setIsAdmin(Boolean(data));
+  const loadAdminStatus = async (accessToken: string) => {
+    setIsAdmin(await fetchAdminStatus(accessToken));
   };
 
   const signIn: AuthCtx["signIn"] = async (email, password) => {

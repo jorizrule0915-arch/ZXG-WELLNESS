@@ -15,6 +15,7 @@ import { Helmet } from "react-helmet-async";
 import { Toaster } from "sonner";
 import adminLogo from "@/assets/Logo/official/gxz-wordmark-dark.webp";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchAdminStatus } from "@/lib/admin-status";
 
 export const Route = createFileRoute("/_admin")({ component: AdminLayout });
 
@@ -57,10 +58,7 @@ function AdminLayout() {
         navigate({ to: "/login" });
         return;
       }
-      const { data: isAdmin } = await supabase.rpc("has_role", {
-        _user_id: session.user.id,
-        _role: "admin",
-      });
+      const isAdmin = await fetchAdminStatus(session.access_token);
       if (!isAdmin) {
         navigate({ to: "/account" });
         return;

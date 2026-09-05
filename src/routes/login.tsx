@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Seo } from "@/lib/seo";
+import { fetchAdminStatus } from "@/lib/admin-status";
 
 export const Route = createFileRoute("/login")({ component: LoginPage });
 
@@ -43,10 +44,7 @@ function LoginPage() {
         window.location.assign(redirectTo);
         return;
       }
-      const { data: isAdmin } = await supabase.rpc("has_role", {
-        _user_id: data.session.user.id,
-        _role: "admin",
-      });
+      const isAdmin = await fetchAdminStatus(data.session.access_token);
       nav({ to: isAdmin ? "/admin" : "/account" });
     });
   }, [nav]);
@@ -116,10 +114,7 @@ function LoginPage() {
       data: { session },
     } = await supabase.auth.getSession();
     if (session) {
-      const { data: isAdmin } = await supabase.rpc("has_role", {
-        _user_id: session.user.id,
-        _role: "admin",
-      });
+      const isAdmin = await fetchAdminStatus(session.access_token);
       nav({ to: isAdmin ? "/admin" : "/account" });
     } else {
       nav({ to: "/account" });

@@ -63,6 +63,39 @@ assert(
   "Suspended and banned profiles must also be blocked in Supabase Auth.",
 );
 
+const roleMigration = await readFile(
+  join(process.cwd(), "supabase", "migrations", "20260906000000_hide_security_definer_helpers.sql"),
+  "utf8",
+);
+assert(
+  roleMigration.includes("create or replace function private.has_role"),
+  "The privileged role helper must live outside the exposed public schema.",
+);
+assert(
+  roleMigration.includes("drop function public.has_role"),
+  "The public role-check RPC must be removed.",
+);
+assert(
+  roleMigration.includes("public.rls_auto_enable() from public, anon, authenticated"),
+  "The RLS maintenance helper must not be executable by API roles.",
+);
+
+const clientRoleSources = await Promise.all(
+  ["src/lib/auth.tsx", "src/routes/login.tsx", "src/routes/_admin.tsx"].map((file) =>
+    readFile(join(process.cwd(), file), "utf8"),
+  ),
+);
+assert(
+  clientRoleSources.every((source) => !source.includes('.rpc("has_role"')),
+  "Browser code must not call the privileged role helper directly.",
+);
+
+const adminStatusApi = await readFile(join(process.cwd(), "api", "admin-status.ts"), "utf8");
+assert(
+  adminStatusApi.includes("requireUser(req)"),
+  "Admin status checks must validate the signed-in user's bearer token.",
+);
+
 process.stdout.write(
-  "Security regression tests passed: account status, Stripe replay protection, CSP, and signup privacy.\n",
+  "Security regression tests passed: account status, Stripe replay protection, CSP, signup privacy, and private role checks.\n",
 );
