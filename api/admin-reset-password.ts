@@ -1,7 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { loadLocalEnv } from "./local-env.js";
-import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security.js";
+import {
+  publicErrorMessage,
+  rejectDisallowedOrigin,
+  setApiHeaders,
+} from "../server/http-security.js";
 
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
@@ -105,7 +109,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { userId, password } = req.body || {};
     if (!userId || !password)
       return res.status(400).json({ error: "userId and password required" });
-    if (password.length < 6) return res.status(400).json({ error: "Password too short" });
+    if (typeof password !== "string" || password.length < 12) {
+      return res.status(400).json({ error: "Password must be at least 12 characters" });
+    }
 
     const { error } = await supabase.auth.admin.updateUserById(userId, { password });
 

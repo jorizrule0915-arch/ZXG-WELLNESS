@@ -915,11 +915,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       if (action === "update-user-status") {
-        const { error } = await supabase
-          .from("profiles")
-          .update({ status: payload.status })
-          .eq("id", id);
-        if (error) return res.status(500).json({ error: error.message });
+        const status = String(payload?.status ?? "").trim();
+        if (status !== "active" && status !== "suspended" && status !== "banned") {
+          return res.status(400).json({ error: "Invalid account status" });
+        }
+
+        // Keep Supabase Auth and the application profile in sync. The profile
+        // check blocks checkout immediately; the auth ban also prevents future
+        // sign-ins and token refreshes until an administrator reactivates the user.
+        const { error: authError } = await supabase.auth.admin.updateUserById(id, {
+          ban_duration: status === "active" ? "none" : "876000h",
+        });
+        if (authError) return res.status(500).json({ error: authError.message });
+
+        const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
+        if (error) {
+          await supabase.auth.admin.updateUserById(id, {
+            ban_duration: status === "active" ? "876000h" : "none",
+          });
+          return res.status(500).json({ error: error.message });
+        }
         return res.status(200).json({ success: true });
       }
 

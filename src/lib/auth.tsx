@@ -91,6 +91,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp: AuthCtx["signUp"] = async (email, password, fullName) => {
+    if (password.length < 12) {
+      return { error: "Password must be at least 12 characters." };
+    }
     const supabase = await getSupabase();
     const { data, error } = await supabase.auth.signUp({
       email,

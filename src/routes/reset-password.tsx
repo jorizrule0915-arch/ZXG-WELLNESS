@@ -58,8 +58,8 @@ function ResetPasswordPage() {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErr(null);
-    if (password.length < 6) {
-      setErr("Password must be at least 6 characters.");
+    if (password.length < 12) {
+      setErr("Password must be at least 12 characters.");
       return;
     }
     if (password !== confirm) {
@@ -130,7 +130,8 @@ function ResetPasswordPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      placeholder="Min. 6 characters"
+                      placeholder="Min. 12 characters"
+                      minLength={12}
                       className="w-full bg-transparent border-b border-gold/30 focus:border-gold outline-none py-2 pr-10 text-sm text-foreground placeholder:text-muted-foreground/50 transition-colors"
                     />
                     <button

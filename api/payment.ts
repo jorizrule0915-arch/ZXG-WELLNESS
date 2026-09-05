@@ -2,7 +2,12 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash } from "crypto";
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { loadLocalEnv } from "./local-env.js";
-import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security.js";
+import {
+  publicErrorMessage,
+  rejectDisallowedOrigin,
+  setApiHeaders,
+} from "../server/http-security.js";
+import { assertAccountCanPurchase } from "../server/account-security.js";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
@@ -417,6 +422,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     enforceRateLimit(req, "payment", { limit: 20, windowMs: 60_000 });
     const { supabase, user } = await requireUser(req);
+    await assertAccountCanPurchase(supabase, user.id);
     const { email, items, stripeMode } = req.body || {};
     if (!email) return res.status(400).json({ error: "Email is required" });
     const serverStripeMode = assertStripeModeMatches(stripeMode);

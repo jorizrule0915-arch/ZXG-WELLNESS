@@ -203,14 +203,21 @@ function LoginPage() {
               <Field label="Email" type="email" value={email} onChange={setEmail} required />
 
               {mode !== "forgot" && (
-                <Field
-                  label="Password"
-                  type="password"
-                  value={password}
-                  onChange={setPassword}
-                  canToggleVisibility
-                  required
-                />
+                <>
+                  <Field
+                    label="Password"
+                    type="password"
+                    value={password}
+                    onChange={setPassword}
+                    canToggleVisibility
+                    required
+                  />
+                  {mode === "signup" && (
+                    <p className="-mt-3 text-[10px] text-muted-foreground">
+                      Use at least 12 characters.
+                    </p>
+                  )}
+                </>
               )}
 
               {err && (

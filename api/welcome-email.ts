@@ -2,7 +2,11 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { loadLocalEnv } from "./local-env.js";
-import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security.js";
+import {
+  publicErrorMessage,
+  rejectDisallowedOrigin,
+  setApiHeaders,
+} from "../server/http-security.js";
 
 const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
@@ -91,34 +95,19 @@ function escapeHtml(value: unknown) {
     .replace(/'/g, "&#39;");
 }
 
-async function findRecentUserByEmail(supabase: SupabaseClient, email: string) {
-  for (let page = 1; page <= 5; page += 1) {
-    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 200 });
-    if (error) throw error;
-
-    const user = data.users.find((item: any) => item.email?.toLowerCase() === email);
-    if (user) return user;
-
-    if (data.users.length < 200) break;
-  }
-
-  throw Object.assign(new Error("Signup was not found yet. Please try again in a moment."), {
-    statusCode: 404,
-  });
-}
-
 async function findRecentUser(supabase: SupabaseClient, email: string, userId: string | null) {
-  if (!userId) return findRecentUserByEmail(supabase, email);
-
+  // A UUID returned by the just-completed signup is required. This avoids scanning
+  // the auth directory by email from an unauthenticated public endpoint.
+  if (!userId) {
+    throw Object.assign(new Error("Signup could not be verified"), { statusCode: 403 });
+  }
   const { data, error } = await supabase.auth.admin.getUserById(userId);
   if (error || !data.user) {
-    throw Object.assign(new Error("Signup was not found yet. Please try again in a moment."), {
-      statusCode: 404,
-    });
+    throw Object.assign(new Error("Signup could not be verified"), { statusCode: 403 });
   }
 
   if (data.user.email?.toLowerCase() !== email) {
-    throw Object.assign(new Error("Signup details do not match."), { statusCode: 403 });
+    throw Object.assign(new Error("Signup could not be verified"), { statusCode: 403 });
   }
 
   return data.user;

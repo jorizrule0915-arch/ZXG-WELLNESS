@@ -8,7 +8,12 @@ import {
   brandFromEmail,
   brandReplyToEmail,
 } from "../server/email-config.js";
-import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security.js";
+import {
+  publicErrorMessage,
+  rejectDisallowedOrigin,
+  setApiHeaders,
+} from "../server/http-security.js";
+import { assertAccountCanPurchase } from "../server/account-security.js";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
@@ -806,6 +811,35 @@ async function retrieveCheckoutSession(checkoutSessionId: string) {
   return data;
 }
 
+function stripePaymentIntentId(checkoutSession: any) {
+  const paymentIntent = checkoutSession?.payment_intent;
+  if (typeof paymentIntent === "string") return paymentIntent;
+  if (paymentIntent && typeof paymentIntent.id === "string") return paymentIntent.id;
+  return null;
+}
+
+async function findExistingOrder(
+  supabase: SupabaseClient,
+  identifiers: { checkoutSessionId: string; paymentIntentId: string | null },
+) {
+  const bySession = await supabase
+    .from("orders")
+    .select("id, user_id")
+    .eq("stripe_checkout_session_id", identifiers.checkoutSessionId)
+    .maybeSingle();
+  if (bySession.error) throw bySession.error;
+  if (bySession.data) return bySession.data;
+
+  if (!identifiers.paymentIntentId) return null;
+  const byPayment = await supabase
+    .from("orders")
+    .select("id, user_id")
+    .eq("stripe_payment_intent_id", identifiers.paymentIntentId)
+    .maybeSingle();
+  if (byPayment.error) throw byPayment.error;
+  return byPayment.data;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   setApiHeaders(req, res);
 
@@ -819,6 +853,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     enforceRateLimit(req, "orders", { limit: 20, windowMs: 60_000 });
     const { supabase, user } = await requireUser(req);
+    await assertAccountCanPurchase(supabase, user.id);
     const { checkoutSessionId, shipping, items } = req.body || {};
     if (!checkoutSessionId) {
       return res.status(400).json({ error: "checkoutSessionId is required" });
@@ -834,7 +869,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "Shipping details are required" });
     }
 
-    const trustedCart = await calculateTrustedCart(supabase, items);
     const checkoutSession = await retrieveCheckoutSession(String(checkoutSessionId));
 
     if (checkoutSession.status !== "complete" || checkoutSession.payment_status !== "paid") {
@@ -843,6 +877,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (checkoutSession.metadata?.userId !== user.id) {
       return res.status(403).json({ error: "Checkout Session does not belong to this user" });
     }
+
+    const paymentIntentId = stripePaymentIntentId(checkoutSession);
+    const orderIdentifiers = {
+      checkoutSessionId: String(checkoutSession.id || checkoutSessionId),
+      paymentIntentId,
+    };
+    const existingOrder = await findExistingOrder(supabase, orderIdentifiers);
+    if (existingOrder) {
+      if (existingOrder.user_id !== user.id) {
+        return res.status(403).json({ error: "Checkout Session does not belong to this user" });
+      }
+      return res.status(200).json({
+        success: true,
+        orderId: existingOrder.id,
+        alreadyCreated: true,
+        emailSent: false,
+      });
+    }
+
+    const trustedCart = await calculateTrustedCart(supabase, items);
     if (checkoutSession.amount_total !== trustedCart.amountCents) {
       return res.status(400).json({ error: "Checkout amount does not match cart total" });
     }
@@ -854,30 +908,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const shippingCity = String(shipping.city ?? "").trim();
     const shippingCityLine = shippingState ? `${shippingCity}, ${shippingState}` : shippingCity;
 
+    const { data: creationRows, error: creationError } = await supabase.rpc("create_paid_order", {
+      p_user_id: user.id,
+      p_total: trustedCart.total,
+      p_email: String(shipping.email),
+      p_shipping_name: String(shipping.name),
+      p_shipping_address: String(shipping.address),
+      p_shipping_city: shippingCityLine,
+      p_shipping_zip: String(shipping.zip),
+      p_checkout_session_id: orderIdentifiers.checkoutSessionId,
+      p_payment_intent_id: paymentIntentId,
+      p_items: trustedCart.items,
+    });
+    if (creationError) throw creationError;
+
+    const creation = Array.isArray(creationRows) ? creationRows[0] : creationRows;
+    if (!creation?.order_id) throw new Error("Order creation failed");
+    if (creation.already_created) {
+      return res.status(200).json({
+        success: true,
+        orderId: creation.order_id,
+        alreadyCreated: true,
+        emailSent: false,
+      });
+    }
+
     const { data: order, error: orderError } = await supabase
       .from("orders")
-      .insert({
-        user_id: user.id,
-        status: "paid",
-        total: trustedCart.total,
-        email: String(shipping.email),
-        shipping_name: String(shipping.name),
-        shipping_address: String(shipping.address),
-        shipping_city: shippingCityLine,
-        shipping_zip: String(shipping.zip),
-      })
       .select("*")
+      .eq("id", creation.order_id)
+      .eq("user_id", user.id)
       .single();
-
     if (orderError || !order) throw orderError ?? new Error("Order creation failed");
-
-    const { error: itemsError } = await supabase.from("order_items").insert(
-      trustedCart.items.map((item) => ({
-        order_id: order.id,
-        ...item,
-      })),
-    );
-    if (itemsError) throw itemsError;
 
     let emailSent = false;
     let emailError: string | undefined;

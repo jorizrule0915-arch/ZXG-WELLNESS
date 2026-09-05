@@ -142,7 +142,7 @@ function AdminUsers() {
 
   const resetPassword = async (user: UserRow) => {
     const pwd = newPassword[user.id]?.trim();
-    if (!pwd || pwd.length < 6) return toast.error("Password must be at least 6 characters");
+    if (!pwd || pwd.length < 12) return toast.error("Password must be at least 12 characters");
     setSending(user.id + "-pwd");
     try {
       const res = await authFetch("/api/admin-reset-password", {
