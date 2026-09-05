@@ -692,100 +692,6 @@ const rebrandProductName = (name: string) =>
     .replaceAll(`${legacyInitials} Wellness`, "GXZ Health and Wellness")
     .replace(new RegExp(`\\b${legacyInitials}\\b`, "g"), "GXZ");
 
-async function calculateTrustedCart(supabase: SupabaseClient, rawItems: CheckoutItemInput[]) {
-  if (!Array.isArray(rawItems) || rawItems.length === 0) {
-    throw Object.assign(new Error("Cart is empty"), { statusCode: 400 });
-  }
-
-  const normalized = rawItems.map((item) => ({
-    slug: String(item.slug ?? "").trim(),
-    quantity: Number(item.quantity),
-    optionLabel: normalizeOption(item),
-  }));
-
-  if (
-    normalized.some(
-      (item) =>
-        !item.slug || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99,
-    )
-  ) {
-    throw Object.assign(new Error("Invalid cart item"), { statusCode: 400 });
-  }
-
-  const slugs = [...new Set(normalized.map((item) => item.slug))];
-  const { data } = await supabase
-    .from("products")
-    .select("slug, name, price, active")
-    .in("slug", slugs);
-
-  const dbProducts = new Map(
-    (data ?? []).map((product: ProductPriceRow) => [
-      product.slug,
-      {
-        slug: product.slug,
-        name: rebrandProductName(product.name),
-        price: Number(product.price),
-        active: Boolean(product.active),
-      } satisfies TrustedProduct,
-    ]),
-  );
-  const localProductMap = new Map(localProducts.map((product) => [product.slug, product]));
-
-  const pricedItems = normalized.map((item) => {
-    const dbProduct = dbProducts.get(item.slug);
-    const localProduct = localProductMap.get(item.slug);
-    const product = dbProduct ?? localProduct;
-
-    if (!product || !product.active) {
-      throw Object.assign(new Error(`Product is not available: ${item.slug}`), { statusCode: 400 });
-    }
-
-    const optionPrice =
-      item.optionLabel && localProduct?.optionPrices
-        ? localProduct.optionPrices[item.optionLabel]
-        : undefined;
-    const unitPrice = optionPrice ?? product.price;
-    const productName = item.optionLabel ? `${product.name} - ${item.optionLabel}` : product.name;
-
-    return {
-      product_slug: product.slug,
-      product_name: productName,
-      unit_price: unitPrice,
-      quantity: item.quantity,
-    };
-  });
-
-  const merchandiseSubtotal = money(
-    pricedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0),
-  );
-  const penQuantity = pricedItems
-    .filter((item) => item.product_slug === "pen")
-    .reduce((quantity, item) => quantity + item.quantity, 0);
-  const penDiscountApplies = penQuantity >= PEN_DISCOUNT_MIN_QTY;
-  const trustedItems = pricedItems.map((item) =>
-    penDiscountApplies && item.product_slug === "pen"
-      ? { ...item, unit_price: money(item.unit_price * (1 - PEN_DISCOUNT_RATE)) }
-      : item,
-  );
-  const subtotal = money(
-    trustedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0),
-  );
-  const discount = money(merchandiseSubtotal - subtotal);
-  const shipping = merchandiseSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
-  const total = money(subtotal + shipping);
-
-  return {
-    items: trustedItems,
-    merchandiseSubtotal,
-    subtotal,
-    discount,
-    shipping,
-    total,
-    amountCents: cents(total),
-    cartHash: hashCart(trustedItems),
-  };
-}
-
 function getStripeSecretKey() {
   loadLocalEnv();
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -965,3 +871,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return sendApiError(res, error);
   }
 }
+import { calculateTrustedCart } from "../server/checkout.js";

@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import {
   fetchProduct,
   fetchProducts,
-  localProducts,
   type Product,
   type ProductVariant,
   type ProductColorVariant,
 } from "@/lib/products";
 import { useCart } from "@/lib/cart";
+import { isProductInStock } from "@/lib/catalog-options";
 import { ProductCard } from "@/components/site/ProductCard";
 import { galleryFor, penColorImages } from "@/lib/productImages";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -41,28 +41,37 @@ function ProductDetail() {
   const { slug } = useParams({ from: "/products/$slug" });
   const nav = useNavigate();
   const add = useCart((s) => s.add);
-  const fallbackProduct = localProducts.find((item) => item.slug === slug) ?? null;
+  const fallbackProduct = null;
   const [product, setProduct] = useState<Product | null>(fallbackProduct);
   const [related, setRelated] = useState<Product[]>([]);
   const [activeImg, setActiveImg] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedColor, setSelectedColor] = useState<ProductColorVariant | null>(null);
   const [loading, setLoading] = useState(!fallbackProduct);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    const nextFallback = localProducts.find((item) => item.slug === slug) ?? null;
+    const nextFallback = null;
+    setLoadError(false);
     setProduct(nextFallback);
     setLoading(!nextFallback);
-    fetchProduct(slug).then((p) => {
-      if (!p) {
-        nav({ to: "/products" });
-        return;
-      }
-      setProduct(p);
-      setSelectedVariant(Array.isArray(p.variants) ? (p.variants[0] ?? null) : null);
-      setSelectedColor(Array.isArray(p.colorVariants) ? (p.colorVariants[0] ?? null) : null);
-      setLoading(false);
-    });
+    fetchProduct(slug)
+      .then((p) => {
+        if (!p) {
+          nav({ to: "/products" });
+          return;
+        }
+        setProduct(p);
+        setSelectedVariant(p.variants?.find((v) => v.inStock !== false) ?? p.variants?.[0] ?? null);
+        setSelectedColor(
+          p.colorVariants?.find((v) => v.inStock !== false) ?? p.colorVariants?.[0] ?? null,
+        );
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoadError(true);
+        setLoading(false);
+      });
   }, [slug, nav]);
 
   useEffect(() => {
@@ -72,6 +81,12 @@ function ProductDetail() {
       .catch(console.error);
   }, [product]);
 
+  if (loadError)
+    return (
+      <div className="py-32 text-center">
+        Unable to load this product. Please refresh to try again.
+      </div>
+    );
   if (loading || !product) {
     return <div className="py-32 text-center text-muted-foreground">Loading…</div>;
   }
@@ -93,7 +108,10 @@ function ProductDetail() {
   const selectedColorImage = selectedColor
     ? (selectedColor.image ?? penColorImages[selectedColor.value] ?? gallery[0])
     : undefined;
-  const selectedColorInStock = selectedColor?.inStock !== false;
+  const selectedColorInStock =
+    isProductInStock(product) &&
+    selectedColor?.inStock !== false &&
+    selectedVariant?.inStock !== false;
   const prefersContainedImage = product.slug === "pen";
   const seoContent = getProductSeoContent(product);
 
@@ -306,14 +324,16 @@ function ProductDetail() {
                   {variants.map((v) => (
                     <button
                       key={v.label}
+                      disabled={v.inStock === false}
                       onClick={() => setSelectedVariant(v)}
-                      className={`px-4 py-3 text-sm font-medium border transition-colors ${
+                      className={`px-4 py-3 text-sm font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                         selectedVariant?.label === v.label
                           ? "bg-gold text-obsidian border-gold"
                           : "border-gold/30 text-foreground/80 hover:border-gold hover:text-gold"
                       }`}
                     >
                       {v.label}
+                      {v.inStock === false && <span className="block text-xs">Out of Stock</span>}
                       <span className="block text-xs font-normal mt-0.5 opacity-80">
                         ${v.price.toFixed(2)}
                       </span>
@@ -354,6 +374,7 @@ function ProductDetail() {
             <div className="mt-8">
               <button
                 onClick={() =>
+                  selectedColorInStock &&
                   add({
                     ...product,
                     image: selectedColorImage ?? gallery[0] ?? product.image,
@@ -365,7 +386,7 @@ function ProductDetail() {
                 disabled={!selectedColorInStock}
                 className="w-full py-4 bg-gold text-obsidian text-xs uppercase tracking-luxury font-semibold hover:bg-gold-light transition-all glow-gold-sm disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {selectedColorInStock ? "Add to Cart →" : "Selected Color Unavailable"}
+                {selectedColorInStock ? "Add to Cart →" : "Out of Stock"}
               </button>
             </div>
           </motion.div>

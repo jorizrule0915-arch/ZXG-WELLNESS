@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import type { Product } from "@/lib/products";
+import { isProductInStock } from "@/lib/catalog-options";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
   return (
@@ -19,6 +20,11 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-obsidian/60 via-transparent to-transparent" />
+          {!isProductInStock(product) && (
+            <span className="absolute bottom-4 left-4 bg-obsidian px-3 py-2 text-sm text-white">
+              Out of Stock
+            </span>
+          )}
           <div className="absolute top-4 left-4 text-[9px] uppercase tracking-luxury text-gold/90 border border-gold/40 px-2 py-1 bg-obsidian/40 backdrop-blur-sm">
             {product.category}
           </div>

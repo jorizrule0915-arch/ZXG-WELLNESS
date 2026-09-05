@@ -1,9 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
+import { catalogOptions } from "./catalog-options";
 import { imageFor, galleryFor, imageRefFor, imageRefsFrom, penColorImages } from "./productImages";
 
 export type ProductVariant = {
   label: string;
   price: number;
+  inStock?: boolean;
+  image?: string;
 };
 
 export type ProductColorVariant = {
@@ -28,6 +31,8 @@ export type Product = {
   ingredients: string[];
   benefits: string[];
   featured: boolean;
+  track_stock?: boolean;
+  stock_qty?: number;
   variants?: ProductVariant[];
   colorVariants?: ProductColorVariant[];
   selectedOptionLabel?: string;
@@ -192,31 +197,15 @@ function optionVariantsFrom(options: unknown, slug: string, basePrice: number) {
   };
 }
 
-const mergePenColorVariants = (colorVariants: ProductColorVariant[]) => {
-  const existingByValue = new Map(colorVariants.map((variant) => [variant.value, variant]));
-
-  return penColorVariants.map((defaultVariant) => {
-    const existing = existingByValue.get(defaultVariant.value);
-
-    return {
-      ...defaultVariant,
-      ...existing,
-      value: defaultVariant.value,
-      image: existing?.image || defaultVariant.image,
-    };
-  });
-};
-
 const mapRow = (r: Row): Product => {
   const refs = imageRefsFrom(r.image);
   const gallery =
     refs.length > 0 ? refs.map((ref) => imageRefFor(ref, r.slug)) : galleryFor(r.slug);
   const price = toFinitePrice(r.price);
   const optionVariants = optionVariantsFrom(r.options, r.slug, price);
-  const colorVariants =
-    r.slug === "pen"
-      ? mergePenColorVariants(optionVariants.colorVariants)
-      : optionVariants.colorVariants;
+  const groups = Array.isArray(r.options) ? r.options : [];
+  const colorVariants = groups.length <= 1 ? optionVariants.colorVariants : [];
+  const choices = catalogOptions(r.options, price);
 
   return {
     ...r,
@@ -231,15 +220,12 @@ const mapRow = (r: Row): Product => {
     benefits: toBrandedStringList(r.benefits),
     featured: Boolean(r.featured),
     variants:
-      r.slug === "pen"
+      colorVariants.length === choices.length && colorVariants.length > 0
         ? undefined
-        : r.slug === "needles"
-          ? needleVariants
-          : optionVariants.variants.length > 0
-            ? optionVariants.variants
-            : r.variants,
-    colorVariants:
-      colorVariants.length > 0 ? colorVariants : r.slug === "pen" ? penColorVariants : undefined,
+        : choices.length > 0
+          ? choices
+          : r.variants,
+    colorVariants: colorVariants.length === choices.length ? colorVariants : undefined,
   };
 };
 
@@ -358,9 +344,9 @@ export async function fetchProducts(): Promise<Product[]> {
 
     const rows = Array.isArray(data) ? (data as Row[]) : [];
     const products = rows.map(mapRow);
-    return products.length > 0 ? products : localProducts;
+    return products;
   } catch {
-    return localProducts;
+    throw new Error("Products could not be loaded. Please try again.");
   }
 }
 
@@ -375,8 +361,8 @@ export async function fetchProduct(slug: string): Promise<Product | null> {
 
     if (error) throw error;
 
-    return data ? mapRow(data as Row) : (localProducts.find((p) => p.slug === slug) ?? null);
+    return data ? mapRow(data as Row) : null;
   } catch {
-    return localProducts.find((p) => p.slug === slug) ?? null;
+    throw new Error("Product could not be loaded. Please try again.");
   }
 }

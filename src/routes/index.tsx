@@ -3,18 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { BadgeCheck, MessageCircle, Star } from "lucide-react";
 import { productImages } from "@/lib/productImages";
-import { localProducts } from "@/lib/products";
+import { fetchProducts, type Product } from "@/lib/products";
+import { ProductCard } from "@/components/site/ProductCard";
 import creatineVideo from "@/assets/Creatine Production Video.mp4";
 import { JsonLd, Seo } from "@/lib/seo";
 import { organizationSchema, websiteSchema } from "@/lib/seoData";
 import { PromoMarquee } from "@/components/site/PromoMarquee";
 
 export const Route = createFileRoute("/")({ component: Index });
-
-const heroSlides = [
-  { slug: "creatine", label: localProducts[0].name, tagline: localProducts[0].tagline },
-  { slug: "body-balm", label: localProducts[1].name, tagline: localProducts[1].tagline },
-];
 
 const testimonials = [
   {
@@ -68,6 +64,13 @@ const testimonials = [
 ];
 
 function Index() {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const heroSlides = featuredProducts.map((product) => ({ ...product, label: product.name }));
+  useEffect(() => {
+    fetchProducts()
+      .then((products) => setFeaturedProducts(products.filter((product) => product.featured)))
+      .catch(console.error);
+  }, []);
   const [heroIdx, setHeroIdx] = useState(0);
   const [loadVideo, setLoadVideo] = useState(false);
   const [showDesktopMotion, setShowDesktopMotion] = useState(false);
@@ -90,9 +93,10 @@ function Index() {
   }, []);
 
   useEffect(() => {
+    if (!heroSlides.length) return;
     const t = setInterval(() => setHeroIdx((i) => (i + 1) % heroSlides.length), 3000);
     return () => clearInterval(t);
-  }, []);
+  }, [heroSlides.length]);
 
   useEffect(() => {
     const element = videoSectionRef.current;
@@ -165,7 +169,7 @@ function Index() {
             </div>
           </div>
 
-          {showDesktopMotion && (
+          {showDesktopMotion && heroSlides.length > 0 && (
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
@@ -176,7 +180,7 @@ function Index() {
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={heroSlides[heroIdx].slug}
-                    src={productImages[heroSlides[heroIdx].slug]}
+                    src={heroSlides[heroIdx].image}
                     alt={heroSlides[heroIdx].label}
                     width="600"
                     height="800"
@@ -239,6 +243,20 @@ function Index() {
         )}
       </section>
 
+      {featuredProducts.length > 0 && (
+        <section className="py-20 border-t border-gold/10" aria-labelledby="featured-products">
+          <div className="mx-auto max-w-7xl px-6 lg:px-10">
+            <h2 id="featured-products" className="font-display text-4xl mb-10">
+              Featured Products
+            </h2>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredProducts.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
       <section className="defer-section py-32 border-t border-gold/10">
         <div className="mx-auto max-w-5xl px-6 lg:px-10 text-center">
           <motion.div

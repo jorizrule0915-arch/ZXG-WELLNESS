@@ -316,6 +316,11 @@ async function retryWithAvailableColumns(
 
     const missingColumn = missingColumnFrom(result.error);
     if (!missingColumn || !(missingColumn in nextPayload)) return result.error;
+    if (["options", "track_stock", "stock_qty", "featured", "active"].includes(missingColumn)) {
+      return new Error(
+        "Product settings could not be saved. The catalog database migration is required.",
+      );
+    }
 
     const { [missingColumn]: _removed, ...rest } = nextPayload;
     nextPayload = rest;
@@ -350,7 +355,7 @@ async function updateOrderTracking(
 }
 
 async function insertProduct(supabase: SupabaseClient, payload: Record<string, unknown>) {
-  return retryWithAvailableColumns(withoutStockFields(payload), async (nextPayload) => {
+  return retryWithAvailableColumns(payload, async (nextPayload) => {
     const { error } = await supabase.from("products").insert(nextPayload);
     return { error };
   });
@@ -361,7 +366,7 @@ async function updateProduct(
   id: string,
   payload: Record<string, unknown>,
 ) {
-  return retryWithAvailableColumns(withoutStockFields(payload), async (nextPayload) => {
+  return retryWithAvailableColumns(payload, async (nextPayload) => {
     const { error } = await supabase.from("products").update(nextPayload).eq("id", id);
     return { error };
   });

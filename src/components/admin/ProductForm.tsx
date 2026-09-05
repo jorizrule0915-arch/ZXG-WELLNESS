@@ -123,7 +123,7 @@ const toOptionalPrice = (value: unknown) => {
 const toProductOptionValues = (value: unknown, slug: string): ProductOptionValue[] =>
   Array.isArray(value)
     ? value
-        .map((item) => {
+        .map((item): ProductOptionValue | null => {
           if (item && typeof item === "object" && !Array.isArray(item)) {
             const source = item as Record<string, unknown>;
             const label = String(source.label ?? source.name ?? source.value ?? "").trim();
@@ -210,6 +210,16 @@ const withNeedleSizeDefaults = (options: ProductOption[], slug: string): Product
 };
 
 const toProductOptions = (value: unknown, slug: string): ProductOption[] => {
+  // Older products stored a flat list. Keep those choices when editing and saving.
+  if (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((item) => !Array.isArray(item?.values))
+  ) {
+    return [
+      { name: slug === "pen" ? "Color" : "Option", values: toProductOptionValues(value, slug) },
+    ];
+  }
   const options = Array.isArray(value)
     ? value
         .map((option) => {
@@ -225,7 +235,9 @@ const toProductOptions = (value: unknown, slug: string): ProductOption[] => {
         .filter((option) => option.name)
     : [];
 
-  return withNeedleSizeDefaults(withPenColorDefaults(options, slug), slug);
+  return Array.isArray(value)
+    ? options
+    : withNeedleSizeDefaults(withPenColorDefaults(options, slug), slug);
 };
 
 const cleanProductOptions = (options: ProductOption[]) =>

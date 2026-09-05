@@ -13,91 +13,6 @@ type CheckoutItemInput = {
   name?: string;
 };
 
-type TrustedProduct = {
-  slug: string;
-  name: string;
-  price: number;
-  active: boolean;
-};
-
-const localProducts: Array<TrustedProduct & { optionPrices?: Record<string, number> }> = [
-  {
-    slug: "pen",
-    name: "GXZ Health and Wellness Reusable Injection Pen",
-    price: 20,
-    active: true,
-    optionPrices: {
-      Blue: 20,
-      Black: 20,
-      Gold: 20,
-      Gray: 20,
-      Pink: 20,
-      Purple: 20,
-      Red: 20,
-      Green: 20,
-      Bronze: 20,
-      Silver: 20,
-    },
-  },
-  {
-    slug: "syringe",
-    name: "GXZ Health and Wellness Syringe",
-    price: 15,
-    active: true,
-    optionPrices: {
-      "Small (1ml 30g)": 15,
-      "Mini (0.5ml 30g)": 15,
-      "Large (3ml 23g)": 15,
-    },
-  },
-  {
-    slug: "cartridge",
-    name: "GXZ Health and Wellness Disposable 3mL Cartridges",
-    price: 10,
-    active: true,
-  },
-  {
-    slug: "needles",
-    name: "GXZ Health and Wellness Single-Use Pen Needles",
-    price: 10,
-    active: true,
-    optionPrices: {
-      "32G x 4mm - Box of 100": 10,
-      "31G x 6mm - Box of 100": 10,
-      "31G x 8mm - Box of 100": 10,
-      "32Gx4mm": 10,
-      "31Gx6mm": 10,
-      "31Gx8mm": 10,
-      "32g x 4mm": 10,
-      "31g x 8mm": 10,
-      "32g × 4mm": 10,
-      "31g × 8mm": 10,
-      "32g Ã— 4mm": 10,
-      "31g Ã— 8mm": 10,
-      "6mm 31G": 10,
-      "6mm x 31G": 10,
-      "31G x 6mm": 10,
-    },
-  },
-  {
-    slug: "creatine",
-    name: "GXZ Health and Wellness Creatine Performance Matrix Powder",
-    price: 29.99,
-    active: true,
-  },
-  {
-    slug: "body-balm",
-    name: "GXZ Health and Wellness Nourishing Body Balm",
-    price: 16.99,
-    active: true,
-    optionPrices: {
-      "Aloe Scent": 16.99,
-      Unscented: 16.99,
-      "Pack (Both)": 23.99,
-    },
-  },
-];
-
 function normalizeOption(item: CheckoutItemInput) {
   if (item.optionLabel) return item.optionLabel;
   const name = item.name ?? "";
@@ -154,48 +69,50 @@ export async function calculateTrustedCart(
   }
 
   const slugs = [...new Set(normalized.map((item) => item.slug))];
-  const { data } = await supabase
-    .from("products")
-    .select("slug, name, price, active")
-    .in("slug", slugs);
-
-  const dbProducts = new Map(
-    (data ?? []).map((product: any) => [
-      product.slug,
-      {
-        slug: product.slug,
-        name: product.name,
-        price: Number(product.price),
-        active: Boolean(product.active),
-      } satisfies TrustedProduct,
-    ]),
+  const { data, error } = await supabase.from("products").select("*").in("slug", slugs);
+  if (error)
+    throw Object.assign(new Error("Unable to check product availability. Please try again."), {
+      statusCode: 503,
+    });
+  const dbProducts = new Map((data ?? []).map((product) => [product.slug, product]));
+  const quantities = new Map<string, number>();
+  normalized.forEach((item) =>
+    quantities.set(item.slug, (quantities.get(item.slug) ?? 0) + item.quantity),
   );
-  const localProductMap = new Map(localProducts.map((product) => [product.slug, product]));
-
   const pricedItems = normalized.map((item) => {
-    const dbProduct = dbProducts.get(item.slug);
-    const localProduct = localProductMap.get(item.slug);
-    const product = dbProduct ?? localProduct;
-
-    if (!product || !product.active) {
+    const product = dbProducts.get(item.slug);
+    if (!product || !product.active)
       throw Object.assign(new Error(`Product is not available: ${item.slug}`), { statusCode: 400 });
+    if (product.track_stock && Number(product.stock_qty) < (quantities.get(item.slug) ?? 0)) {
+      throw Object.assign(new Error(`Not enough stock for ${product.name}`), { statusCode: 400 });
     }
-
-    const optionPrice =
-      item.optionLabel && localProduct?.optionPrices
-        ? localProduct.optionPrices[item.optionLabel]
-        : undefined;
-    const unitPrice = optionPrice ?? product.price;
-    const productName = item.optionLabel ? `${product.name} - ${item.optionLabel}` : product.name;
-
+    const choices = catalogOptions(product.options, Number(product.price));
+    const choice = choices.find((value) => value.label === item.optionLabel);
+    if (choices.length && (!choice || !choice.inStock)) {
+      throw Object.assign(
+        new Error(
+          `Selected option is unavailable for ${product.name}. Please choose an in-stock option.`,
+        ),
+        { statusCode: 400 },
+      );
+    }
+    if (!choices.length && item.optionLabel) {
+      throw Object.assign(
+        new Error(
+          `Product options have changed for ${product.name}. Please add the product again.`,
+        ),
+        { statusCode: 400 },
+      );
+    }
+    const unitPrice = choice?.price ?? Number(product.price);
+    if (!Number.isFinite(unitPrice) || unitPrice < 0) throw new Error("Invalid product price");
     return {
       product_slug: product.slug,
-      product_name: productName,
+      product_name: choice ? `${product.name} - ${choice.label}` : product.name,
       unit_price: unitPrice,
       quantity: item.quantity,
     };
   });
-
   const merchandiseSubtotal = money(
     pricedItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0),
   );
@@ -226,3 +143,4 @@ export async function calculateTrustedCart(
     cartHash: hashCart(trustedItems),
   };
 }
+import { catalogOptions } from "../src/lib/catalog-options.js";
