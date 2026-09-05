@@ -31,7 +31,7 @@ export function organizationSchema() {
     name: siteName,
     alternateName: ["GXZ Health", "GXZ"],
     url: siteUrl,
-    logo: absoluteUrl("/gxz-android-chrome-512x512.png"),
+    logo: absoluteUrl("/android-chrome-512x512.png"),
     email: "g@zxgwellness.com",
     hasMerchantReturnPolicy: merchantReturnPolicySchema,
     ...(sameAs.length > 0 ? { sameAs } : {}),

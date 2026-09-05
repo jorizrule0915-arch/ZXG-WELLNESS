@@ -219,7 +219,7 @@ function schemaFor(route) {
         name: siteName,
         alternateName: ["GXZ Health", "GXZ"],
         url: siteUrl,
-        logo: `${siteUrl}/gxz-android-chrome-512x512.png`,
+        logo: `${siteUrl}/android-chrome-512x512.png`,
         email: "g@zxgwellness.com",
         ...(socialProfiles.length > 0 ? { sameAs: socialProfiles } : {}),
       },
