@@ -2,7 +2,7 @@ export const siteName = "GXZ Health and Wellness";
 export const siteUrl = "https://www.gxzhealthandwellness.com";
 export const defaultSeoDescription =
   "Shop GXZ Health and Wellness reusable peptide injection pens, 3mL cartridges, pen needles, creatine, hydration, and premium recovery products.";
-export const defaultOgImage = "/og/gxz-health-and-wellness.png";
+export const defaultOgImage = "/og/gxz-search-share.png";
 
 export const merchantReturnPolicySchema = {
   "@type": "MerchantReturnPolicy",
@@ -29,8 +29,9 @@ export function organizationSchema() {
     "@context": "https://schema.org",
     "@type": "OnlineStore",
     name: siteName,
+    alternateName: ["GXZ Health", "GXZ"],
     url: siteUrl,
-    logo: absoluteUrl("/android-chrome-512x512.png"),
+    logo: absoluteUrl("/gxz-android-chrome-512x512.png"),
     email: "g@zxgwellness.com",
     hasMerchantReturnPolicy: merchantReturnPolicySchema,
     ...(sameAs.length > 0 ? { sameAs } : {}),
@@ -47,6 +48,7 @@ export function websiteSchema() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteName,
+    alternateName: ["GXZ Health", "GXZ"],
     url: siteUrl,
   };
 }

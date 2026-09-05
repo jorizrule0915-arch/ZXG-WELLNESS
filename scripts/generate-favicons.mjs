@@ -12,6 +12,14 @@ const source = path.join(
   "official",
   "gxz-wordmark-dark.webp",
 );
+const stackedSource = path.join(
+  repoRoot,
+  "src",
+  "assets",
+  "Logo",
+  "official",
+  "gxz-stacked-dark.webp",
+);
 const publicDir = path.join(repoRoot, "public");
 
 async function renderSquare(size) {
@@ -78,4 +86,21 @@ await fs.writeFile(
   pngToIco(rendered.get(48), 48),
 );
 
-console.log("Generated GXZ favicon and app icon files.");
+const shareLogo = await sharp(stackedSource)
+  .resize({ width: 640, height: 360, fit: "contain" })
+  .png()
+  .toBuffer();
+const shareImage = await sharp({
+  create: {
+    width: 1200,
+    height: 630,
+    channels: 4,
+    background: "#050505",
+  },
+})
+  .composite([{ input: shareLogo, gravity: "center" }])
+  .png()
+  .toBuffer();
+await fs.writeFile(path.join(publicDir, "og", "gxz-search-share.png"), shareImage);
+
+console.log("Generated GXZ favicon, app icon, and search sharing files.");

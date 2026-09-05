@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 const outputDirectory = join(process.cwd(), "dist", "vercel");
 const siteUrl = "https://www.gxzhealthandwellness.com";
 const siteName = "GXZ Health and Wellness";
-const defaultImage = `${siteUrl}/og/gxz-health-and-wellness.png`;
+const defaultImage = `${siteUrl}/og/gxz-search-share.png`;
 const merchantReturnPolicy = {
   "@type": "MerchantReturnPolicy",
   applicableCountry: "US",
@@ -217,8 +217,9 @@ function schemaFor(route) {
         "@context": "https://schema.org",
         "@type": "OnlineStore",
         name: siteName,
+        alternateName: ["GXZ Health", "GXZ"],
         url: siteUrl,
-        logo: `${siteUrl}/android-chrome-512x512.png`,
+        logo: `${siteUrl}/gxz-android-chrome-512x512.png`,
         email: "g@zxgwellness.com",
         ...(socialProfiles.length > 0 ? { sameAs: socialProfiles } : {}),
       },
@@ -226,6 +227,7 @@ function schemaFor(route) {
         "@context": "https://schema.org",
         "@type": "WebSite",
         name: siteName,
+        alternateName: ["GXZ Health", "GXZ"],
         url: siteUrl,
       },
     ];
@@ -246,10 +248,14 @@ function render(baseHtml, route) {
     `<meta data-rh="true" property="og:description" content="${escapeHtml(route.description)}" />`,
     `<meta data-rh="true" property="og:url" content="${escapeHtml(canonical)}" />`,
     `<meta data-rh="true" property="og:image" content="${defaultImage}" />`,
+    `<meta data-rh="true" property="og:image:width" content="1200" />`,
+    `<meta data-rh="true" property="og:image:height" content="630" />`,
+    `<meta data-rh="true" property="og:image:alt" content="${siteName}" />`,
     `<meta data-rh="true" name="twitter:card" content="summary_large_image" />`,
     `<meta data-rh="true" name="twitter:title" content="${escapeHtml(title)}" />`,
     `<meta data-rh="true" name="twitter:description" content="${escapeHtml(route.description)}" />`,
     `<meta data-rh="true" name="twitter:image" content="${defaultImage}" />`,
+    `<meta data-rh="true" name="twitter:image:alt" content="${siteName}" />`,
     googleVerification
       ? `<meta name="google-site-verification" content="${escapeHtml(googleVerification)}" />`
       : "",
