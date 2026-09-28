@@ -3,7 +3,7 @@ import { Resend } from "resend";
 const PEN_DISCOUNT_MIN_QTY = 5;
 const PEN_DISCOUNT_RATE = 0.1;
 const FREE_SHIPPING_THRESHOLD = 50;
-const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <g@gxzhealthandwellness.com>";
+const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
 const DEFAULT_ADMIN_EMAILS = ["jorizrule0@gmail.com", "g@gxzhealthandwellness.com"];
 
 const money = (value: number) => Math.round(value * 100) / 100;

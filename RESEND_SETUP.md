@@ -25,7 +25,7 @@ Once you've verified your domain in Resend, follow these steps:
 The order sender is hardcoded in the app:
 
 ```typescript
-const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <g@gxzhealthandwellness.com>";
+const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
 ```
 
 No extra sender environment variable is required. Just confirm `RESEND_API_KEY` is copied from the
@@ -37,7 +37,7 @@ Order confirmation emails use [server/order-email.ts](server/order-email.ts).
 
 ## Sender
 
-- **From/Sender:** `g@gxzhealthandwellness.com`
+- **From/Sender:** `orders@zxgwellness.com`
 - **Reply-To:** `g@gxzhealthandwellness.com`
 - **Admin recipients:** addresses in `DEFAULT_ADMIN_EMAILS`
 - **Checkout success:** based on the customer confirmation email; admin notification failures are

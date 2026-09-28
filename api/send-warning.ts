@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { loadLocalEnv } from "./local-env.js";
 import { publicErrorMessage, rejectDisallowedOrigin, setApiHeaders } from "../server/http-security.js";
 
-const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <g@gxzhealthandwellness.com>";
+const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
 const REPLY_TO_EMAIL = "g@gxzhealthandwellness.com";
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 

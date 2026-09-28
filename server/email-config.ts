@@ -18,6 +18,6 @@ export function getContactRecipientEmails() {
 }
 
 export const brandFromEmail =
-  process.env.RESEND_FROM_EMAIL || "GXZ Health and Wellness <g@gxzhealthandwellness.com>";
+  process.env.RESEND_FROM_EMAIL || "GXZ Health and Wellness <orders@zxgwellness.com>";
 
 export const brandReplyToEmail = process.env.CUSTOMER_SUPPORT_EMAIL || "g@gxzhealthandwellness.com";
