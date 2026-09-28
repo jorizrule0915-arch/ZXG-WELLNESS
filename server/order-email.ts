@@ -3,8 +3,8 @@ import { Resend } from "resend";
 const PEN_DISCOUNT_MIN_QTY = 5;
 const PEN_DISCOUNT_RATE = 0.1;
 const FREE_SHIPPING_THRESHOLD = 50;
-const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
-const DEFAULT_ADMIN_EMAILS = ["jorizrule0@gmail.com", "g@zxgwellness.com"];
+const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <g@gxzhealthandwellness.com>";
+const DEFAULT_ADMIN_EMAILS = ["jorizrule0@gmail.com", "g@gxzhealthandwellness.com"];
 
 const money = (value: number) => Math.round(value * 100) / 100;
 
@@ -208,7 +208,7 @@ export function buildOrderEmailHtml(order: OrderEmail) {
               </p>
 
               <p style="margin:24px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#374151;">Your order is being prepared. You can review updates from your account page.</p>
-              <p style="margin:12px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#6b7280;">Questions? Reply to this email or contact admin@zxgwellness.com.</p>
+              <p style="margin:12px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#6b7280;">Questions? Reply to this email or contact g@gxzhealthandwellness.com.</p>
             </td>
           </tr>
         </table>
@@ -254,7 +254,7 @@ ${order.shipping_name}
 ${order.shipping_address}
 ${order.shipping_city}${shippingState} ${order.shipping_zip}
 
-Your order is being prepared. Questions? Reply to this email or contact admin@zxgwellness.com.`;
+Your order is being prepared. Questions? Reply to this email or contact g@gxzhealthandwellness.com.`;
 }
 
 function buildLegacyOrderEmailHtml(order: OrderEmail) {
@@ -409,7 +409,7 @@ function buildLegacyOrderEmailHtml(order: OrderEmail) {
                     </td>
                   </tr>
                 </table>
-                <p style="margin:20px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:18px;color:#746b61;">Questions? Reply to this email or contact <a href="mailto:admin@zxgwellness.com" style="color:#c9a84c;text-decoration:none;">admin@zxgwellness.com</a>.</p>
+                <p style="margin:20px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:18px;color:#746b61;">Questions? Reply to this email or contact <a href="mailto:g@gxzhealthandwellness.com" style="color:#c9a84c;text-decoration:none;">g@gxzhealthandwellness.com</a>.</p>
               </td>
             </tr>
           </table>
@@ -440,7 +440,7 @@ export async function sendOrderConfirmationEmail(order: OrderEmail): Promise<Ord
     {
       from,
       to: order.email,
-      replyTo: "admin@zxgwellness.com",
+      replyTo: "g@gxzhealthandwellness.com",
       subject: `Order Confirmed & Paid — #${shortId} | GXZ Health and Wellness`,
       html,
       text,

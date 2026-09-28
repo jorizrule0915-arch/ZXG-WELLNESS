@@ -71,8 +71,8 @@ export function Footer() {
           <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Contact</div>
           <ul className="space-y-3 text-sm text-foreground/75">
             <li>
-              <a href="mailto:g@zxgwellness.com" className="transition-colors hover:text-gold">
-                g@zxgwellness.com
+              <a href="mailto:g@gxzhealthandwellness.com" className="transition-colors hover:text-gold">
+                g@gxzhealthandwellness.com
               </a>
             </li>
           </ul>

@@ -138,11 +138,11 @@ function ContactPage() {
 
             <div className="mt-7 flex flex-wrap gap-3">
               <a
-                href="mailto:g@zxgwellness.com"
+                href="mailto:g@gxzhealthandwellness.com"
                 className="inline-flex min-h-11 items-center gap-2 border border-gold/20 px-4 py-2 text-sm text-foreground transition-colors hover:border-gold hover:text-gold"
               >
                 <Mail className="h-4 w-4 text-gold" />
-                g@zxgwellness.com
+                g@gxzhealthandwellness.com
               </a>
               {instagramUrl && (
                 <a
@@ -202,7 +202,7 @@ function ContactPage() {
                       className="border border-red-400/40 bg-red-950/30 px-4 py-3 text-sm text-red-200"
                     >
                       {error}{" "}
-                      <a href="mailto:g@zxgwellness.com" className="underline">
+                      <a href="mailto:g@gxzhealthandwellness.com" className="underline">
                         Email us directly
                       </a>
                       .

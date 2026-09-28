@@ -132,7 +132,7 @@ The email value should be entered without angle brackets unless a sender name is
 
 Example:
 
-`orders@zxgwellness.com`
+`g@gxzhealthandwellness.com`
 
 The sending domain must also be approved in Resend.
 

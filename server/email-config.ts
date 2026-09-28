@@ -1,4 +1,4 @@
-const BRAND_FALLBACK_NOTIFICATION_EMAILS = ["jorizrule0@gmail.com", "g@zxgwellness.com"];
+const BRAND_FALLBACK_NOTIFICATION_EMAILS = ["jorizrule0@gmail.com", "g@gxzhealthandwellness.com"];
 
 function parseEmailList(value: string | undefined) {
   return String(value ?? "")
@@ -18,6 +18,6 @@ export function getContactRecipientEmails() {
 }
 
 export const brandFromEmail =
-  process.env.RESEND_FROM_EMAIL || "GXZ Health and Wellness <orders@zxgwellness.com>";
+  process.env.RESEND_FROM_EMAIL || "GXZ Health and Wellness <g@gxzhealthandwellness.com>";
 
-export const brandReplyToEmail = process.env.CUSTOMER_SUPPORT_EMAIL || "g@zxgwellness.com";
+export const brandReplyToEmail = process.env.CUSTOMER_SUPPORT_EMAIL || "g@gxzhealthandwellness.com";

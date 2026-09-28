@@ -8,7 +8,7 @@ import {
   setApiHeaders,
 } from "../server/http-security.js";
 
-const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <orders@zxgwellness.com>";
+const DEFAULT_FROM_EMAIL = "GXZ Health and Wellness <g@gxzhealthandwellness.com>";
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
 type WelcomeRequest = {
@@ -171,7 +171,7 @@ function buildWelcomeEmailHtml({ fullName }: { fullName: string }) {
               <li>Read product guides in the GXZ Health and Wellness Journal.</li>
             </ul>
           </div>
-          <p style="margin-bottom:0;color:#9a9a9a;">If this was not you, you can ignore this message or contact us at <a href="mailto:admin@zxgwellness.com" style="color:#c9a84c;text-decoration:none;">admin@zxgwellness.com</a>.</p>
+          <p style="margin-bottom:0;color:#9a9a9a;">If this was not you, you can ignore this message or contact us at <a href="mailto:g@gxzhealthandwellness.com" style="color:#c9a84c;text-decoration:none;">g@gxzhealthandwellness.com</a>.</p>
         </div>
       </div>
     </div>
@@ -192,7 +192,7 @@ What you can do next:
 - Track your orders from your account page.
 - Read product guides in the GXZ Health and Wellness Journal.
 
-If this was not you, you can ignore this message or contact us at admin@zxgwellness.com.`;
+If this was not you, you can ignore this message or contact us at g@gxzhealthandwellness.com.`;
 }
 
 async function sendWelcomeEmail(values: { email: string; fullName: string }) {
@@ -200,7 +200,7 @@ async function sendWelcomeEmail(values: { email: string; fullName: string }) {
   const { error } = await resend.emails.send({
     from: DEFAULT_FROM_EMAIL,
     to: values.email,
-    replyTo: "admin@zxgwellness.com",
+    replyTo: "g@gxzhealthandwellness.com",
     subject: "Welcome to GXZ Health and Wellness",
     html: buildWelcomeEmailHtml(values),
     text: buildWelcomeEmailText(values),

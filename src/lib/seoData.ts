@@ -32,13 +32,13 @@ export function organizationSchema() {
     alternateName: ["GXZ Health", "GXZ"],
     url: siteUrl,
     logo: absoluteUrl("/android-chrome-512x512.png"),
-    email: "g@zxgwellness.com",
+    email: "g@gxzhealthandwellness.com",
     hasMerchantReturnPolicy: merchantReturnPolicySchema,
     ...(sameAs.length > 0 ? { sameAs } : {}),
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",
-      email: "g@zxgwellness.com",
+      email: "g@gxzhealthandwellness.com",
     },
   };
 }
