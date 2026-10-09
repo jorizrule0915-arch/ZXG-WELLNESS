@@ -3,6 +3,7 @@ import { X, Plus, Minus } from "lucide-react";
 import { useCart, cartSummary, cartItemKey } from "@/lib/cart";
 import { imageFor } from "@/lib/productImages";
 import { AnimatePresence, motion } from "framer-motion";
+import { CartRecommendations } from "@/components/site/CartRecommendations";
 
 export function CartDrawer() {
   const { items, isOpen, close, setQty, remove } = useCart();
@@ -106,6 +107,7 @@ export function CartDrawer() {
                   })}
                 </ul>
               )}
+              {items.length > 0 && <CartRecommendations items={items} compact onNavigate={close} />}
             </div>
 
             {items.length > 0 && (

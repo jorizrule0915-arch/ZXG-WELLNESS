@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { buildOrderGuidanceHtml, buildOrderGuidanceText } from "./order-guidance.js";
 
 const PEN_DISCOUNT_MIN_QTY = 5;
 const PEN_DISCOUNT_RATE = 0.1;
@@ -207,6 +208,7 @@ export function buildOrderEmailHtml(order: OrderEmail) {
                 ${escapeHtml(order.shipping_city)}${shippingState} ${escapeHtml(order.shipping_zip)}
               </p>
 
+              ${buildOrderGuidanceHtml(order.items)}
               <p style="margin:24px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#374151;">Your order is being prepared. You can review updates from your account page.</p>
               <p style="margin:12px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#6b7280;">Questions? Reply to this email or contact g@gxzhealthandwellness.com.</p>
             </td>
@@ -253,6 +255,8 @@ Shipping to:
 ${order.shipping_name}
 ${order.shipping_address}
 ${order.shipping_city}${shippingState} ${order.shipping_zip}
+
+${buildOrderGuidanceText(order.items)}
 
 Your order is being prepared. Questions? Reply to this email or contact g@gxzhealthandwellness.com.`;
 }

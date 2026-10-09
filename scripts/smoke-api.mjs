@@ -193,6 +193,21 @@ const trackingEmail = await bundleEntry(["server", "tracking-email.ts"], "tracki
   );
 }
 
+const orderGuidance = await bundleEntry(["server", "order-guidance.ts"], "order-guidance");
+{
+  const accessoryHtml = orderGuidance.buildOrderGuidanceHtml([{ product_slug: "pen" }]);
+  const accessoryText = orderGuidance.buildOrderGuidanceText([{ product_slug: "needles" }]);
+  const wellnessHtml = orderGuidance.buildOrderGuidanceHtml([{ product_slug: "creatine" }]);
+  assert(
+    accessoryHtml.includes("View the Setup Guide") && accessoryText.includes("/how-to-use"),
+    "Accessory orders should include post-purchase setup guidance.",
+  );
+  assert(
+    wellnessHtml === "",
+    "Orders without pen accessories should not receive unrelated setup guidance.",
+  );
+}
+
 const webhook = await bundleApi("stripe-webhook");
 {
   assert(webhook.config?.api?.bodyParser === false, "Stripe body parsing must be disabled.");
@@ -245,5 +260,5 @@ const webhook = await bundleApi("stripe-webhook");
 }
 
 process.stdout.write(
-  "API smoke tests passed: contact, newsletter consent, CORS, tracking email confirmation, carrier links, and Stripe payment signature.\n",
+  "API smoke tests passed: contact, newsletter consent, CORS, tracking and order guidance, carrier links, and Stripe payment signature.\n",
 );

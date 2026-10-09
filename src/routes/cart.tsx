@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus, Minus, X } from "lucide-react";
 import { useCart, cartSummary, cartItemKey } from "@/lib/cart";
 import { Seo } from "@/lib/seo";
+import { CartRecommendations } from "@/components/site/CartRecommendations";
 
 export const Route = createFileRoute("/cart")({ component: CartPage });
 
@@ -36,57 +37,60 @@ function CartPage() {
           </div>
         ) : (
           <div className="mt-12 grid lg:grid-cols-[1fr,360px] gap-12">
-            <ul className="border-t border-gold/15">
-              {items.map((i) => {
-                const key = cartItemKey(i);
+            <div>
+              <ul className="border-t border-gold/15">
+                {items.map((i) => {
+                  const key = cartItemKey(i);
 
-                return (
-                  <li key={key} className="border-b border-gold/15 py-6 flex gap-6">
-                    <img
-                      src={i.image}
-                      alt={i.name}
-                      className="h-32 w-28 object-contain bg-surface-2"
-                      loading="lazy"
-                    />
-                    <div className="flex-1 flex flex-col">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-display text-2xl">{i.name}</h3>
-                          <div className="mt-1 text-sm text-gold">${i.price} each</div>
-                        </div>
-                        <button
-                          onClick={() => remove(key)}
-                          aria-label="Remove"
-                          className="text-muted-foreground hover:text-gold"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                      <div className="mt-auto flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+                  return (
+                    <li key={key} className="border-b border-gold/15 py-6 flex gap-6">
+                      <img
+                        src={i.image}
+                        alt={i.name}
+                        className="h-32 w-28 object-contain bg-surface-2"
+                        loading="lazy"
+                      />
+                      <div className="flex-1 flex flex-col">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="font-display text-2xl">{i.name}</h3>
+                            <div className="mt-1 text-sm text-gold">${i.price} each</div>
+                          </div>
                           <button
-                            onClick={() => setQty(key, i.quantity - 1)}
-                            className="h-8 w-8 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition flex items-center justify-center"
+                            onClick={() => remove(key)}
+                            aria-label="Remove"
+                            className="text-muted-foreground hover:text-gold"
                           >
-                            <Minus className="h-3 w-3" />
-                          </button>
-                          <span className="w-6 text-center">{i.quantity}</span>
-                          <button
-                            onClick={() => setQty(key, i.quantity + 1)}
-                            className="h-8 w-8 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition flex items-center justify-center"
-                          >
-                            <Plus className="h-3 w-3" />
+                            <X className="h-4 w-4" />
                           </button>
                         </div>
-                        <div className="font-display text-xl text-gold">
-                          ${(i.price * i.quantity).toFixed(0)}
+                        <div className="mt-auto flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => setQty(key, i.quantity - 1)}
+                              className="h-8 w-8 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition flex items-center justify-center"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="w-6 text-center">{i.quantity}</span>
+                            <button
+                              onClick={() => setQty(key, i.quantity + 1)}
+                              className="h-8 w-8 border border-gold/40 text-gold hover:bg-gold hover:text-obsidian transition flex items-center justify-center"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                          <div className="font-display text-xl text-gold">
+                            ${(i.price * i.quantity).toFixed(0)}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+                    </li>
+                  );
+                })}
+              </ul>
+              <CartRecommendations items={items} />
+            </div>
 
             <aside className="bg-charcoal border border-gold/20 p-8 h-fit sticky top-24">
               <div className="text-[10px] uppercase tracking-luxury text-gold mb-6">

@@ -47,6 +47,18 @@ const RELATED_PRODUCT_SLUGS: Record<string, string[]> = {
   "body-balm": ["creatine", "hydration"],
 };
 
+const COMPLETE_SETUP_SLUGS = ["pen", "cartridge", "needles"];
+
+function formatStartingPrice(product: Product) {
+  const prices = [
+    product.price,
+    ...(product.variants ?? []).map((variant) => variant.price),
+    ...(product.colorVariants ?? []).map((variant) => variant.price),
+  ].filter((price) => Number.isFinite(price));
+  const minimum = Math.min(...prices);
+  return `${new Set(prices).size > 1 ? "From " : ""}$${minimum.toFixed(2)}`;
+}
+
 function ProductDetail() {
   const { slug } = useParams({ from: "/products/$slug" });
   const nav = useNavigate();
@@ -148,6 +160,13 @@ function ProductDetail() {
       : product.name;
   const productPath = `/products/${product.slug}`;
   const primaryImage = selectedColorImage ?? gallery[activeImg] ?? gallery[0] ?? product.image;
+  const completeSetupProducts = COMPLETE_SETUP_SLUGS.includes(product.slug)
+    ? COMPLETE_SETUP_SLUGS.map((setupSlug) =>
+        setupSlug === product.slug
+          ? product
+          : related.find((candidate) => candidate.slug === setupSlug),
+      ).filter((candidate): candidate is Product => Boolean(candidate))
+    : [];
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -428,10 +447,80 @@ function ProductDetail() {
                     </p>
                   </>
                 )}
+                {COMPLETE_SETUP_SLUGS.includes(product.slug) && (
+                  <p>
+                    Need the full accessory system?{" "}
+                    <a href="#complete-setup" className="text-gold hover:underline">
+                      Build your complete setup
+                    </a>
+                    .
+                  </p>
+                )}
               </div>
             </div>
           </motion.div>
         </div>
+
+        {completeSetupProducts.length === COMPLETE_SETUP_SLUGS.length && (
+          <section
+            id="complete-setup"
+            className="mt-20 border border-gold/20 bg-charcoal p-6 md:p-10"
+            aria-labelledby="complete-setup-title"
+          >
+            <div className="text-xs uppercase tracking-luxury text-gold">Complete setup</div>
+            <div className="mt-3 grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
+              <div>
+                <h2 id="complete-setup-title" className="font-display text-3xl md:text-4xl">
+                  Build the full reusable pen setup
+                </h2>
+                <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">
+                  A complete setup uses a reusable pen, compatible 3mL cartridges, and single-use
+                  pen needles. Choose each item separately so you can select the right pen color and
+                  needle size before checkout.
+                </p>
+              </div>
+              <Link
+                to="/how-to-use"
+                className="inline-flex min-h-11 items-center justify-center border border-gold/30 px-5 py-3 text-sm text-gold transition-colors hover:bg-gold hover:text-obsidian"
+              >
+                Review the setup guide
+              </Link>
+            </div>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              {completeSetupProducts.map((setupProduct, index) => (
+                <Link
+                  key={setupProduct.slug}
+                  to="/products/$slug"
+                  params={{ slug: setupProduct.slug }}
+                  className="group flex items-center gap-4 border border-gold/15 bg-obsidian/55 p-4 transition-colors hover:border-gold/50"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-gold/30 text-xs text-gold">
+                    {index + 1}
+                  </span>
+                  <img
+                    src={setupProduct.image}
+                    alt=""
+                    className="h-20 w-16 shrink-0 bg-surface-2 object-contain p-1"
+                    loading="lazy"
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-sm leading-5 text-foreground transition-colors group-hover:text-gold">
+                      {setupProduct.name}
+                    </span>
+                    <span className="mt-1 block text-xs text-gold">
+                      {formatStartingPrice(setupProduct)}
+                    </span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <p className="mt-5 text-xs leading-5 text-muted-foreground">
+              Items are sold separately. Review each product page for current availability,
+              compatible options, and pricing.
+            </p>
+          </section>
+        )}
 
         {product.featuredVideo && (
           <section className="mt-20 border-t border-gold/10 pt-16">

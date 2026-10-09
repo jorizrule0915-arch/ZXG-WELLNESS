@@ -14,6 +14,7 @@ import {
   setApiHeaders,
 } from "../server/http-security.js";
 import { assertAccountCanPurchase } from "../server/account-security.js";
+import { buildOrderGuidanceHtml, buildOrderGuidanceText } from "../server/order-guidance.js";
 
 const SHIPPING_FEE = 10;
 const FREE_SHIPPING_THRESHOLD = 50;
@@ -398,6 +399,7 @@ function buildOrderEmailHtml(order: OrderEmail) {
                 ${escapeHtml(order.shipping_city)}${shippingState} ${escapeHtml(order.shipping_zip)}
               </p>
 
+              ${buildOrderGuidanceHtml(order.items)}
               <p style="margin:24px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#374151;">Your order is being prepared. You can review updates from your account page.</p>
               <p style="margin:12px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#6b7280;">Questions? Reply to this email or contact g@gxzhealthandwellness.com.</p>
             </td>
@@ -444,6 +446,8 @@ Shipping to:
 ${order.shipping_name}
 ${order.shipping_address}
 ${order.shipping_city}${shippingState} ${order.shipping_zip}
+
+${buildOrderGuidanceText(order.items)}
 
 Your order is being prepared. Questions? Reply to this email or contact g@gxzhealthandwellness.com.`;
 }
@@ -717,10 +721,17 @@ async function retrieveCheckoutSession(checkoutSessionId: string) {
   return data;
 }
 
-function stripePaymentIntentId(checkoutSession: any) {
-  const paymentIntent = checkoutSession?.payment_intent;
+function stripePaymentIntentId(checkoutSession: unknown) {
+  if (!checkoutSession || typeof checkoutSession !== "object") return null;
+  const paymentIntent = (checkoutSession as { payment_intent?: unknown }).payment_intent;
   if (typeof paymentIntent === "string") return paymentIntent;
-  if (paymentIntent && typeof paymentIntent.id === "string") return paymentIntent.id;
+  if (
+    paymentIntent &&
+    typeof paymentIntent === "object" &&
+    "id" in paymentIntent &&
+    typeof paymentIntent.id === "string"
+  )
+    return paymentIntent.id;
   return null;
 }
 

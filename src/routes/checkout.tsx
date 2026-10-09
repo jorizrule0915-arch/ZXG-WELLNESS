@@ -28,6 +28,7 @@ function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [showSetupGuide, setShowSetupGuide] = useState(false);
   const nav = useNavigate();
 
   const handleShippingSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -140,6 +141,9 @@ function CheckoutPage() {
         setNotice(null);
       }
 
+      setShowSetupGuide(
+        items.some((item) => ["pen", "cartridge", "needles", "syringe"].includes(item.slug)),
+      );
       clear();
       setDone(true);
     } catch (e) {
@@ -163,7 +167,7 @@ function CheckoutPage() {
           account.
         </p>
         {notice && <p className="mt-4 text-sm text-gold max-w-lg">{notice}</p>}
-        <div className="mt-10 flex gap-4">
+        <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
             to="/account"
             className="px-6 py-3 bg-gold text-obsidian text-[11px] uppercase tracking-luxury hover:bg-gold-light transition-colors"
@@ -176,6 +180,14 @@ function CheckoutPage() {
           >
             Continue Browsing
           </Link>
+          {showSetupGuide && (
+            <Link
+              to="/how-to-use"
+              className="px-6 py-3 border border-gold/40 text-gold text-[11px] uppercase tracking-luxury hover:bg-gold hover:text-obsidian transition-colors"
+            >
+              View Setup Guide
+            </Link>
+          )}
         </div>
       </div>
     );
