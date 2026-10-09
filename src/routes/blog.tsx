@@ -31,6 +31,7 @@ function BlogPage() {
     category,
     count: blogArticles.filter((article) => article.category === category).length,
   }));
+  const publishedCategoryCounts = categoryCounts.filter(({ count }) => count > 0);
   const filteredArticles = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -132,7 +133,7 @@ function BlogPage() {
               </p>
               <div className="mt-5 grid grid-cols-3 gap-3 border-t border-gold/10 pt-5">
                 <StatBlock label="Guides" value={blogArticles.length} />
-                <StatBlock label="Topics" value={blogCategories.length} />
+                <StatBlock label="Topics" value={publishedCategoryCounts.length} />
                 <StatBlock label="Sources" value={referenceCount} />
               </div>
             </aside>
@@ -163,7 +164,7 @@ function BlogPage() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {categoryCounts.map(({ category, count }) => (
+            {publishedCategoryCounts.map(({ category, count }) => (
               <TopicCard
                 key={category}
                 category={category}
@@ -321,9 +322,7 @@ function TopicCard({
         <span className="border border-gold/20 px-2 py-1 text-xs text-gold">{count}</span>
       </div>
       <p className="mt-4 text-sm leading-6 text-muted-foreground">
-        {count > 0
-          ? `${count} guide${count === 1 ? "" : "s"} covering customer questions in this topic.`
-          : "Planned topic cluster for future education."}
+        {`${count} guide${count === 1 ? "" : "s"} covering customer questions in this topic.`}
       </p>
       <span className="mt-4 inline-flex items-center gap-2 text-sm text-gold transition-transform group-hover:translate-x-1">
         Browse topic

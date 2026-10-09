@@ -5,7 +5,7 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { JsonLd, Seo } from "@/lib/seo";
 import { absoluteUrl, breadcrumbSchema } from "@/lib/seoData";
 
-const categories = ["All", "Supplements", "Skincare", "Accessories"] as const;
+const categories = ["All", "Supplements", "Hydration", "Skincare", "Accessories"] as const;
 
 export const Route = createFileRoute("/products")({ component: ProductsPage });
 
@@ -66,7 +66,8 @@ function ProductsPage() {
             Considered <span className="text-gradient-gold italic">essentials</span>
           </h1>
           <p className="mt-6 max-w-xl mx-auto text-muted-foreground">
-            Two products. Both intentional. Creatine for performance, Body Balm for recovery.
+            Purpose-built wellness products and precision accessories for performance, recovery,
+            hydration, and daily care.
           </p>
         </div>
 

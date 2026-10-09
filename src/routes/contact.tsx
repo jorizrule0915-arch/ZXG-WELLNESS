@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Instagram, Mail, MessageCircle } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import contactFeatureVideo from "@/assets/contact-feature.mp4";
@@ -132,8 +132,8 @@ function ContactPage() {
               How can we <span className="text-gradient-gold italic">help?</span>
             </h1>
             <p className="mt-5 max-w-xl text-sm leading-7 text-muted-foreground">
-              Tell us what you need and we’ll reply as soon as possible. For order questions,
-              include your order number in the message.
+              GXZ Health and Wellness is an online store. Tell us what you need and we’ll reply as
+              soon as possible. For order questions, include your order number in the message.
             </p>
 
             <div className="mt-7 flex flex-wrap gap-3">
@@ -232,6 +232,9 @@ function ContactPage() {
                 Quick answers for orders, accessories, returns, and the kind of support our team can
                 provide.
               </p>
+              <Link to="/faq" className="mt-5 inline-flex text-sm text-gold hover:underline">
+                View all frequently asked questions
+              </Link>
             </div>
 
             <div className="divide-y divide-gold/15 border-y border-gold/15">

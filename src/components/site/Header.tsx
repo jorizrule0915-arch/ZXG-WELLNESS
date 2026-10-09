@@ -14,6 +14,10 @@ type NavTo =
   | "/how-to-use"
   | "/about"
   | "/returns"
+  | "/faq"
+  | "/privacy-policy"
+  | "/terms-of-service"
+  | "/shipping-policy"
   | "/contact";
 
 type NavLink = {
@@ -28,12 +32,13 @@ const links: readonly NavLink[] = [
 ] as const;
 
 const learnLinks: readonly NavLink[] = [
-  { to: "/reusable-pen-difference", label: "Pen Diff" },
+  { to: "/reusable-pen-difference", label: "Reusable Pen Difference" },
   { to: "/how-to-use", label: "How to Use" },
 ] as const;
 
 const supportLinks: readonly NavLink[] = [
   { to: "/about", label: "About" },
+  { to: "/faq", label: "FAQ" },
   { to: "/returns", label: "Returns" },
   { to: "/contact", label: "Contact" },
 ] as const;
@@ -177,8 +182,8 @@ export function Header() {
 
       {/* Mobile menu */}
       <div
-        className={`xl:hidden overflow-hidden border-t border-border bg-background/95 backdrop-blur-xl transition-[max-height] duration-500 ${
-          mobileOpen ? "max-h-96" : "max-h-0"
+        className={`xl:hidden overflow-y-auto border-t border-border bg-background/95 backdrop-blur-xl transition-[max-height] duration-500 ${
+          mobileOpen ? "max-h-[calc(100vh-68px)]" : "max-h-0"
         }`}
       >
         <nav className="flex flex-col py-2 px-6">
@@ -221,14 +226,20 @@ function DesktopSubNav({
   pathname: string;
   active: boolean;
 }) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <div className="group relative">
+    <div className="group relative" onMouseLeave={() => setOpen(false)}>
       <button
         type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
         className="relative flex items-center gap-1.5 text-[13px] font-medium uppercase tracking-widest text-foreground transition-colors hover:text-gold"
       >
         {label}
-        <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
+        <ChevronDown
+          className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : "group-hover:rotate-180"}`}
+        />
         <span
           className={`absolute -bottom-1.5 left-0 h-px bg-gold transition-all duration-300 ${
             active ? "w-full" : "w-0 group-hover:w-full"
@@ -236,7 +247,11 @@ function DesktopSubNav({
         />
       </button>
 
-      <div className="invisible absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+      <div
+        className={`${
+          open ? "visible opacity-100" : "invisible opacity-0"
+        } absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-4 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100`}
+      >
         <div className="border border-gold/15 bg-background/95 p-2 shadow-2xl backdrop-blur-xl">
           {links.map((link) => {
             const linkActive = isRouteActive(pathname, link.to);
@@ -245,6 +260,7 @@ function DesktopSubNav({
               <Link
                 key={link.to}
                 to={link.to}
+                onClick={() => setOpen(false)}
                 className={`block px-4 py-3 text-sm transition-colors hover:bg-gold hover:text-obsidian ${
                   linkActive ? "text-gold" : "text-foreground/80"
                 }`}

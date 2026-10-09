@@ -10,6 +10,13 @@
       "maxDuration": 30
     }
   },
+  "redirects": [
+    {
+      "source": "/blog/authors/zxg-wellness-editorial-team",
+      "destination": "/blog/authors/gxz-health-and-wellness-editorial-team",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

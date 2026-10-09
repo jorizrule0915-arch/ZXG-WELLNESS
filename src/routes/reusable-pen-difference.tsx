@@ -286,7 +286,7 @@ function ReusablePenDifferencePage() {
                 Home
               </Link>
               <ChevronRight className="h-4 w-4 text-gold" />
-              <span>Pen Diff</span>
+              <span>Reusable Pen Difference</span>
             </div>
           </div>
         </section>

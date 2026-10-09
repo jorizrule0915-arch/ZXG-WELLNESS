@@ -47,7 +47,7 @@ export function Footer() {
             </li>
             <li>
               <Link to="/reusable-pen-difference" className="hover:text-gold">
-                Pen Diff
+                Reusable Pen Difference
               </Link>
             </li>
             <li>
@@ -61,6 +61,26 @@ export function Footer() {
               </Link>
             </li>
             <li>
+              <Link to="/shipping-policy" className="hover:text-gold">
+                Shipping Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/faq" className="hover:text-gold">
+                FAQ
+              </Link>
+            </li>
+            <li>
+              <Link to="/privacy-policy" className="hover:text-gold">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/terms-of-service" className="hover:text-gold">
+                Terms of Service
+              </Link>
+            </li>
+            <li>
               <Link to="/contact" className="hover:text-gold">
                 Contact
               </Link>
@@ -71,7 +91,10 @@ export function Footer() {
           <div className="text-[10px] uppercase tracking-luxury text-gold mb-4">Contact</div>
           <ul className="space-y-3 text-sm text-foreground/75">
             <li>
-              <a href="mailto:g@gxzhealthandwellness.com" className="transition-colors hover:text-gold">
+              <a
+                href="mailto:g@gxzhealthandwellness.com"
+                className="transition-colors hover:text-gold"
+              >
                 g@gxzhealthandwellness.com
               </a>
             </li>

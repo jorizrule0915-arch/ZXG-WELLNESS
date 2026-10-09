@@ -50,7 +50,13 @@
   </url>
   <url>
     <loc>https://www.gxzhealthandwellness.com/products/body-balm</loc>
-    <lastmod>2026-06-29</lastmod>
+    <lastmod>2026-10-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.gxzhealthandwellness.com/products/hydration</loc>
+    <lastmod>2026-10-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -85,8 +91,8 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.gxzhealthandwellness.com/blog/authors/zxg-wellness-editorial-team</loc>
-    <lastmod>2026-06-29</lastmod>
+    <loc>https://www.gxzhealthandwellness.com/blog/authors/gxz-health-and-wellness-editorial-team</loc>
+    <lastmod>2026-10-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -110,8 +116,32 @@
   </url>
   <url>
     <loc>https://www.gxzhealthandwellness.com/returns</loc>
-    <lastmod>2026-06-29</lastmod>
+    <lastmod>2026-10-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://www.gxzhealthandwellness.com/shipping-policy</loc>
+    <lastmod>2026-10-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.gxzhealthandwellness.com/privacy-policy</loc>
+    <lastmod>2026-10-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://www.gxzhealthandwellness.com/terms-of-service</loc>
+    <lastmod>2026-10-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://www.gxzhealthandwellness.com/faq</loc>
+    <lastmod>2026-10-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>

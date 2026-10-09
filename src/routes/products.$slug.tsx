@@ -37,6 +37,16 @@ const COLOR_SWATCHES: Record<string, string> = {
   silver: "#bdc3c7",
 };
 
+const RELATED_PRODUCT_SLUGS: Record<string, string[]> = {
+  pen: ["cartridge", "needles", "syringe"],
+  cartridge: ["pen", "needles", "syringe"],
+  needles: ["pen", "cartridge", "syringe"],
+  syringe: ["pen", "cartridge", "needles"],
+  creatine: ["hydration", "body-balm"],
+  hydration: ["creatine", "body-balm"],
+  "body-balm": ["creatine", "hydration"],
+};
+
 function ProductDetail() {
   const { slug } = useParams({ from: "/products/$slug" });
   const nav = useNavigate();
@@ -77,7 +87,17 @@ function ProductDetail() {
   useEffect(() => {
     if (!product) return;
     fetchProducts()
-      .then((all) => setRelated(all.filter((p) => p.slug !== product.slug).slice(0, 3)))
+      .then((all) => {
+        const priorities = RELATED_PRODUCT_SLUGS[product.slug] ?? [];
+        const candidates = all.filter((candidate) => candidate.slug !== product.slug);
+        const prioritized = priorities
+          .map((relatedSlug) => candidates.find((candidate) => candidate.slug === relatedSlug))
+          .filter((candidate): candidate is Product => Boolean(candidate));
+        const remaining = candidates.filter(
+          (candidate) => !prioritized.some((item) => item.slug === candidate.slug),
+        );
+        setRelated([...prioritized, ...remaining].slice(0, 3));
+      })
       .catch(console.error);
   }, [product]);
 
@@ -388,6 +408,27 @@ function ProductDetail() {
               >
                 {selectedColorInStock ? "Add to Cart →" : "Out of Stock"}
               </button>
+              <div className="mt-4 space-y-2 text-xs leading-5 text-muted-foreground">
+                <p>
+                  Eligible unused items in original packaging may be returned within 30 days.{" "}
+                  <Link to="/returns" className="text-gold hover:underline">
+                    Review the return policy
+                  </Link>
+                  .
+                </p>
+                {product.slug === "pen" && (
+                  <>
+                    <p className="text-gold">Order 5 or more reusable pens and receive 10% off.</p>
+                    <p>
+                      Choosing a pen?{" "}
+                      <Link to="/reusable-pen-difference" className="text-gold hover:underline">
+                        Compare the reusable pen system
+                      </Link>
+                      .
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
           </motion.div>
         </div>

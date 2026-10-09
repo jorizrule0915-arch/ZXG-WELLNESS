@@ -52,11 +52,11 @@ const testimonials = [
     avatar:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&h=128&q=75",
     verified: "Verified buyer",
-    product: "Pen Diff Page",
+    product: "Reusable Pen Guide",
     quote:
       "The site helped me understand the difference between the reusable pen and the refill pieces. It felt clear, polished, and not overwhelming.",
     messages: [
-      { from: "Erin", text: "The pen diff page helped a lot, thank you." },
+      { from: "Erin", text: "The reusable pen guide helped a lot, thank you." },
       { from: "GXZ", text: "Happy it made the setup clearer." },
       { from: "Erin", text: "Yes — now I know what to buy first and what to restock." },
     ],
@@ -150,7 +150,7 @@ function Index() {
               ritually <span className="text-gradient-gold italic">gilded</span>.
             </h1>
             <p className="mt-8 max-w-md text-base text-foreground/75 leading-relaxed">
-              Two products. Creatine for performance. Body Balm for recovery. Both built to last.
+              A focused collection for performance, recovery, hydration, and precision.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-5">
               <Link

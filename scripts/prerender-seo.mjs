@@ -64,6 +64,13 @@ const products = [
       "Shop GXZ Health and Wellness Nourishing Body Balm, a recovery-focused skin treatment with cocoa butter, shea butter, and squalane for daily moisture.",
     price: "16.99",
   },
+  {
+    path: "/products/hydration",
+    title: "GXZ Health Hydration",
+    description:
+      "Shop GXZ Health Hydration, a convenient hydration formula designed for active routines, travel, training, and everyday fluid support.",
+    price: "16.97",
+  },
 ];
 
 const articles = [
@@ -139,6 +146,30 @@ const staticRoutes = [
       "Read the GXZ Health and Wellness return, refund, damaged item, cancellation, and customer care policy before ordering.",
   },
   {
+    path: "/shipping-policy",
+    title: "Shipping Policy",
+    description:
+      "Review GXZ Health and Wellness shipping charges, free-shipping eligibility, tracking, delivery estimates, and shipment support.",
+  },
+  {
+    path: "/privacy-policy",
+    title: "Privacy Policy",
+    description:
+      "Learn how GXZ Health and Wellness collects, uses, protects, and shares customer and website information.",
+  },
+  {
+    path: "/terms-of-service",
+    title: "Terms of Service",
+    description:
+      "Review the terms that apply when using the GXZ Health and Wellness website or purchasing from the online store.",
+  },
+  {
+    path: "/faq",
+    title: "Frequently Asked Questions",
+    description:
+      "Find answers about GXZ Health and Wellness shipping, tracking, returns, reusable pens, cartridges, needles, and customer support.",
+  },
+  {
     path: "/how-to-use",
     title: "How to Use GXZ Health and Wellness Accessories",
     description:
@@ -151,7 +182,7 @@ const staticRoutes = [
       "Compare reusable pens, refill cartridges, single-use pen needles, and compatible accessory options from GXZ Health and Wellness.",
   },
   {
-    path: "/blog/authors/zxg-wellness-editorial-team",
+    path: "/blog/authors/gxz-health-and-wellness-editorial-team",
     title: "GXZ Health and Wellness Editorial Team",
     description:
       "Meet the GXZ Health and Wellness editorial team behind practical product, recovery, hydration, and reusable-pen education.",

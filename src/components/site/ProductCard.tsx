@@ -4,6 +4,15 @@ import type { Product } from "@/lib/products";
 import { isProductInStock } from "@/lib/catalog-options";
 
 export function ProductCard({ product, index = 0 }: { product: Product; index?: number }) {
+  const optionPrices = [
+    ...(product.variants ?? []).map((variant) => Number(variant.price)),
+    ...(product.colorVariants ?? []).map((variant) => Number(variant.price)),
+  ].filter(Number.isFinite);
+  const allPrices = [Number(product.price), ...optionPrices].filter(Number.isFinite);
+  const minimumPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
+  const maximumPrice = allPrices.length > 0 ? Math.max(...allPrices) : minimumPrice;
+  const priceLabel = `${maximumPrice > minimumPrice ? "From " : ""}$${minimumPrice.toFixed(2)}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -36,7 +45,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
             </h3>
             <p className="mt-1 text-xs text-muted-foreground">{product.tagline}</p>
           </div>
-          <div className="font-display text-xl text-gold whitespace-nowrap">${product.price}</div>
+          <div className="font-display text-xl text-gold whitespace-nowrap">{priceLabel}</div>
         </div>
       </Link>
     </motion.div>

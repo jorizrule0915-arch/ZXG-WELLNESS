@@ -1,9 +1,20 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useParams } from "@tanstack/react-router";
 import { formatBlogDate, getArticlesByAuthor, getBlogAuthor } from "@/lib/blog";
 import { JsonLd, Seo } from "@/lib/seo";
 import { absoluteUrl, breadcrumbSchema } from "@/lib/seoData";
 
-export const Route = createFileRoute("/blog/authors/$slug")({ component: BlogAuthorPage });
+export const Route = createFileRoute("/blog/authors/$slug")({
+  beforeLoad: ({ params }) => {
+    if (params.slug === "zxg-wellness-editorial-team") {
+      throw redirect({
+        to: "/blog/authors/$slug",
+        params: { slug: "gxz-health-and-wellness-editorial-team" },
+        replace: true,
+      });
+    }
+  },
+  component: BlogAuthorPage,
+});
 
 function BlogAuthorPage() {
   const { slug } = useParams({ from: "/blog/authors/$slug" });

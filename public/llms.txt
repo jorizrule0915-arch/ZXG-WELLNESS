@@ -20,6 +20,10 @@
 
 - [Contact](https://www.gxzhealthandwellness.com/contact): Contact the GXZ customer support team.
 - [Returns](https://www.gxzhealthandwellness.com/returns): Review the return and refund policy.
+- [Shipping Policy](https://www.gxzhealthandwellness.com/shipping-policy): Review shipping charges, tracking, and delivery information.
+- [FAQ](https://www.gxzhealthandwellness.com/faq): Find answers about orders, delivery, returns, and product accessories.
+- [Privacy Policy](https://www.gxzhealthandwellness.com/privacy-policy): Review how customer information is handled.
+- [Terms of Service](https://www.gxzhealthandwellness.com/terms-of-service): Review the store's website and purchase terms.
 
 ## Discovery files
 

@@ -67,7 +67,7 @@ export const blogCategories: BlogCategory[] = [
 
 export const blogAuthors: BlogAuthor[] = [
   {
-    slug: "zxg-wellness-editorial-team",
+    slug: "gxz-health-and-wellness-editorial-team",
     name: "GXZ Health and Wellness Editorial Team",
     role: "Product education and wellness editorial team",
     credentials:
@@ -96,7 +96,7 @@ export const blogArticles: BlogArticle[] = [
     updatedAt: "2026-06-29",
     readingTime: "6 min read",
     author: "GXZ Health and Wellness Editorial Team",
-    authorSlug: "zxg-wellness-editorial-team",
+    authorSlug: "gxz-health-and-wellness-editorial-team",
     reviewedBy: "GXZ Health and Wellness Editorial Team",
     reviewedAt: "2026-06-29",
     summaryAnswer:
@@ -218,7 +218,7 @@ export const blogArticles: BlogArticle[] = [
     updatedAt: "2026-06-29",
     readingTime: "7 min read",
     author: "GXZ Health and Wellness Editorial Team",
-    authorSlug: "zxg-wellness-editorial-team",
+    authorSlug: "gxz-health-and-wellness-editorial-team",
     reviewedBy: "GXZ Health and Wellness Editorial Team",
     reviewedAt: "2026-06-29",
     summaryAnswer:
@@ -334,7 +334,7 @@ export const blogArticles: BlogArticle[] = [
     updatedAt: "2026-07-25",
     readingTime: "8 min read",
     author: "GXZ Health and Wellness Editorial Team",
-    authorSlug: "zxg-wellness-editorial-team",
+    authorSlug: "gxz-health-and-wellness-editorial-team",
     reviewedBy: "GXZ Health and Wellness Editorial Team",
     reviewedAt: "2026-06-29",
     summaryAnswer:
@@ -461,7 +461,7 @@ export const blogArticles: BlogArticle[] = [
     updatedAt: "2026-07-01",
     readingTime: "9 min read",
     author: "GXZ Health and Wellness Editorial Team",
-    authorSlug: "zxg-wellness-editorial-team",
+    authorSlug: "gxz-health-and-wellness-editorial-team",
     reviewedBy: "GXZ Health and Wellness Editorial Team",
     reviewedAt: "2026-07-01",
     summaryAnswer:

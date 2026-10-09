@@ -9,12 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
+import { Route as ShippingPolicyRouteImport } from './routes/shipping-policy'
 import { Route as ReusablePenDifferenceRouteImport } from './routes/reusable-pen-difference'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HowToUseRouteImport } from './routes/how-to-use'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
@@ -35,6 +39,16 @@ import { Route as AdminAdminOrdersRouteImport } from './routes/_admin.admin.orde
 import { Route as AdminAdminProductsNewRouteImport } from './routes/_admin.admin.products.new'
 import { Route as AdminAdminProductsIdRouteImport } from './routes/_admin.admin.products.$id'
 
+const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
+  id: '/terms-of-service',
+  path: '/terms-of-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShippingPolicyRoute = ShippingPolicyRouteImport.update({
+  id: '/shipping-policy',
+  path: '/shipping-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReusablePenDifferenceRoute = ReusablePenDifferenceRouteImport.update({
   id: '/reusable-pen-difference',
   path: '/reusable-pen-difference',
@@ -55,6 +69,11 @@ const ProductsRoute = ProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -63,6 +82,11 @@ const LoginRoute = LoginRouteImport.update({
 const HowToUseRoute = HowToUseRouteImport.update({
   id: '/how-to-use',
   path: '/how-to-use',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -168,12 +192,16 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/how-to-use': typeof HowToUseRoute
   '/login': typeof LoginRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/products': typeof ProductsRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/reusable-pen-difference': typeof ReusablePenDifferenceRoute
+  '/shipping-policy': typeof ShippingPolicyRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -194,12 +222,16 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/how-to-use': typeof HowToUseRoute
   '/login': typeof LoginRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/products': typeof ProductsRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/reusable-pen-difference': typeof ReusablePenDifferenceRoute
+  '/shipping-policy': typeof ShippingPolicyRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -221,12 +253,16 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/how-to-use': typeof HowToUseRoute
   '/login': typeof LoginRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/products': typeof ProductsRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/reusable-pen-difference': typeof ReusablePenDifferenceRoute
+  '/shipping-policy': typeof ShippingPolicyRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -249,12 +285,16 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/faq'
     | '/how-to-use'
     | '/login'
+    | '/privacy-policy'
     | '/products'
     | '/reset-password'
     | '/returns'
     | '/reusable-pen-difference'
+    | '/shipping-policy'
+    | '/terms-of-service'
     | '/admin'
     | '/auth/callback'
     | '/blog/$slug'
@@ -275,12 +315,16 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/faq'
     | '/how-to-use'
     | '/login'
+    | '/privacy-policy'
     | '/products'
     | '/reset-password'
     | '/returns'
     | '/reusable-pen-difference'
+    | '/shipping-policy'
+    | '/terms-of-service'
     | '/auth/callback'
     | '/blog/$slug'
     | '/products/$slug'
@@ -301,12 +345,16 @@ export interface FileRouteTypes {
     | '/cart'
     | '/checkout'
     | '/contact'
+    | '/faq'
     | '/how-to-use'
     | '/login'
+    | '/privacy-policy'
     | '/products'
     | '/reset-password'
     | '/returns'
     | '/reusable-pen-difference'
+    | '/shipping-policy'
+    | '/terms-of-service'
     | '/_admin/admin'
     | '/auth/callback'
     | '/blog/$slug'
@@ -329,17 +377,35 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
   HowToUseRoute: typeof HowToUseRoute
   LoginRoute: typeof LoginRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ProductsRoute: typeof ProductsRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   ReturnsRoute: typeof ReturnsRoute
   ReusablePenDifferenceRoute: typeof ReusablePenDifferenceRoute
+  ShippingPolicyRoute: typeof ShippingPolicyRoute
+  TermsOfServiceRoute: typeof TermsOfServiceRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms-of-service': {
+      id: '/terms-of-service'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service'
+      preLoaderRoute: typeof TermsOfServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shipping-policy': {
+      id: '/shipping-policy'
+      path: '/shipping-policy'
+      fullPath: '/shipping-policy'
+      preLoaderRoute: typeof ShippingPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reusable-pen-difference': {
       id: '/reusable-pen-difference'
       path: '/reusable-pen-difference'
@@ -368,6 +434,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -380,6 +453,13 @@ declare module '@tanstack/react-router' {
       path: '/how-to-use'
       fullPath: '/how-to-use'
       preLoaderRoute: typeof HowToUseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -592,12 +672,16 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
   HowToUseRoute: HowToUseRoute,
   LoginRoute: LoginRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   ProductsRoute: ProductsRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   ReturnsRoute: ReturnsRoute,
   ReusablePenDifferenceRoute: ReusablePenDifferenceRoute,
+  ShippingPolicyRoute: ShippingPolicyRoute,
+  TermsOfServiceRoute: TermsOfServiceRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport

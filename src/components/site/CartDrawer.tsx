@@ -34,7 +34,7 @@ export function CartDrawer() {
                 <div className="text-[10px] uppercase tracking-luxury text-gold">
                   Your Selection
                 </div>
-                <h3 className="font-display text-2xl mt-1">Atelier Cart</h3>
+                <h3 className="font-display text-2xl mt-1">GXZ Cart</h3>
               </div>
               <button
                 onClick={close}
@@ -50,7 +50,7 @@ export function CartDrawer() {
                 <div className="h-full flex flex-col items-center justify-center text-center">
                   <div className="font-display text-3xl text-gold/80">Empty</div>
                   <p className="mt-2 text-sm text-muted-foreground max-w-xs">
-                    Your atelier cart awaits its first treasure.
+                    Your cart is ready when you are. Explore the collection to begin.
                   </p>
                   <Link
                     to="/products"
